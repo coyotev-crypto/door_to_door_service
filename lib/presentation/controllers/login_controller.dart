@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/models/user_model.dart';
 import '../../core/utils/toast_util.dart';
+import '../../core/services/auth_service.dart';
 
 class LoginController extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
+  final AuthService _authService = AuthService.instance;
 
   // 表单状态
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -123,14 +124,11 @@ class LoginController extends ChangeNotifier {
         throw Exception(result.message ?? '登录失败');
       }
 
-      // 保存Token
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', result.token ?? '');
-
-      // 保存Token过期时间
-      if (result.expire != null) {
-        await prefs.setString('tokenExpire', result.expire!);
-      }
+      // Token已在auth_repository中保存，更新AuthService登录状态
+      await _authService.login(
+        token: result.token!,
+        expireSeconds: result.expire,
+      );
 
       if (context.mounted) {
         // 登录成功,跳转到首页

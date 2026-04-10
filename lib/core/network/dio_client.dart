@@ -2,10 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import '../utils/log_util.dart';
+import '../services/token_service.dart';
 
 class DioClient {
   static DioClient? _instance;
   late Dio _dio;
+  final TokenService _tokenService = TokenService.instance;
+  bool _isRefreshing = false;
 
   DioClient._internal() {
     _dio = Dio(BaseOptions(
@@ -66,7 +69,7 @@ class DioClient {
         }
         return handler.next(response);
       },
-      onError: (error, handler) {
+      onError: (error, handler) async {
         // 使用LogUtil打印错误信息
         LogUtil.networkError(
           url: error.requestOptions.uri.toString(),
@@ -74,10 +77,40 @@ class DioClient {
           statusCode: error.response?.statusCode,
         );
 
-        // 处理错误
+        // 处理401错误
         if (error.response?.statusCode == 401) {
-          // Token过期，需要重新登录
-          // TODO: 跳转到登录页
+          // 检查是否正在刷新Token
+          if (_isRefreshing) {
+            // 如果正在刷新，将请求加入队列
+            // TODO: 实现请求队列
+            return handler.next(error);
+          }
+
+          // 开始刷新Token
+          _isRefreshing = true;
+
+          try {
+            // 检查刷新Token是否有效
+            final refreshToken = await _tokenService.getRefreshToken();
+            if (refreshToken == null || await _tokenService.isRefreshTokenExpired()) {
+              // 刷新Token无效，清除所有Token
+              await _tokenService.clearToken();
+              // TODO: 跳转到登录页
+              return handler.next(error);
+            }
+
+            // TODO: 调用刷新Token接口
+            // 这里需要实现刷新Token的逻辑
+            // 暂时清除Token并跳转到登录页
+            await _tokenService.clearToken();
+            // TODO: 跳转到登录页
+          } catch (e) {
+            LogUtil.e('刷新Token失败: $e');
+            await _tokenService.clearToken();
+            // TODO: 跳转到登录页
+          } finally {
+            _isRefreshing = false;
+          }
         }
         return handler.next(error);
       },

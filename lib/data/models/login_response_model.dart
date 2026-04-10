@@ -1,5 +1,3 @@
-import 'user_model.dart';
-
 class LoginResponseModel {
   final int code;
   final String? token;
