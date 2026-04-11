@@ -1,6 +1,52 @@
 import 'package:flutter/material.dart';
+import '../../data/repositories/agreement_repository.dart';
+import '../../data/models/agreement_model.dart';
 
 class PrivacyPolicyController extends ChangeNotifier {
+  final AgreementRepository _agreementRepository = AgreementRepository();
+
   // 隐私政策内容
-  String get policyContent => "1. 信息收集\n1.1 我们收集的信息包括：手机号码、位置信息、订单信息、支付信息等。\n1.2 我们收集这些信息是为了提供更好的服务体验和保障交易安全。\n\n2. 信息使用\n2.1 您的手机号码用于账号注册、登录和接收服务通知。\n2.2 位置信息用于推荐附近的服务者和计算服务距离。\n2.3 订单信息用于服务预约、支付和售后。\n2.4 支付信息用于完成交易和开具发票。\n\n3. 信息共享\n3.1 未经您的同意，我们不会向任何第三方共享您的个人信息。\n3.2 我们可能与服务者共享必要的信息以完成服务。\n3.3 法律法规要求的情况下，我们可能向政府机构提供信息。\n\n4. 信息存储\n4.1 我们采用安全措施保护您的个人信息。\n4.2 我们只在必要的时间内保留您的个人信息。\n4.3 您可以要求删除您的个人信息。\n\n5. Cookie使用\n5.1 我们使用Cookie来改善用户体验。\n5.2 您可以通过浏览器设置管理Cookie。\n\n6. 儿童隐私\n6.1 我们的服务不面向14岁以下的儿童。\n6.2 如果发现我们收集了儿童的个人信息，将立即删除。\n\n7. 隐私政策变更\n我们可能不时更新本隐私政策。更新后的政策将在应用内公布。\n\n8. 联系我们\n如果您对本隐私政策有任何疑问，请通过以下方式联系我们：\n邮箱：support@doortodoorservice.com\n电话：400-XXX-XXXX\n\n本隐私政策自发布之日起生效。";
+  String get policyContent => _agreement?.content ?? '';
+
+  // 协议模型
+  AgreementModel? _agreement;
+
+  // 是否正在加载
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  // 错误信息
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  /// 加载隐私政策
+  Future<void> loadPrivacyPolicy({String? version}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _agreement = await _agreementRepository.getPrivacyPolicy(version: version);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString();
+      // 如果加载失败，使用默认内容
+      _agreement = AgreementModel(
+        id: 0,
+        type: 'privacy',
+        version: '1.0.0',
+        title: '隐私政策',
+        content: getDefaultPolicyContent(),
+        isCurrent: true,
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// 获取默认隐私政策内容
+  String getDefaultPolicyContent() {
+    return "1. 信息收集\n1.1 我们收集的信息包括：手机号码、位置信息、订单信息、支付信息等。\n1.2 我们收集这些信息是为了提供更好的服务体验和保障交易安全。\n\n2. 信息使用\n2.1 您的手机号码用于账号注册、登录和接收服务通知。\n2.2 位置信息用于推荐附近的服务者和计算服务距离。\n2.3 订单信息用于服务预约、支付和售后。\n2.4 支付信息用于完成交易和开具发票。\n\n3. 信息共享\n3.1 未经您的同意，我们不会向任何第三方共享您的个人信息。\n3.2 我们可能与服务者共享必要的信息以完成服务。\n3.3 法律法规要求的情况下，我们可能向政府机构提供信息。\n\n4. 信息存储\n4.1 我们采用安全措施保护您的个人信息。\n4.2 我们只在必要的时间内保留您的个人信息。\n4.3 您可以要求删除您的个人信息。\n\n5. Cookie使用\n5.1 我们使用Cookie来改善用户体验。\n5.2 您可以通过浏览器设置管理Cookie。\n\n6. 儿童隐私\n6.1 我们的服务不面向14岁以下的儿童。\n6.2 如果发现我们收集了儿童的个人信息，将立即删除。\n\n7. 隐私政策变更\n我们可能不时更新本隐私政策。更新后的政策将在应用内公布。\n\n8. 联系我们\n如果您对本隐私政策有任何疑问，请通过以下方式联系我们：\n邮箱：support@doortodoorservice.com\n电话：400-XXX-XXXX\n\n本隐私政策自发布之日起生效。";
+  }
 }

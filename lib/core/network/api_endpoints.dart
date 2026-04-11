@@ -53,4 +53,15 @@ class ApiEndpoints {
 
   /// 获取服务详情
   static const String getServiceDetail = '/service/detail';
+
+  // ========== 协议相关 ==========
+
+  /// 获取用户协议
+  static const String getUserAgreement = '/agreement/user';
+
+  /// 获取隐私政策
+  static const String getPrivacyPolicy = '/agreement/privacy';
+
+  /// 获取协议版本列表
+  static const String getAgreementVersions = '/agreement/versions';
 }
