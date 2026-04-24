@@ -17,7 +17,19 @@ dependencies:
   dio: ^5.4.0
   flutter_screenutil: ^5.9.3
   flutter_html: ^3.0.0-beta.2
-
+  # 声网聊天SDK
+  agora_chat_sdk: ^1.3.3
+  fluttertoast: ^8.2.2
+  city_pickers: ^1.3.0
+  easy_refresh: ^3.3.2
+  # 百度定位SDK
+  flutter_bmflocation: ^3.8.4
+  # 权限处理
+  permission_handler: ^11.0.1
+  # 百度地图SDK
+  flutter_baidu_mapapi_map: 3.9.9
+  # UUID生成器
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:

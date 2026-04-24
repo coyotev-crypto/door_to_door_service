@@ -7,7 +7,7 @@ class ApiConfig {
   /// API基础URL
   /// 开发环境: http://localhost:8080
   /// 生产环境: 请修改为实际的生产环境地址
-  static const String baseUrl = 'http://172.18.0.1:8000/api/v1';
+  static const String baseUrl = 'http://192.168.1.7:8000/api/v1';
 
   /// 连接超时时间（秒）
   static const int connectTimeout = 30;

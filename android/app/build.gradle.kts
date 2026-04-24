@@ -5,10 +5,32 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force use of AndroidX instead of old Support Library
+        force("androidx.core:core:1.13.1")
+        force("androidx.core:core-ktx:1.13.1")
+
+        // Exclude all old Android Support Library modules
+        eachDependency {
+            if (requested.group == "com.android.support") {
+                useTarget("androidx.${requested.name}:${requested.version}")
+            }
+        }
+
+        // Explicitly exclude old Support Library
+        exclude(group = "com.android.support", module = "support-compat")
+        exclude(group = "com.android.support", module = "support-core-utils")
+        exclude(group = "com.android.support", module = "support-core-ui")
+        exclude(group = "com.android.support", module = "support-fragment")
+        exclude(group = "com.android.support", module = "support-media-compat")
+    }
+}
+
 android {
-    namespace = "com.example.door_to_door_service"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    namespace = "com.doortodoor.service"
+    compileSdk = 36
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -21,13 +43,17 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.door_to_door_service"
+        applicationId = "com.doortodoor.service"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
+        }
     }
 
     buildTypes {
@@ -35,6 +61,12 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 }

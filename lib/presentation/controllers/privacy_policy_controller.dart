@@ -1,37 +1,55 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../data/repositories/agreement_repository.dart';
 import '../../data/models/agreement_model.dart';
 
-class PrivacyPolicyController extends ChangeNotifier {
+/// 隐私政策控制器
+class PrivacyPolicyController extends GetxController {
+  static PrivacyPolicyController get to => Get.find();
+
   final AgreementRepository _agreementRepository = AgreementRepository();
 
-  // 隐私政策内容
-  String get policyContent => _agreement?.content ?? '';
+  @override
+  void onInit() {
+    super.onInit();
+    // 初始化时加载隐私政策
+    loadPrivacyPolicy();
+  }
 
   // 协议模型
-  AgreementModel? _agreement;
+  final Rx<AgreementModel?> _agreement = Rx<AgreementModel?>(null);
 
   // 是否正在加载
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  final RxBool _isLoading = false.obs;
 
   // 错误信息
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
+  final RxString _errorMessage = ''.obs;
+
+  /// 隐私政策内容
+  String get policyContent => _agreement.value?.content ?? '';
+
+  /// 协议模型
+  AgreementModel? get agreement => _agreement.value;
+
+  /// 是否正在加载
+  bool get isLoading => _isLoading.value;
+
+  /// 错误信息
+  String? get errorMessage => _errorMessage.value.isEmpty ? null : _errorMessage.value;
 
   /// 加载隐私政策
+  /// [version] 协议版本号
   Future<void> loadPrivacyPolicy({String? version}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _isLoading.value = true;
+    _errorMessage.value = '';
 
     try {
-      _agreement = await _agreementRepository.getPrivacyPolicy(version: version);
-      _errorMessage = null;
+      _agreement.value =
+          await _agreementRepository.getPrivacyPolicy(version: version);
+      _errorMessage.value = '';
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage.value = e.toString();
       // 如果加载失败，使用默认内容
-      _agreement = AgreementModel(
+      _agreement.value = AgreementModel(
         id: 0,
         type: 'privacy',
         version: '1.0.0',
@@ -40,8 +58,7 @@ class PrivacyPolicyController extends ChangeNotifier {
         isCurrent: true,
       );
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _isLoading.value = false;
     }
   }
 

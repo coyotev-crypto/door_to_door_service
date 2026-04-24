@@ -26,7 +26,7 @@ class BaseResponse<T> {
   }) {
     return BaseResponse<T>(
       code: json['code'] as int? ?? -1,
-      message: json['message'] as String? ?? '',
+      message: json['msg'] as String? ?? json['message'] as String? ?? '',
       data: dataParser != null && json['data'] != null
           ? dataParser(json['data'])
           : json['data'] as T?,

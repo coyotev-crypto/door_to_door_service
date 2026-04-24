@@ -4,23 +4,11 @@ import 'package:get/get.dart';
 import '../controllers/user_agreement_controller.dart';
 import '../../core/utils/screen_adapter.dart';
 
-class UserAgreementScreen extends StatefulWidget {
+/// 用户协议页面
+///
+/// 用于展示应用的用户协议内容，支持HTML格式的内容展示
+class UserAgreementScreen extends GetWidget<UserAgreementController> {
   const UserAgreementScreen({super.key});
-
-  @override
-  State<UserAgreementScreen> createState() => _UserAgreementScreenState();
-}
-
-class _UserAgreementScreenState extends State<UserAgreementScreen> {
-  late final UserAgreementController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = Get.put(UserAgreementController());
-    // 加载用户协议
-    _controller.loadUserAgreement();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +17,44 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       appBar: AppBar(
         title: Text('用户协议', style: TextStyle(fontSize: 18.sp)),
       ),
-      body: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          if (_controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Obx(() {
+        // 显示加载状态
+        if (controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '用户协议',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
+        // 显示用户协议内容
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '用户协议',
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Html(
+                data: controller.agreementContent,
+                style: {
+                  "body": Style(
+                    fontSize: FontSize(14.sp),
+                    lineHeight: const LineHeight(1.5),
+                    margin: Margins.zero,
+                    padding: HtmlPaddings.zero,
                   ),
-                ),
-                SizedBox(height: 20.h),
-                Html(
-                  data: _controller.agreementContent,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                  "p": Style(
+                    margin: Margins.only(bottom: 10.h),
+                  ),
+                },
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

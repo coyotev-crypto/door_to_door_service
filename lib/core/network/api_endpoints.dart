@@ -54,6 +54,17 @@ class ApiEndpoints {
   /// 获取服务详情
   static const String getServiceDetail = '/service/detail';
 
+  /// 更新服务
+  static const String updateService = '/service/{id}';
+
+  // ========== 分类相关 ==========
+
+  /// 获取分类列表
+  static const String getCategories = '/service-category';
+
+  /// 获取分类服务数量
+  static const String getCategoryServiceCount = '/category-service-count';
+
   // ========== 协议相关 ==========
 
   /// 获取用户协议

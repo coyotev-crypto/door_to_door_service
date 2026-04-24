@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:door_to_door_service/routes/route_names.dart';
+import 'package:door_to_door_service/core/services/auth_service.dart';
+import 'package:get/get.dart' as GetX;
 import '../config/api_config.dart';
 import '../utils/log_util.dart';
 import '../services/token_service.dart';
@@ -8,7 +11,9 @@ class DioClient {
   static DioClient? _instance;
   late Dio _dio;
   final TokenService _tokenService = TokenService.instance;
-  bool _isRefreshing = false;
+
+  // 存储每个请求的CancelToken，key为请求的唯一标识
+  final Map<String, CancelToken> _cancelTokens = {};
 
   DioClient._internal() {
     _dio = Dio(BaseOptions(
@@ -31,8 +36,7 @@ class DioClient {
         );
 
         // 添加token到请求头
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
+        final token = await _tokenService.getToken();
         if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -70,47 +74,25 @@ class DioClient {
         return handler.next(response);
       },
       onError: (error, handler) async {
-        // 使用LogUtil打印错误信息
-        LogUtil.networkError(
-          url: error.requestOptions.uri.toString(),
-          error: error.message ?? '未知错误',
-          statusCode: error.response?.statusCode,
-        );
+        // 如果是取消请求，不打印错误日志
+        if (error.type != DioExceptionType.cancel) {
+          // 使用LogUtil打印错误信息
+          LogUtil.networkError(
+            url: error.requestOptions.uri.toString(),
+            error: error.message ?? '未知错误',
+            statusCode: error.response?.statusCode,
+          );
+        }
 
         // 处理401错误
         if (error.response?.statusCode == 401) {
-          // 检查是否正在刷新Token
-          if (_isRefreshing) {
-            // 如果正在刷新，将请求加入队列
-            // TODO: 实现请求队列
-            return handler.next(error);
-          }
+          // 清除Token和用户信息
+          await _tokenService.clearToken();
+          await AuthService.instance.logout();
 
-          // 开始刷新Token
-          _isRefreshing = true;
-
-          try {
-            // 检查刷新Token是否有效
-            final refreshToken = await _tokenService.getRefreshToken();
-            if (refreshToken == null || await _tokenService.isRefreshTokenExpired()) {
-              // 刷新Token无效，清除所有Token
-              await _tokenService.clearToken();
-              // TODO: 跳转到登录页
-              return handler.next(error);
-            }
-
-            // TODO: 调用刷新Token接口
-            // 这里需要实现刷新Token的逻辑
-            // 暂时清除Token并跳转到登录页
-            await _tokenService.clearToken();
-            // TODO: 跳转到登录页
-          } catch (e) {
-            LogUtil.e('刷新Token失败: $e');
-            await _tokenService.clearToken();
-            // TODO: 跳转到登录页
-          } finally {
-            _isRefreshing = false;
-          }
+          // 跳转到登录界面并显示提示
+          GetX.Get.offAllNamed(RouteNames.login);
+          ToastUtil.showWarning('登录失效，请重新登录');
         }
         return handler.next(error);
       },
@@ -124,6 +106,38 @@ class DioClient {
 
   Dio get dio => _dio;
 
+  /// 生成请求的唯一标识
+  String _generateRequestKey(String method, String path,
+      {Map<String, dynamic>? queryParameters, dynamic data}) {
+    // 将参数转换为字符串并排序，确保相同的参数生成相同的key
+    // String paramsKey = '';
+    // if (queryParameters != null && queryParameters.isNotEmpty) {
+    //   final sortedKeys = queryParameters.keys.toList()..sort();
+    //   paramsKey = sortedKeys.map((k) => '$k=${queryParameters[k]}').join('&');
+    // }
+    // if (data != null && data is! FormData) {
+    //   final dataStr = data.toString();
+    //   paramsKey = paramsKey.isEmpty ? dataStr : '$paramsKey&$dataStr';
+    // }
+    // return '${method}_$path${paramsKey.isEmpty ? '' : '?$paramsKey'}';
+    // 只使用path作为请求的唯一标识，不包含参数
+    return '${method}_$path';
+  }
+
+  /// 取消指定key的请求
+  void _cancelRequest(String key) {
+    if (_cancelTokens.containsKey(key)) {
+      LogUtil.d('取消请求: $key', tag: 'DioClient');
+      _cancelTokens[key]?.cancel('请求已取消：新请求已发起');
+      _cancelTokens.remove(key);
+    }
+  }
+
+  /// 清理所有取消令牌
+  void clearCancelTokens() {
+    _cancelTokens.clear();
+  }
+
   // GET请求
   Future<Response> get(
     String path, {
@@ -131,17 +145,50 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
+    bool cancelPrevious = true, // 是否取消之前的相同请求
   }) async {
+    // 生成请求唯一标识
+    final requestKey =
+        _generateRequestKey('GET', path, queryParameters: queryParameters);
+
+    // 如果需要取消之前的请求
+    if (cancelPrevious) {
+      _cancelRequest(requestKey);
+    }
+
+    // 创建新的CancelToken
+    final newCancelToken = CancelToken();
+    _cancelTokens[requestKey] = newCancelToken;
+
+    // 如果外部提供了cancelToken，则合并使用
+    final effectiveCancelToken = cancelToken ?? newCancelToken;
+
     try {
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
+        cancelToken: effectiveCancelToken,
         onReceiveProgress: onReceiveProgress,
       );
+
+      // 请求成功后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
       return response;
+    } on DioException catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
+      // 如果是取消请求，打印日志
+      if (e.type == DioExceptionType.cancel) {
+        LogUtil.d('GET请求已取消: $requestKey', tag: 'DioClient');
+      }
+
+      rethrow;
     } catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
       rethrow;
     }
   }
@@ -155,19 +202,52 @@ class DioClient {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    bool cancelPrevious = true, // 是否取消之前的相同请求
   }) async {
+    // 生成请求唯一标识
+    final requestKey = _generateRequestKey('POST', path,
+        queryParameters: queryParameters, data: data);
+
+    // 如果需要取消之前的请求
+    if (cancelPrevious) {
+      _cancelRequest(requestKey);
+    }
+
+    // 创建新的CancelToken
+    final newCancelToken = CancelToken();
+    _cancelTokens[requestKey] = newCancelToken;
+
+    // 如果外部提供了cancelToken，则合并使用
+    final effectiveCancelToken = cancelToken ?? newCancelToken;
+
     try {
       final response = await _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
+        cancelToken: effectiveCancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+
+      // 请求成功后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
       return response;
+    } on DioException catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
+      // 如果是取消请求，打印日志
+      if (e.type == DioExceptionType.cancel) {
+        LogUtil.d('POST请求已取消: $requestKey', tag: 'DioClient');
+      }
+
+      rethrow;
     } catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
       rethrow;
     }
   }
@@ -181,19 +261,52 @@ class DioClient {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    bool cancelPrevious = true, // 是否取消之前的相同请求
   }) async {
+    // 生成请求唯一标识
+    final requestKey = _generateRequestKey('PUT', path,
+        queryParameters: queryParameters, data: data);
+
+    // 如果需要取消之前的请求
+    if (cancelPrevious) {
+      _cancelRequest(requestKey);
+    }
+
+    // 创建新的CancelToken
+    final newCancelToken = CancelToken();
+    _cancelTokens[requestKey] = newCancelToken;
+
+    // 如果外部提供了cancelToken，则合并使用
+    final effectiveCancelToken = cancelToken ?? newCancelToken;
+
     try {
       final response = await _dio.put(
         path,
         data: data,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
+        cancelToken: effectiveCancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+
+      // 请求成功后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
       return response;
+    } on DioException catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
+      // 如果是取消请求，打印日志
+      if (e.type == DioExceptionType.cancel) {
+        LogUtil.d('PUT请求已取消: $requestKey', tag: 'DioClient');
+      }
+
+      rethrow;
     } catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
       rethrow;
     }
   }
@@ -205,17 +318,50 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
+    bool cancelPrevious = true, // 是否取消之前的相同请求
   }) async {
+    // 生成请求唯一标识
+    final requestKey = _generateRequestKey('DELETE', path,
+        queryParameters: queryParameters, data: data);
+
+    // 如果需要取消之前的请求
+    if (cancelPrevious) {
+      _cancelRequest(requestKey);
+    }
+
+    // 创建新的CancelToken
+    final newCancelToken = CancelToken();
+    _cancelTokens[requestKey] = newCancelToken;
+
+    // 如果外部提供了cancelToken，则合并使用
+    final effectiveCancelToken = cancelToken ?? newCancelToken;
+
     try {
       final response = await _dio.delete(
         path,
         data: data,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
+        cancelToken: effectiveCancelToken,
       );
+
+      // 请求成功后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
       return response;
+    } on DioException catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
+
+      // 如果是取消请求，打印日志
+      if (e.type == DioExceptionType.cancel) {
+        LogUtil.d('DELETE请求已取消: $requestKey', tag: 'DioClient');
+      }
+
+      rethrow;
     } catch (e) {
+      // 请求失败或被取消后移除cancelToken
+      _cancelTokens.remove(requestKey);
       rethrow;
     }
   }

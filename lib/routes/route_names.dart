@@ -16,7 +16,18 @@ class RouteNames {
   static const String profile = '/profile';
   static const String settings = '/settings';
 
+  // 服务相关
+  static const String category = '/category';
+  static const String moreRecommendations = '/more-recommendations';
+  static const String search = '/search';
+
   // 协议相关
   static const String privacyPolicy = '/privacy-policy';
   static const String userAgreement = '/user-agreement';
+
+  // 地址相关
+  static const String addressSelect = '/address/select';
+  static const String addressManage = '/address/manage';
+  static const String addressEdit = '/address/edit';
+  static const String mapSelect = '/map/select';
 }

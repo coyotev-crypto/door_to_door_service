@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/models/user_model.dart';
 import '../../core/utils/toast_util.dart';
 import '../../core/services/auth_service.dart';
 
-class LoginController extends ChangeNotifier {
+/// 登录控制器
+class LoginController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
   final AuthService _authService = AuthService.instance;
 
@@ -16,25 +18,26 @@ class LoginController extends ChangeNotifier {
   final TextEditingController passwordController = TextEditingController();
 
   // UI状态
-  bool agreedToTerms = false;
-  bool isLoading = false;
-  int countdown = 0;
-  bool isPasswordLogin = false; // 登录方式：false=验证码登录, true=密码登录
-  bool isPasswordVisible = false; // 密码可见性：false=隐藏, true=显示
+  final RxBool agreedToTerms = false.obs;
+  final RxBool isLoading = false.obs;
+  final RxInt countdown = 0.obs;
+  final RxBool isPasswordLogin = false.obs; // 登录方式：false=验证码登录, true=密码登录
+  final RxBool isPasswordVisible = false.obs; // 密码可见性：false=隐藏, true=显示
 
   // 用户信息
-  UserModel? userInfo;
+  final Rx<UserModel?> userInfo = Rx<UserModel?>(null);
 
-  // 发送验证码
+  /// 发送验证码
+  /// [context] 上下文
   Future<void> sendVerificationCode(BuildContext context) async {
     if (phoneController.text.length != 11) {
-      ToastUtil.showError(context, '请输入正确的手机号');
+      ToastUtil.showError('请输入正确的手机号');
       return;
     }
 
     // 检查是否同意用户协议
-    if (!agreedToTerms) {
-      ToastUtil.showError(context, '请先同意用户协议和隐私政策');
+    if (!agreedToTerms.value) {
+      ToastUtil.showError('请先同意用户协议和隐私政策');
       return;
     }
 
@@ -44,72 +47,70 @@ class LoginController extends ChangeNotifier {
         type: '2', // 2-登录
       );
 
-      countdown = 60;
-      notifyListeners();
+      countdown.value = 60;
       _startCountdown();
-      ToastUtil.showSuccess(context, '验证码已发送');
+      ToastUtil.showSuccess('验证码已发送');
     } on DioException catch (e) {
-      ToastUtil.showError(context, e.message ?? '发送验证码失败');
+      ToastUtil.showError(e.message ?? '发送验证码失败');
     }
   }
 
-  // 开始倒计时
+  /// 开始倒计时
   void _startCountdown() {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
-      if (countdown > 0) {
-        countdown--;
-        notifyListeners();
+      if (countdown.value > 0) {
+        countdown.value--;
       }
-      return countdown > 0;
+      return countdown.value > 0;
     });
   }
 
-  // 登录/注册
+  /// 登录/注册
+  /// [context] 上下文
   Future<void> handleLogin(BuildContext context) async {
     // 验证手机号
     if (phoneController.text.isEmpty) {
-      ToastUtil.showError(context, '请输入手机号');
+      ToastUtil.showError('请输入手机号');
       return;
     }
     if (phoneController.text.length != 11) {
-      ToastUtil.showError(context, '请输入正确的手机号');
+      ToastUtil.showError('请输入正确的手机号');
       return;
     }
 
     // 根据登录方式验证不同的输入
-    if (isPasswordLogin) {
+    if (isPasswordLogin.value) {
       // 密码登录
       if (passwordController.text.isEmpty) {
-        ToastUtil.showError(context, '请输入密码');
+        ToastUtil.showError('请输入密码');
         return;
       }
       if (passwordController.text.length < 6) {
-        ToastUtil.showError(context, '密码长度不能少于6位');
+        ToastUtil.showError('密码长度不能少于6位');
         return;
       }
     } else {
       // 验证码登录
       if (codeController.text.isEmpty) {
-        ToastUtil.showError(context, '请输入验证码');
+        ToastUtil.showError('请输入验证码');
         return;
       }
       if (codeController.text.length != 6) {
-        ToastUtil.showError(context, '请输入6位验证码');
+        ToastUtil.showError('请输入6位验证码');
         return;
       }
     }
 
-    if (!agreedToTerms) {
-      ToastUtil.showError(context, '请先同意用户协议');
+    if (!agreedToTerms.value) {
+      ToastUtil.showError('请先同意用户协议');
       return;
     }
 
-    isLoading = true;
-    notifyListeners();
+    isLoading.value = true;
 
     try {
-      final result = isPasswordLogin
+      final result = isPasswordLogin.value
           ? await _authRepository.loginByPassword(
               phoneNumber: phoneController.text,
               password: passwordController.text,
@@ -135,38 +136,35 @@ class LoginController extends ChangeNotifier {
         Navigator.pushReplacementNamed(context, '/');
       }
     } on DioException catch (e) {
-      ToastUtil.showError(context, e.message ?? '登录失败');
-      isLoading = false;
-      notifyListeners();
+      ToastUtil.showError(e.message ?? '登录失败');
+      isLoading.value = false;
     }
   }
 
-  // 更新协议同意状态
+  /// 更新协议同意状态
+  /// [value] 是否同意
   void updateAgreement(bool value) {
-    agreedToTerms = value;
-    notifyListeners();
+    agreedToTerms.value = value;
   }
 
-  // 切换登录方式
+  /// 切换登录方式
   void toggleLoginType() {
-    isPasswordLogin = !isPasswordLogin;
+    isPasswordLogin.value = !isPasswordLogin.value;
     // 清空输入框
     codeController.clear();
     passwordController.clear();
-    notifyListeners();
   }
 
-  // 切换密码可见性
+  /// 切换密码可见性
   void togglePasswordVisibility() {
-    isPasswordVisible = !isPasswordVisible;
-    notifyListeners();
+    isPasswordVisible.value = !isPasswordVisible.value;
   }
 
   @override
-  void dispose() {
+  void onClose() {
     phoneController.dispose();
     codeController.dispose();
     passwordController.dispose();
-    super.dispose();
+    super.onClose();
   }
 }
