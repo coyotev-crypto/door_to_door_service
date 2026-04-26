@@ -180,9 +180,14 @@ class DioClient {
       // 请求失败或被取消后移除cancelToken
       _cancelTokens.remove(requestKey);
 
-      // 如果是取消请求，打印日志
+      // 如果是取消请求，打印日志但不抛出异常
       if (e.type == DioExceptionType.cancel) {
         LogUtil.d('GET请求已取消: $requestKey', tag: 'DioClient');
+        return Response(
+          requestOptions: e.requestOptions,
+          statusCode: 499, // 使用499表示客户端关闭请求
+          statusMessage: '请求已取消',
+        );
       }
 
       rethrow;
@@ -239,9 +244,14 @@ class DioClient {
       // 请求失败或被取消后移除cancelToken
       _cancelTokens.remove(requestKey);
 
-      // 如果是取消请求，打印日志
+      // 如果是取消请求，打印日志但不抛出异常
       if (e.type == DioExceptionType.cancel) {
         LogUtil.d('POST请求已取消: $requestKey', tag: 'DioClient');
+        return Response(
+          requestOptions: e.requestOptions,
+          statusCode: 499, // 使用499表示客户端关闭请求
+          statusMessage: '请求已取消',
+        );
       }
 
       rethrow;
@@ -298,9 +308,14 @@ class DioClient {
       // 请求失败或被取消后移除cancelToken
       _cancelTokens.remove(requestKey);
 
-      // 如果是取消请求，打印日志
+      // 如果是取消请求，打印日志但不抛出异常
       if (e.type == DioExceptionType.cancel) {
         LogUtil.d('PUT请求已取消: $requestKey', tag: 'DioClient');
+        return Response(
+          requestOptions: e.requestOptions,
+          statusCode: 499, // 使用499表示客户端关闭请求
+          statusMessage: '请求已取消',
+        );
       }
 
       rethrow;
@@ -353,9 +368,14 @@ class DioClient {
       // 请求失败或被取消后移除cancelToken
       _cancelTokens.remove(requestKey);
 
-      // 如果是取消请求，打印日志
+      // 如果是取消请求，打印日志但不抛出异常
       if (e.type == DioExceptionType.cancel) {
         LogUtil.d('DELETE请求已取消: $requestKey', tag: 'DioClient');
+        return Response(
+          requestOptions: e.requestOptions,
+          statusCode: 499, // 使用499表示客户端关闭请求
+          statusMessage: '请求已取消',
+        );
       }
 
       rethrow;
@@ -391,6 +411,17 @@ class DioClient {
         options: options,
       );
       return response;
+    } on DioException catch (e) {
+      // 如果是取消请求，打印日志但不抛出异常
+      if (e.type == DioExceptionType.cancel) {
+        LogUtil.d('下载请求已取消: $urlPath', tag: 'DioClient');
+        return Response(
+          requestOptions: e.requestOptions,
+          statusCode: 499, // 使用499表示客户端关闭请求
+          statusMessage: '请求已取消',
+        );
+      }
+      rethrow;
     } catch (e) {
       rethrow;
     }

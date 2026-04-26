@@ -166,6 +166,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.9.9"
+  flutter_baidu_mapapi_search:
+    dependency: "direct main"
+    description:
+      name: flutter_baidu_mapapi_search
+      sha256: "4a87ac7a4ba99fc3a44b7306ad382cb035b4d1bb62b7c62bf57dbebf5ea2b706"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.9.9"
+  flutter_baidu_mapapi_utils:
+    dependency: "direct main"
+    description:
+      name: flutter_baidu_mapapi_utils
+      sha256: c82b985fea33ea7dce0ef9c474c597bde7c8e02e4495d69428d6d2787413c4b3
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.9.9"
   flutter_bmflocation:
     dependency: "direct main"
     description:

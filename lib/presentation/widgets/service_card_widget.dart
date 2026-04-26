@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/models/service_item.dart';
+import '../../data/models/service_item.dart';
 
 /// 服务卡片 Widget
 class ServiceCardWidget extends StatelessWidget {

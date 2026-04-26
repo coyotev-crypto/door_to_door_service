@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import '../../core/models/service_item.dart';
+import '../../data/models/service_item.dart';
 import '../../data/repositories/service_repository.dart';
-import '../../core/models/sort_option.dart';
-import '../../core/models/filter_option.dart';
+import '../../data/models/sort_option.dart';
 
 /// 更多推荐页面控制器
 /// 管理更多推荐页面的状态和业务逻辑
@@ -45,9 +44,6 @@ class MoreRecommendationsController extends GetxController {
       ServiceSortOption.comprehensive.obs;
   final RxBool _isAscending = false.obs;
 
-  // 筛选选项
-  final Rx<ServiceFilterOption> _filterOption = ServiceFilterOption().obs;
-
   final ServiceRepository _serviceRepository = ServiceRepository();
 
   /// 服务列表
@@ -85,9 +81,6 @@ class MoreRecommendationsController extends GetxController {
 
   /// 是否升序排序
   bool get isAscending => _isAscending.value;
-
-  /// 获取当前筛选选项
-  ServiceFilterOption get filterOption => _filterOption.value;
 
   @override
   void onInit() {
@@ -201,11 +194,6 @@ class MoreRecommendationsController extends GetxController {
         // 综合排序不设置特定字段
         break;
     }
-  }
-
-  /// 设置筛选选项
-  void setFilterOption(ServiceFilterOption option) {
-    _filterOption.value = option;
   }
 
   /// 处理城市变化

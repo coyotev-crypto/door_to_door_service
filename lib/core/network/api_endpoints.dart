@@ -75,4 +75,21 @@ class ApiEndpoints {
 
   /// 获取协议版本列表
   static const String getAgreementVersions = '/agreement/versions';
+
+  // ========== 地址相关 ==========
+
+  /// 获取地址列表
+  static const String getAddressList = '/address/list';
+
+  /// 创建地址
+  static const String createAddress = '/address';
+
+  /// 更新地址
+  static const String updateAddress = '/address/{id}';
+
+  /// 删除地址
+  static const String deleteAddress = '/address/{id}';
+
+  /// 设置默认地址
+  static const String setDefaultAddress = '/address/{id}/default';
 }

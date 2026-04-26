@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import '../../core/models/category_item.dart';
-import '../../core/models/service_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/models/category_item.dart';
+import '../../data/models/service_item.dart';
 import '../../data/repositories/category_repository.dart';
 import 'service_controller.dart';
 
@@ -109,7 +108,6 @@ class HomeContentController extends GetxController {
     _isInitialized.value = true;
   }
 
-
   /// 加载服务分类数据
   Future<void> _loadCategories() async {
     if (_isLoadingCategories.value) return;
@@ -167,8 +165,6 @@ class HomeContentController extends GetxController {
     // 重新加载服务列表
     loadServices();
   }
-
-
 
   /// 加载服务列表
   Future<void> loadServices() async {

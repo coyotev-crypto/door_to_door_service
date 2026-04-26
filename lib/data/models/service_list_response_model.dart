@@ -1,5 +1,5 @@
 import '../../core/network/base_response.dart';
-import '../../core/models/service_item.dart';
+import 'service_item.dart';
 
 /// 服务列表响应模型
 class ServiceListResponseModel extends BaseResponse {

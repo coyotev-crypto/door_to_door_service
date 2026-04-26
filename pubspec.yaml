@@ -28,6 +28,8 @@ dependencies:
   permission_handler: ^11.0.1
   # 百度地图SDK
   flutter_baidu_mapapi_map: 3.9.9
+  flutter_baidu_mapapi_utils: 3.9.9
+  flutter_baidu_mapapi_search: 3.9.9
   # UUID生成器
   uuid: ^4.0.0
 
@@ -39,3 +41,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - resources/

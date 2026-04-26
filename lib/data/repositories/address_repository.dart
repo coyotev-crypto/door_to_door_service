@@ -1,110 +1,121 @@
+import 'dart:ffi';
 
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:door_to_door_service/core/models/address_model.dart';
+import 'package:door_to_door_service/data/models/address_model.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:door_to_door_service/core/network/dio_client.dart';
+import 'package:door_to_door_service/core/network/api_endpoints.dart';
+import 'package:door_to_door_service/core/network/base_response.dart';
 
 /// 地址仓库
-/// 
+///
 /// 负责地址数据的增删改查操作，包括本地存储和网络请求
 class AddressRepository {
   static const String _tag = 'AddressRepository';
-  static const String _addressesKey = 'user_addresses';
-  static const String _selectedAddressIdKey = 'selected_address_id';
 
-  /// 获取所有地址列表
-  Future<List<AddressModel>> getAddresses() async {
+  /// 从服务器获取地址列表，支持分页、筛选、排序
+  Future<List<AddressModel>> getAddressListFromServer({
+    String? userId,
+    String? province,
+    String? city,
+    String? district,
+    bool? isDefault,
+    int pageSize = 20,
+    int pageIndex = 1,
+  }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final addressesJson = prefs.getString(_addressesKey);
+      // 构建查询参数
+      final Map<String, dynamic> queryParams = {
+        'pageSize': pageSize,
+        'pageIndex': pageIndex,
+      };
 
-      if (addressesJson == null || addressesJson.isEmpty) {
-        // 返回默认的模拟数据
-        return _getMockAddresses();
+      // 添加可选参数
+      if (userId != null && userId.isNotEmpty) {
+        queryParams['userId'] = userId;
+      }
+      if (province != null && province.isNotEmpty) {
+        queryParams['province'] = province;
+      }
+      if (city != null && city.isNotEmpty) {
+        queryParams['city'] = city;
+      }
+      if (district != null && district.isNotEmpty) {
+        queryParams['district'] = district;
+      }
+      if (isDefault != null) {
+        queryParams['isDefault'] = isDefault;
       }
 
-      final List<dynamic> jsonList = json.decode(addressesJson);
-      return jsonList
-          .map((json) => AddressModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      LogUtil.e('获取地址列表失败: $e', tag: _tag);
-      // 发生错误时返回模拟数据
-      return _getMockAddresses();
-    }
-  }
-
-  /// 保存地址列表
-  Future<void> saveAddresses(List<AddressModel> addresses) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final addressesJson = json.encode(
-        addresses.map((address) => address.toJson()).toList(),
+      // 发送请求
+      final response = await DioClient.instance.get(
+        ApiEndpoints.getAddressList,
+        queryParameters: queryParams,
       );
-      await prefs.setString(_addressesKey, addressesJson);
-      LogUtil.d('保存地址列表成功，共 ${addresses.length} 条', tag: _tag);
-    } catch (e) {
-      LogUtil.e('保存地址列表失败: $e', tag: _tag);
-      rethrow;
-    }
-  }
 
-  /// 获取选中的地址
-  Future<AddressModel?> getSelectedAddress() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final selectedId = prefs.getString(_selectedAddressIdKey);
+      // 解析响应
+      if (response.statusCode == 200 && response.data != null) {
+        final baseResponse = BaseResponse.fromJson(
+          response.data as Map<String, dynamic>,
+          dataParser: (data) {
+            if (data is Map<String, dynamic> && data.containsKey('list')) {
+              // 如果返回的数据包含list字段，解析list
+              final list = data['list'] as List<dynamic>;
+              return list
+                  .map((item) =>
+                      AddressModel.fromJson(item as Map<String, dynamic>))
+                  .toList();
+            } else if (data is List) {
+              // 如果返回的数据本身就是列表，直接解析
+              return data
+                  .map((item) =>
+                      AddressModel.fromJson(item as Map<String, dynamic>))
+                  .toList();
+            }
+            return <AddressModel>[];
+          },
+        );
 
-      if (selectedId == null || selectedId.isEmpty) {
-        return null;
+        if (baseResponse.isSuccess && baseResponse.data != null) {
+          return baseResponse.data as List<AddressModel>;
+        }
       }
 
-      final addresses = await getAddresses();
-      try {
-        return addresses.firstWhere((address) => address.id == selectedId);
-      } catch (e) {
-        return null;
-      }
+      // 请求失败或数据格式不正确，返回空列表
+      LogUtil.e('获取地址列表失败: ${response.data}', tag: _tag);
+      return <AddressModel>[];
     } catch (e) {
-      LogUtil.e('获取选中地址失败: $e', tag: _tag);
-      return null;
-    }
-  }
-
-  /// 设置选中的地址
-  Future<void> setSelectedAddress(String addressId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_selectedAddressIdKey, addressId);
-      LogUtil.d('设置选中地址: $addressId', tag: _tag);
-    } catch (e) {
-      LogUtil.e('设置选中地址失败: $e', tag: _tag);
-      rethrow;
+      LogUtil.e('获取地址列表异常: $e', tag: _tag);
+      // 发生异常时返回空列表
+      return <AddressModel>[];
     }
   }
 
   /// 添加地址
-  Future<AddressModel> addAddress(AddressModel address) async {
+  Future<void> addAddress(AddressModel address) async {
     try {
-      final addresses = await getAddresses();
+      // 发送请求到服务器
+      final response = await DioClient.instance.post(
+        ApiEndpoints.createAddress,
+        data: address.toJson(),
+      );
 
-      // 如果设置为默认地址，先取消其他默认地址
-      if (address.isDefault) {
-        addresses.forEach((a) => a.copyWith(isDefault: false));
+      // 解析响应
+      if (response.statusCode == 200 && response.data != null) {
+        final baseResponse = BaseResponse.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+
+        if (baseResponse.isSuccess) {
+          LogUtil.d('添加地址成功: ${address.name}', tag: _tag);
+          return;
+        }
       }
 
-      addresses.add(address);
-      await saveAddresses(addresses);
-
-      // 如果是默认地址，设置为选中地址
-      if (address.isDefault) {
-        await setSelectedAddress(address.id);
-      }
-
-      LogUtil.d('添加地址成功: ${address.name}', tag: _tag);
-      return address;
+      // 请求失败或数据格式不正确
+      LogUtil.e('添加地址失败: ${response.data}', tag: _tag);
+      throw Exception('添加地址失败');
     } catch (e) {
-      LogUtil.e('添加地址失败: $e', tag: _tag);
+      LogUtil.e('添加地址异常: $e', tag: _tag);
       rethrow;
     }
   }
@@ -112,120 +123,97 @@ class AddressRepository {
   /// 更新地址
   Future<AddressModel> updateAddress(AddressModel address) async {
     try {
-      final addresses = await getAddresses();
-      final index = addresses.indexWhere((a) => a.id == address.id);
+      // 发送请求到服务器
+      final response = await DioClient.instance.put(
+        ApiEndpoints.updateAddress.replaceAll('{id}', address.id.toString()),
+        data: address.toJson(),
+      );
 
-      if (index == -1) {
-        throw Exception('地址不存在');
+      // 解析响应
+      if (response.statusCode == 200 && response.data != null) {
+        final baseResponse = BaseResponse.fromJson(
+          response.data as Map<String, dynamic>,
+          dataParser: (data) {
+            if (data is Map<String, dynamic>) {
+              return AddressModel.fromJson(data);
+            }
+            // 如果返回的data只是一个ID而不是完整对象，返回null
+            return null;
+          },
+        );
+
+        // 检查响应是否成功
+        if (baseResponse.isSuccess) {
+          LogUtil.d('更新地址成功: ${address.name}', tag: _tag);
+          // 如果服务器返回的是完整的地址对象，则使用返回的对象
+          // 如果服务器返回的只是ID或其他标识，则使用传入的address对象
+          return baseResponse.data ?? address;
+        }
       }
-
-      // 如果设置为默认地址，先取消其他默认地址
-      if (address.isDefault) {
-        addresses.forEach((a) => a.copyWith(isDefault: false));
-      }
-
-      addresses[index] = address;
-      await saveAddresses(addresses);
-
-      // 如果是默认地址，设置为选中地址
-      if (address.isDefault) {
-        await setSelectedAddress(address.id);
-      }
-
-      LogUtil.d('更新地址成功: ${address.name}', tag: _tag);
-      return address;
+      // 请求失败或数据格式不正确
+      LogUtil.e('更新地址失败: ${response.data}', tag: _tag);
+      throw Exception('更新地址失败');
     } catch (e) {
-      LogUtil.e('更新地址失败: $e', tag: _tag);
+      LogUtil.e('更新地址异常: $e', tag: _tag);
       rethrow;
     }
   }
 
   /// 删除地址
-  Future<void> deleteAddress(String addressId) async {
+  Future<void> deleteAddress(int addressId) async {
     try {
-      final addresses = await getAddresses();
-      addresses.removeWhere((a) => a.id == addressId);
-      await saveAddresses(addresses);
+      // 发送请求到服务器
+      final response = await DioClient.instance.delete(
+        ApiEndpoints.deleteAddress.replaceAll('{id}', addressId.toString()),
+      );
 
-      // 如果删除的是选中的地址，清除选中状态
-      final selectedAddress = await getSelectedAddress();
-      if (selectedAddress?.id == addressId) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.remove(_selectedAddressIdKey);
+      // 解析响应
+      if (response.statusCode == 200 && response.data != null) {
+        final baseResponse = BaseResponse.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+
+        if (baseResponse.isSuccess) {
+          LogUtil.d('删除地址成功: $addressId', tag: _tag);
+          return;
+        }
       }
 
-      LogUtil.d('删除地址成功: $addressId', tag: _tag);
+      // 请求失败或数据格式不正确
+      LogUtil.e('删除地址失败: ${response.data}', tag: _tag);
+      throw Exception('删除地址失败');
     } catch (e) {
-      LogUtil.e('删除地址失败: $e', tag: _tag);
+      LogUtil.e('删除地址异常: $e', tag: _tag);
       rethrow;
     }
   }
 
   /// 设置默认地址
-  Future<void> setDefaultAddress(String addressId) async {
+  Future<void> setDefaultAddress(int addressId) async {
     try {
-      final addresses = await getAddresses();
+      // 发送请求到服务器
+      final response = await DioClient.instance.put(
+        ApiEndpoints.setDefaultAddress.replaceAll('{id}', addressId.toString()),
+      );
 
-      // 取消所有默认地址
-      final updatedAddresses = addresses.map((a) {
-        return a.copyWith(isDefault: a.id == addressId);
-      }).toList();
+      // 解析响应
+      if (response.statusCode == 200 && response.data != null) {
+        final baseResponse = BaseResponse.fromJson(
+          response.data as Map<String, dynamic>,
+        );
 
-      await saveAddresses(updatedAddresses);
-      await setSelectedAddress(addressId);
+        if (baseResponse.isSuccess) {
+          LogUtil.d('设置默认地址成功: $addressId', tag: _tag);
+          return;
+        }
+      }
 
-      LogUtil.d('设置默认地址成功: $addressId', tag: _tag);
+      // 请求失败或数据格式不正确
+      LogUtil.e('设置默认地址失败: ${response.data}', tag: _tag);
+      throw Exception('设置默认地址失败');
     } catch (e) {
-      LogUtil.e('设置默认地址失败: $e', tag: _tag);
+      LogUtil.e('设置默认地址异常: $e', tag: _tag);
       rethrow;
     }
-  }
-
-  /// 获取模拟地址数据
-  List<AddressModel> _getMockAddresses() {
-    return [
-      AddressModel(
-        id: '1',
-        name: '北京市朝阳区建国路88号SOHO现代城A座',
-        shortName: 'SOHO现代城A座',
-        province: '北京市',
-        city: '北京市',
-        district: '朝阳区',
-        street: '建国路88号SOHO现代城A座',
-        latitude: 39.908823,
-        longitude: 116.397470,
-        isDefault: true,
-        contactName: '张三',
-        contactPhone: '13800138000',
-      ),
-      AddressModel(
-        id: '2',
-        name: '北京市海淀区中关村大街1号',
-        shortName: '中关村大街1号',
-        province: '北京市',
-        city: '北京市',
-        district: '海淀区',
-        street: '中关村大街1号',
-        latitude: 39.982345,
-        longitude: 116.318567,
-        isDefault: false,
-        contactName: '李四',
-        contactPhone: '13900139000',
-      ),
-      AddressModel(
-        id: '3',
-        name: '北京市东城区王府井大街255号',
-        shortName: '王府井大街255号',
-        province: '北京市',
-        city: '北京市',
-        district: '东城区',
-        street: '王府井大街255号',
-        latitude: 39.915678,
-        longitude: 116.412345,
-        isDefault: false,
-        contactName: '王五',
-        contactPhone: '13700137000',
-      ),
-    ];
   }
 }

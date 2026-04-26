@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/models/category_item.dart';
+import '../../data/models/category_item.dart';
 
 /// 分类筛选导航栏 Widget
 class CategoryFilterBarWidget extends StatelessWidget {

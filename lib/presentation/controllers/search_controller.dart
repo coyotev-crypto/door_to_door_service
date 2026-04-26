@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/models/service_item.dart';
+import '../../data/models/service_item.dart';
 import 'service_controller.dart';
 
 /// 搜索控制器

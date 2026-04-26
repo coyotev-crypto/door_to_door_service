@@ -1,10 +1,9 @@
-
 /// 地址数据模型
-/// 
+///
 /// 用于存储和管理用户地址信息，包括收货人、联系方式、详细地址等
 class AddressModel {
   /// 地址唯一标识
-  final String id;
+  final int id;
 
   /// 完整地址名称
   final String name;
@@ -40,7 +39,7 @@ class AddressModel {
   final String? contactPhone;
 
   AddressModel({
-    required this.id,
+    this.id = 0,
     required this.name,
     required this.shortName,
     required this.province,
@@ -57,7 +56,7 @@ class AddressModel {
   /// 从 JSON 创建 AddressModel 实例
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
-      id: json['id'] as String? ?? '',
+      id: json['id'] as int? ?? 0,
       name: json['name'] as String? ?? '',
       shortName: json['shortName'] as String? ?? '',
       province: json['province'] as String? ?? '',
@@ -92,7 +91,7 @@ class AddressModel {
 
   /// 创建副本并修改部分字段
   AddressModel copyWith({
-    String? id,
+    int? id,
     String? name,
     String? shortName,
     String? province,

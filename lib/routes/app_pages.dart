@@ -1,4 +1,5 @@
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
 import 'package:get/get.dart';
 import 'route_names.dart';
@@ -99,6 +100,7 @@ class AppPages {
     GetPage(
       name: RouteNames.mapSelect,
       page: () => const MapSelectScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => MapSelectController())),
     ),
   ];
 }
