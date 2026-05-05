@@ -22,7 +22,7 @@ class LoginResponseModel {
       currentAuthority: json['currentAuthority']?.toString(),
       expire: json['expire']?.toString(),
       success: json['success'] as bool?,
-      message: json['message']?.toString(),
+      message: json['msg']?.toString(),
     );
   }
 
@@ -33,7 +33,7 @@ class LoginResponseModel {
       'currentAuthority': currentAuthority,
       'expire': expire,
       'success': success,
-      'message': message,
+      'msg': message,
     };
   }
 

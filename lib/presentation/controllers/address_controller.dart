@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:get/get.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
@@ -182,6 +181,7 @@ class AddressController extends GetxController {
   }
 
   /// 刷新数据
+  @override
   Future<void> refresh() async {
     await _loadAddresses();
   }

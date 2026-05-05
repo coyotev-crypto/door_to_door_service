@@ -1,6 +1,7 @@
-import '../../core/config/api_config.dart';
+import '../../core/config/app_config.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_endpoints.dart';
+import '../../core/network/base_response.dart';
 import '../../core/services/token_service.dart';
 import '../models/login_response_model.dart';
 import '../models/sms_response_model.dart';
@@ -21,7 +22,7 @@ class AuthRepository {
       data: {
         'phoneNumber': phoneNumber,
         'type': type,
-        'templateCode': ApiConfig.smsTemplateCode
+        'templateCode': AppConfig.smsTemplateCode
       },
     );
 
@@ -167,6 +168,32 @@ class AuthRepository {
     } finally {
       // 无论接口调用成功与否，都清除本地Token
       await _tokenService.clearToken();
+    }
+  }
+
+  /// 验证码重置密码
+  /// [phone] 手机号
+  /// [code] 短信验证码
+  /// [newPassword] 新密码
+  Future<BaseResponse> resetPasswordWithCode({
+    required String phone,
+    required String code,
+    required String newPassword,
+  }) async {
+    final response = await _dioClient.post(
+      ApiEndpoints.resetPasswordWithCode,
+      data: {
+        'phone': phone,
+        'code': code,
+        'newPassword': newPassword,
+      },
+    );
+
+    final responseData = response.data;
+    if (responseData is Map<String, dynamic>) {
+      return BaseResponse.fromJson(responseData);
+    } else {
+      throw Exception('重置密码失败: 响应数据格式不正确');
     }
   }
 }

@@ -32,10 +32,6 @@ class MessageController extends GetxController {
   // 当前用户ID
   String? get currentUserId => ChatClient.getInstance.currentUserId;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onClose() {

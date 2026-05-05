@@ -91,10 +91,12 @@ class NewcomerRecommendationWidget extends StatelessWidget {
                   )
                 : ListView.builder(
                     scrollDirection: Axis.horizontal,
+                    cacheExtent: 5 * 180.w, // 缓存5个item的宽度
                     itemCount: services.length,
                     itemBuilder: (context, index) {
                       final service = services[index];
-                      return GestureDetector(
+                      return RepaintBoundary(
+                        child: GestureDetector(
                         onTap: () => onServiceTap?.call(service),
                         child: Container(
                           width: 180.w,
@@ -283,6 +285,7 @@ class NewcomerRecommendationWidget extends StatelessWidget {
                             ],
                           ),
                         ),
+                      ),
                       );
                     },
                   ),

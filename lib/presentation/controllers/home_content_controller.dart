@@ -105,6 +105,9 @@ class HomeContentController extends GetxController {
       _loadCategories(),
     ]);
 
+    // 加载服务列表
+    await loadServices();
+
     _isInitialized.value = true;
   }
 
@@ -164,6 +167,8 @@ class HomeContentController extends GetxController {
     _selectedCategoryIndex.value = index;
     // 重新加载服务列表
     loadServices();
+    // 更新分类UI
+    update(['category']);
   }
 
   /// 加载服务列表
@@ -257,5 +262,26 @@ class HomeContentController extends GetxController {
     _searchKeyword.value = null;
     _serviceController.clearSearch();
     loadServices();
+  }
+
+  /// 更新服务收藏状态
+  /// [serviceId] 服务ID
+  /// [isFavorite] 是否收藏
+  void updateServiceFavorite(int serviceId, bool isFavorite) {
+    // 更新服务列表中的收藏状态
+    final index = _services.indexWhere((service) => service.id == serviceId);
+    if (index != -1) {
+      _services[index] = _services[index].copyWith(isFavorite: isFavorite);
+      // 触发列表更新
+      _services.refresh();
+    }
+
+    // 更新新人推荐列表中的收藏状态
+    final newcomerIndex = _newcomerServices.indexWhere((service) => service.id == serviceId);
+    if (newcomerIndex != -1) {
+      _newcomerServices[newcomerIndex] = _newcomerServices[newcomerIndex].copyWith(isFavorite: isFavorite);
+      // 触发列表更新
+      _newcomerServices.refresh();
+    }
   }
 }

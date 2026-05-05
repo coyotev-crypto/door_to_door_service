@@ -1,6 +1,9 @@
 /// 网络请求响应基类
 /// 统一处理API响应数据格式
 class BaseResponse<T> {
+  /// 请求ID
+  final String? requestId;
+
   /// 响应码
   final int code;
 
@@ -14,6 +17,7 @@ class BaseResponse<T> {
   bool get isSuccess => code == 200;
 
   BaseResponse({
+    this.requestId,
     required this.code,
     required this.message,
     this.data,
@@ -25,6 +29,7 @@ class BaseResponse<T> {
     T Function(dynamic)? dataParser,
   }) {
     return BaseResponse<T>(
+      requestId: json['requestId']?.toString(),
       code: json['code'] as int? ?? -1,
       message: json['msg'] as String? ?? json['message'] as String? ?? '',
       data: dataParser != null && json['data'] != null
@@ -36,6 +41,7 @@ class BaseResponse<T> {
   /// 转换为JSON
   Map<String, dynamic> toJson() {
     return {
+      'requestId': requestId,
       'code': code,
       'message': message,
       'data': data,
@@ -69,6 +75,6 @@ class BaseResponse<T> {
 
   @override
   String toString() {
-    return 'BaseResponse{code: $code, message: $message, data: $data}';
+    return 'BaseResponse{requestId: $requestId, code: $code, message: $message, data: $data}';
   }
 }

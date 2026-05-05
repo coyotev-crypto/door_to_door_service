@@ -32,6 +32,10 @@ dependencies:
   flutter_baidu_mapapi_search: 3.9.9
   # UUID生成器
   uuid: ^4.0.0
+  # 图片选择器
+  image_picker: ^1.0.4
+  # 图片上传
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:

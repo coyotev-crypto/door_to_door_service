@@ -1,21 +1,34 @@
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/profile_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/provider_qualification_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/favorite_controller.dart';
 import 'package:get/get.dart';
 import 'route_names.dart';
 import '../presentation/screens/splash_screen.dart';
-import '../presentation/screens/login_screen.dart';
+import '../presentation/screens/auth/login_screen.dart';
+import '../presentation/screens/account/forgot_password_screen.dart';
 import '../presentation/screens/home_screen.dart';
-import '../presentation/screens/profile_screen.dart';
+import '../presentation/screens/account/profile_edit_screen.dart';
+import '../presentation/screens/provider/provider_join_page.dart';
+import '../presentation/screens/provider/provider_qualification_page.dart';
 import '../presentation/screens/settings_screen.dart';
-import '../presentation/screens/privacy_policy_screen.dart';
-import '../presentation/screens/user_agreement_screen.dart';
-import '../presentation/screens/more_recommendations_screen.dart';
-import '../presentation/screens/search_screen.dart';
-import '../presentation/screens/address_select_screen.dart';
-import '../presentation/screens/address_manage_screen.dart';
-import '../presentation/screens/address_edit_screen.dart';
-import '../presentation/screens/map_select_screen.dart';
+import '../presentation/screens/agreement/privacy_policy_screen.dart';
+import '../presentation/screens/agreement/user_agreement_screen.dart';
+import '../presentation/screens/server/more_recommendations_screen.dart';
+import '../presentation/screens/server/search_screen.dart';
+import '../presentation/screens/server/favorite_list_screen.dart';
+import '../presentation/screens/address/address_select_screen.dart';
+import '../presentation/screens/address/address_manage_screen.dart';
+import '../presentation/screens/address/address_edit_screen.dart';
+import '../presentation/screens/address/map_select_screen.dart';
+import '../presentation/screens/account/account_security_screen.dart';
+import '../presentation/screens/account/change_password_screen.dart';
+import '../presentation/screens/account/set_payment_password_screen.dart';
+import '../presentation/screens/account/change_phone_screen.dart';
+import '../presentation/screens/account/login_devices_screen.dart';
+import '../presentation/screens/account/delete_account_screen.dart';
 import '../presentation/controllers/login_controller.dart';
 import '../presentation/controllers/privacy_policy_controller.dart';
 import '../presentation/controllers/user_agreement_controller.dart';
@@ -24,6 +37,7 @@ import '../presentation/controllers/message_controller.dart';
 import '../presentation/controllers/more_recommendations_controller.dart';
 import '../presentation/controllers/search_controller.dart';
 import '../presentation/controllers/address_controller.dart';
+import '../presentation/controllers/account_security_controller.dart';
 import '../core/services/agora_chat_service.dart';
 
 class AppPages {
@@ -40,19 +54,21 @@ class AppPages {
       binding: BindingsBuilder(() => Get.lazyPut(() => LoginController())),
     ),
     GetPage(
+      name: RouteNames.forgotPassword,
+      page: () => const ForgotPasswordScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => LoginController())),
+    ),
+    GetPage(
       name: RouteNames.home,
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() => [
             Get.lazyPut(() => HomeController()),
             Get.lazyPut(() => MessageController()),
             Get.lazyPut(() => ServiceController()),
+            Get.lazyPut(() => ProfileController()),
             Get.lazyPut(() => HomeContentController()),
             Get.put(() => AgoraChatService()),
           ]),
-    ),
-    GetPage(
-      name: RouteNames.profile,
-      page: () => const ProfileScreen(),
     ),
     GetPage(
       name: RouteNames.settings,
@@ -81,6 +97,11 @@ class AppPages {
       page: () => const SearchScreen(),
       binding: BindingsBuilder(() => Get.lazyPut(() => SearchController())),
     ),
+    GetPage(
+      name: RouteNames.favorites,
+      page: () => const FavoriteListScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => FavoriteController())),
+    ),
     // 地址相关路由
     GetPage(
       name: RouteNames.addressSelect,
@@ -101,6 +122,60 @@ class AppPages {
       name: RouteNames.mapSelect,
       page: () => const MapSelectScreen(),
       binding: BindingsBuilder(() => Get.lazyPut(() => MapSelectController())),
+    ),
+    GetPage(
+      name: RouteNames.profileEdit,
+      page: () => const ProfileEditScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => ProfileController())),
+    ),
+    // 入驻相关路由
+    GetPage(
+      name: RouteNames.providerJoin,
+      page: () => ProviderJoinPage(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => ProfileController())),
+    ),
+    GetPage(
+      name: RouteNames.providerQualification,
+      page: () => const ProviderQualificationPage(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => ProviderQualificationController())),
+    ),
+
+    // 账户安全相关路由
+    GetPage(
+      name: RouteNames.accountSecurity,
+      page: () => const AccountSecurityScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+    ),
+    GetPage(
+      name: RouteNames.changePassword,
+      page: () => const ChangePasswordScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+    ),
+    GetPage(
+      name: RouteNames.setPaymentPassword,
+      page: () => const SetPaymentPasswordScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+    ),
+    GetPage(
+      name: RouteNames.changePhone,
+      page: () => const ChangePhoneScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+    ),
+    GetPage(
+      name: RouteNames.loginDevices,
+      page: () => const LoginDevicesScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+    ),
+    GetPage(
+      name: RouteNames.deleteAccount,
+      page: () => const DeleteAccountScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
     ),
   ];
 }

@@ -1,11 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/token_service.dart';
+import '../utils/log_util.dart';
 import '../../data/models/user_model.dart';
 
 /// 认证服务
 /// 管理用户登录状态、用户信息等
-class AuthService extends ChangeNotifier {
+class AuthService extends GetxService {
   final TokenService _tokenService = TokenService.instance;
+
+  // 本地存储键名
+  static const String _userKey = 'user_info';
 
   /// 单例模式
   static AuthService? _instance;
@@ -16,30 +21,133 @@ class AuthService extends ChangeNotifier {
 
   AuthService._internal();
   // 用户信息
-  UserModel? _user;
+  final Rx<UserModel?> _user = Rx<UserModel?>(null);
 
   // 登录状态
-  bool _isLoggedIn = false;
+  final RxBool _isLoggedIn = false.obs;
 
   // 是否正在登录
-  bool _isLoggingIn = false;
+  final RxBool _isLoggingIn = false.obs;
+
+  /// 获取用户信息响应式变量
+  Rx<UserModel?> get userRx {
+    return _user;
+  }
+
+  /// 获取登录状态响应式变量
+  RxBool get isLoggedInRx {
+    return _isLoggedIn;
+  }
 
   /// 获取用户信息
-  UserModel? get user => _user;
+  UserModel? get user => _user.value;
 
   /// 是否已登录
-  bool get isLoggedIn => _isLoggedIn;
+  bool get isLoggedIn => _isLoggedIn.value;
 
   /// 是否正在登录
-  bool get isLoggingIn => _isLoggingIn;
+  bool get isLoggingIn => _isLoggingIn.value;
 
   /// 初始化认证服务
   Future<void> initialize() async {
-    _isLoggedIn = await _tokenService.isLoggedIn();
-    if (_isLoggedIn) {
-      // TODO: 从本地存储加载用户信息
+    _isLoggedIn.value = await _tokenService.isLoggedIn();
+    if (_isLoggedIn.value) {
+      await _loadUserInfoFromLocal();
     }
-    notifyListeners();
+  }
+
+  /// 从本地存储加载用户信息
+  Future<void> _loadUserInfoFromLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString(_userKey);
+
+      if (userJson != null && userJson.isNotEmpty) {
+        // 这里需要将JSON字符串转换为Map，再转换为UserModel
+        // 由于SharedPreferences只能存储基本类型，我们需要手动处理
+        // 假设我们存储的是JSON字符串
+        final Map<String, dynamic> userData = {
+          'id': prefs.getString('$_userKey.id') ?? '',
+          'phoneNumber': prefs.getString('$_userKey.phoneNumber') ?? '',
+          'nickname': prefs.getString('$_userKey.nickname'),
+          'avatar': prefs.getString('$_userKey.avatar'),
+          'email': prefs.getString('$_userKey.email'),
+          'gender': prefs.getString('$_userKey.gender'),
+          'remark': prefs.getString('$_userKey.remark'),
+          'realName': prefs.getString('$_userKey.realName'),
+          'idCardNumber': prefs.getString('$_userKey.idCardNumber'),
+          'realNameAuthStatus': prefs.getString('$_userKey.realNameAuthStatus'),
+          'idCardFrontImageUrl':
+              prefs.getString('$_userKey.idCardFrontImageUrl'),
+          'idCardBackImageUrl': prefs.getString('$_userKey.idCardBackImageUrl'),
+          'createdAt': prefs.getString('$_userKey.createdAt'),
+          'updatedAt': prefs.getString('$_userKey.updatedAt'),
+        };
+
+        _user.value = UserModel.fromJson(userData);
+        LogUtil.d('用户信息加载成功: ${_user.value?.phoneNumber}');
+      }
+    } catch (e) {
+      LogUtil.e('加载用户信息失败: $e');
+    }
+  }
+
+  /// 保存用户信息到本地存储
+  Future<void> _saveUserInfoToLocal(UserModel user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.setString('$_userKey.id', user.id);
+      await prefs.setString('$_userKey.phoneNumber', user.phoneNumber);
+      if (user.nickname != null) {
+        await prefs.setString('$_userKey.nickname', user.nickname!);
+      }
+      if (user.avatar != null) {
+        await prefs.setString('$_userKey.avatar', user.avatar!);
+      }
+      if (user.email != null) {
+        await prefs.setString('$_userKey.email', user.email!);
+      }
+      if (user.gender != null) {
+        await prefs.setString('$_userKey.gender', user.gender!);
+      }
+      if (user.remark != null) {
+        await prefs.setString('$_userKey.remark', user.remark!);
+      }
+      if (user.createdAt != null) {
+        await prefs.setString(
+            '$_userKey.createdAt', user.createdAt!.toIso8601String());
+      }
+      if (user.updatedAt != null) {
+        await prefs.setString(
+            '$_userKey.updatedAt', user.updatedAt!.toIso8601String());
+      }
+
+      LogUtil.d('用户信息保存成功: ${user.phoneNumber}');
+    } catch (e) {
+      LogUtil.e('保存用户信息失败: $e');
+    }
+  }
+
+  /// 清除本地存储的用户信息
+  Future<void> _clearUserInfoFromLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.remove('$_userKey.id');
+      await prefs.remove('$_userKey.phoneNumber');
+      await prefs.remove('$_userKey.nickname');
+      await prefs.remove('$_userKey.avatar');
+      await prefs.remove('$_userKey.email');
+      await prefs.remove('$_userKey.gender');
+      await prefs.remove('$_userKey.remark');
+      await prefs.remove('$_userKey.createdAt');
+      await prefs.remove('$_userKey.updatedAt');
+
+      LogUtil.d('用户信息清除成功');
+    } catch (e) {
+      LogUtil.e('清除用户信息失败: $e');
+    }
   }
 
   /// 登录成功
@@ -51,8 +159,7 @@ class AuthService extends ChangeNotifier {
     UserModel? user,
   }) async {
     try {
-      _isLoggingIn = true;
-      notifyListeners();
+      _isLoggingIn.value = true;
 
       // 保存Token
       final saved = await _tokenService.saveToken(
@@ -63,9 +170,14 @@ class AuthService extends ChangeNotifier {
       );
 
       if (saved) {
-        _isLoggedIn = true;
-        _user = user;
-        notifyListeners();
+        _isLoggedIn.value = true;
+        _user.value = user;
+
+        // 保存用户信息到本地存储
+        if (user != null) {
+          await _saveUserInfoToLocal(user);
+        }
+
         return true;
       }
 
@@ -73,8 +185,7 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       return false;
     } finally {
-      _isLoggingIn = false;
-      notifyListeners();
+      _isLoggingIn.value = false;
     }
   }
 
@@ -84,10 +195,12 @@ class AuthService extends ChangeNotifier {
       // 清除Token
       await _tokenService.clearToken();
 
+      // 清除本地存储的用户信息
+      await _clearUserInfoFromLocal();
+
       // 清除用户信息
-      _user = null;
-      _isLoggedIn = false;
-      notifyListeners();
+      _user.value = null;
+      _isLoggedIn.value = false;
 
       return true;
     } catch (e) {
@@ -115,8 +228,10 @@ class AuthService extends ChangeNotifier {
   }
 
   /// 更新用户信息
-  void updateUser(UserModel user) {
-    _user = user;
-    notifyListeners();
+  Future<void> updateUser(UserModel user) async {
+    _user.value = user;
+
+    // 同步更新到本地存储
+    await _saveUserInfoToLocal(user);
   }
 }

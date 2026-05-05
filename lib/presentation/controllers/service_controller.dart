@@ -126,6 +126,7 @@ class ServiceController extends GetxController {
   /// [keyword] 搜索关键词
   /// [latitude] 用户纬度（可选，不传则使用当前用户位置）
   /// [longitude] 用户经度（可选，不传则使用当前用户位置）
+  /// [radius] 搜索半径，默认为20.0
   Future<void> loadServices({
     bool refresh = false,
     int? categoryId,
@@ -137,6 +138,7 @@ class ServiceController extends GetxController {
     String? keyword,
     double? latitude,
     double? longitude,
+    double radius = 20.0,
   }) async {
     // 如果是刷新，重置页码
     LogUtil.d(
@@ -172,6 +174,7 @@ class ServiceController extends GetxController {
         keyword: _searchKeyword.value,
         latitude: useLatitude,
         longitude: useLongitude,
+        radius: radius,
       );
 
       if (refresh) {
@@ -250,7 +253,6 @@ class ServiceController extends GetxController {
   }) async {
     _userLatitude.value = latitude;
     _userLongitude.value = longitude;
-    LogUtil.d('设置用户位置: 纬度=$latitude, 经度=$longitude', tag: _tag);
     if (refresh) {
       await refreshServices();
     }
@@ -271,7 +273,6 @@ class ServiceController extends GetxController {
   void _initLocationCallback() {
     // 设置位置更新回调
     _locationService.onLocationUpdated = (latitude, longitude) {
-      LogUtil.d('收到位置更新回调: 纬度=$latitude, 经度=$longitude', tag: _tag);
       setUserLocation(
         latitude: latitude,
         longitude: longitude,
@@ -298,9 +299,12 @@ class ServiceController extends GetxController {
   /// 切换收藏状态
   /// [serviceId] 服务ID
   /// [isFavorite] 是否收藏
-  Future<void> toggleFavorite(int serviceId, bool isFavorite) async {
+  Future<void> toggleFavorite(
+    int serviceId,
+    bool isFavorite,
+  ) async {
     try {
-      await _serviceRepository.updateService(
+      await _serviceRepository.toggleFavorite(
         serviceId: serviceId,
         isFavorite: isFavorite,
       );
@@ -329,7 +333,6 @@ class ServiceController extends GetxController {
     } catch (e) {
       _errorMessage.value = e.toString();
       ToastUtil.showError('操作失败: $e');
-      rethrow;
     }
   }
 }

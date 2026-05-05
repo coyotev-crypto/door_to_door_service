@@ -57,6 +57,8 @@ class CategoryFilterBarWidget extends StatelessWidget {
                                 isSelected ? FontWeight.w600 : FontWeight.w500,
                             color: isSelected ? Colors.white : Colors.grey[700],
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     );

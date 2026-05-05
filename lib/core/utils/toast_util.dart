@@ -1,71 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class ToastUtil {
   // 显示普通消息
   static void showMessage(
     String message, {
-    Toast toastLength = Toast.LENGTH_SHORT,
-    ToastGravity gravity = ToastGravity.BOTTOM,
-    Color backgroundColor = Colors.black87,
+    Duration duration = const Duration(seconds: 2),
+    SnackPosition snackPosition = SnackPosition.TOP,
     Color textColor = Colors.white,
     double fontSize = 14.0,
   }) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: toastLength,
-      gravity: gravity,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
-      fontSize: fontSize,
+    Get.snackbar(
+      '提示',
+      message,
+      duration: duration,
+      snackPosition: snackPosition,
     );
   }
 
   // 显示错误消息
   static void showError(
     String message, {
-    Toast toastLength = Toast.LENGTH_SHORT,
-    ToastGravity gravity = ToastGravity.BOTTOM,
+    Duration duration = const Duration(seconds: 2),
+    SnackPosition snackPosition = SnackPosition.TOP,
   }) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: toastLength,
-      gravity: gravity,
-      backgroundColor: Colors.red[50],
-      textColor: Colors.red[700],
-      fontSize: 14.0,
+    Get.snackbar(
+      '错误',
+      message,
+      duration: duration,
+      snackPosition: snackPosition,
+      colorText: Colors.red[700],
     );
   }
 
   // 显示成功消息
   static void showSuccess(
     String message, {
-    Toast toastLength = Toast.LENGTH_SHORT,
-    ToastGravity gravity = ToastGravity.BOTTOM,
+    Duration duration = const Duration(seconds: 2),
+    SnackPosition snackPosition = SnackPosition.TOP,
   }) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: toastLength,
-      gravity: gravity,
-      backgroundColor: Colors.green[50],
-      textColor: Colors.green[700],
-      fontSize: 14.0,
+    Get.snackbar(
+      '成功',
+      message,
+      duration: duration,
+      snackPosition: snackPosition,
+      colorText: Colors.green[700],
     );
   }
 
   // 显示警告消息
   static void showWarning(
     String message, {
-    Toast toastLength = Toast.LENGTH_SHORT,
-    ToastGravity gravity = ToastGravity.BOTTOM,
+    Duration duration = const Duration(seconds: 2),
+    SnackPosition snackPosition = SnackPosition.TOP,
   }) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: toastLength,
-      gravity: gravity,
-      backgroundColor: Colors.orange[50],
-      textColor: Colors.orange[700],
-      fontSize: 14.0,
+    Get.snackbar(
+      '警告',
+      message,
+      duration: duration,
+      snackPosition: snackPosition,
+      colorText: Colors.orange[700],
     );
   }
 }

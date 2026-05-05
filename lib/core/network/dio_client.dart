@@ -3,7 +3,7 @@ import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:door_to_door_service/core/services/auth_service.dart';
 import 'package:get/get.dart' as GetX;
-import '../config/api_config.dart';
+import '../config/app_config.dart';
 import '../utils/log_util.dart';
 import '../services/token_service.dart';
 
@@ -17,10 +17,10 @@ class DioClient {
 
   DioClient._internal() {
     _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: const Duration(seconds: ApiConfig.connectTimeout),
-      receiveTimeout: const Duration(seconds: ApiConfig.receiveTimeout),
-      headers: ApiConfig.headers,
+      baseUrl: AppConfig.baseApiUrl,
+      connectTimeout: const Duration(seconds: AppConfig.connectTimeout),
+      receiveTimeout: const Duration(seconds: AppConfig.receiveTimeout),
+      headers: AppConfig.headers,
     ));
 
     // 添加拦截器
@@ -49,6 +49,11 @@ class DioClient {
           statusCode: response.statusCode,
           data: response.data,
         );
+
+        // 如果是取消请求（状态码为499），直接返回响应，不处理
+        if (response.statusCode == 499) {
+          return handler.next(response);
+        }
 
         // 解析响应数据
         if (response.data is Map<String, dynamic>) {

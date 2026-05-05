@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/data/models/service_item.dart';
 import 'package:flutter/material.dart';
 import '../../core/utils/screen_adapter.dart';
 
@@ -191,22 +192,4 @@ class HomeHotServiceWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-class ServiceItem {
-  final String name;
-  final double rating;
-  final double price;
-  final double? originalPrice;
-  final bool isNew;
-  final String? imageUrl;
-
-  ServiceItem({
-    required this.name,
-    required this.rating,
-    required this.price,
-    this.originalPrice,
-    this.isNew = false,
-    this.imageUrl,
-  });
 }

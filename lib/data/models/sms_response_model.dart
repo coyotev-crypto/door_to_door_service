@@ -10,14 +10,14 @@ class SmsResponseModel {
   factory SmsResponseModel.fromJson(Map<String, dynamic> json) {
     return SmsResponseModel(
       code: json['code'] as int? ?? -1,
-      message: json['message']?.toString(),
+      message: json['msg']?.toString(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'code': code,
-      'message': message,
+      'msg': message,
     };
   }
 

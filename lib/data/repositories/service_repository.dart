@@ -1,4 +1,5 @@
 import '../models/service_list_response_model.dart';
+import '../models/favorite_list_response_model.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_endpoints.dart';
 
@@ -23,6 +24,7 @@ class ServiceRepository {
     String? keyword,
     double? latitude,
     double? longitude,
+    double? radius,
   }) async {
     try {
       final queryParams = <String, dynamic>{
@@ -78,6 +80,10 @@ class ServiceRepository {
         queryParams['longitude'] = longitude;
       }
 
+      if (radius != null) {
+        queryParams['radius'] = radius;
+      }
+
       final response = await _dioClient.get(
         ApiEndpoints.getServiceList,
         queryParameters: queryParams,
@@ -88,25 +94,49 @@ class ServiceRepository {
     }
   }
 
-  /// 更新服务
+  /// 切换服务收藏状态
   /// [serviceId] 服务ID
   /// [isFavorite] 是否收藏
-  Future<Map<String, dynamic>> updateService({
+  Future<Map<String, dynamic>> toggleFavorite({
     required int serviceId,
-    bool? isFavorite,
+    required bool isFavorite,
   }) async {
     try {
-      final data = <String, dynamic>{};
-      if (isFavorite != null) {
-        data['isFavorite'] = isFavorite;
+      if (isFavorite) {
+        final response = await _dioClient.post(
+          ApiEndpoints.toggleFavoriteService,
+          data: {'serviceId': serviceId, 'isFavorite': isFavorite},
+        );
+        return response.data as Map<String, dynamic>;
+      } else {
+        final response = await _dioClient.delete(
+          ApiEndpoints.deleteFavoriteService
+              .replaceFirst('{id}', serviceId.toString()),
+        );
+        return response.data as Map<String, dynamic>;
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-      final endpoint = ApiEndpoints.updateService.replaceAll('{id}', serviceId.toString());
-      final response = await _dioClient.put(
-        endpoint,
-        data: data,
+  /// 获取收藏列表
+  Future<FavoriteListResponseModel> getFavorites({
+    required int userId,
+    int pageIndex = 1,
+    int pageSize = 10,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'userId': userId,
+        'pageIndex': pageIndex,
+        'pageSize': pageSize,
+      };
+      final response = await _dioClient.get(
+        ApiEndpoints.getFavorites,
+        queryParameters: queryParams,
       );
-      return response.data as Map<String, dynamic>;
+      return FavoriteListResponseModel.fromJson(response.data);
     } catch (e) {
       rethrow;
     }

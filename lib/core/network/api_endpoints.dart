@@ -27,10 +27,16 @@ class ApiEndpoints {
   // ========== 用户相关 ==========
 
   /// 获取用户信息
-  static const String getUserInfo = '/user/info';
+  static const String getUserInfo = '/user/profile';
 
   /// 更新用户信息
-  static const String updateUserInfo = '/user/update';
+  static const String updateUserInfo = '/user/profile';
+
+  /// 上传图片
+  static const String uploadImage = '/public/uploadFile';
+
+  /// 验证码重置密码
+  static const String resetPasswordWithCode = '/user/pwd/reset-with-code';
 
   // ========== 订单相关 ==========
 
@@ -56,6 +62,13 @@ class ApiEndpoints {
 
   /// 更新服务
   static const String updateService = '/service/{id}';
+
+  static const String toggleFavoriteService = '/service/favorite';
+
+  static const String deleteFavoriteService = '/service/favorite/{id}';
+
+  /// 获取收藏列表
+  static const String getFavorites = '/service/favorite/list';
 
   // ========== 分类相关 ==========
 
@@ -92,4 +105,46 @@ class ApiEndpoints {
 
   /// 设置默认地址
   static const String setDefaultAddress = '/address/{id}/default';
+
+  // ========== 实名认证相关 ==========
+
+  /// 创建实名认证
+  static const String createRealNameAuth = '/real-name-auth';
+
+  /// 获取实名认证信息
+  static const String getRealNameAuth = '/real-name-auth';
+
+  /// 更新实名认证信息
+  static const String updateRealNameAuth = '/real-name-auth';
+
+  // ========== 账户安全相关 ==========
+
+  /// 修改登录密码
+  static const String changePassword = '/user/pwd/set';
+
+  /// 设置支付密码
+  static const String setPaymentPassword = '/user/pay-password/set';
+
+  /// 修改支付密码
+  static const String changePaymentPassword = '/user/payment-password/change';
+
+  /// 验证支付密码
+  static const String verifyPaymentPassword = '/user/payment-password/verify';
+
+  /// 更换手机号
+  static const String changePhoneNumber = '/user/phone/change';
+
+  /// 获取登录设备列表
+  static const String getLoginDevices = '/user/login-devices';
+
+  /// 移除登录设备
+  static const String removeLoginDevice = '/user/login-devices/{id}';
+
+  /// 注销账号
+  static const String deleteAccount = '/user/account';
+
+  // ========== 服务商资质相关 ==========
+
+  /// 提交服务商资质材料
+  static const String submitProviderQualification = '/provider/qualification';
 }

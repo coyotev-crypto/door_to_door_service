@@ -58,19 +58,19 @@ class ScreenAdapter {
 /// 屏幕适配扩展方法
 extension ScreenAdapterExtension on num {
   /// 宽度适配
-  double get w => ScreenAdapter.setWidth(this.toDouble());
+  double get w => ScreenAdapter.setWidth(toDouble());
 
   /// 高度适配
-  double get h => ScreenAdapter.setHeight(this.toDouble());
+  double get h => ScreenAdapter.setHeight(toDouble());
 
   /// 字体适配
-  double get sp => ScreenAdapter.setFont(this.toDouble());
+  double get sp => ScreenAdapter.setFont(toDouble());
 
   /// 半径适配
-  double get r => ScreenAdapter.setRadius(this.toDouble());
+  double get r => ScreenAdapter.setRadius(toDouble());
 
   /// 间距适配
-  double get space => ScreenAdapter.setSpacing(this.toDouble());
+  double get space => ScreenAdapter.setSpacing(toDouble());
 }
 
 /// 屏幕适配上下文扩展

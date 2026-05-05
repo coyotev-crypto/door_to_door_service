@@ -1,54 +1,18 @@
-# Flutter 项目编码规范（DoorToDoorService）
+你是 Flutter 专家，严格遵循以下规范：
 
-你是一个 Flutter 开发专家，请严格遵循以下编码规范生成代码。所有代码必须符合本项目架构、命名、注释等要求。
+架构：lib/{core,data,presentation,routes} 分层
+命名：文件 snake_case，类 PascalCase，变量/方法 camelCase，私有 _开头，常量 camelCase
+导入：Flutter → 第三方 → 项目内部
+顺序：静态 → 实例(私有→公有) → 构造函数 → getter → 公共 → 私有
+注释：类/方法必须 ///，参数说明，复杂逻辑行内
+类型：可空?，必需 required，可选默认值
+异步：async/await，try-catch 处理错误
+状态：GetX 管理，Controller 在 routes 初始化，服务类单例
+UI：StatelessWidget 或 StatefulWidget（私有状态类），ScreenUtil 适配 (w/h/sp)，ToastUtil 替代 Get.snackbar
+网络：Repository + DioClient，请求响应基类BaseResponse, 模型提供 fromJson 并处理空值, 
+通用组件：主要按钮 PrimaryButton ， 表单 PrimaryInputField
+发送验证码：SmsCodeController
+业务：业务逻辑全放到Controll层去实现，保证UI层的整洁。
+生成可运行代码，包含必要 import，注释齐全。
 
-## 1. 项目架构
-项目采用分层架构，代码必须放在对应目录下：
-- `lib/core/`：核心层（模型、网络、服务、配置、工具、主题）
-- `lib/data/`：数据层（数据模型、仓库）
-- `lib/presentation/`：表现层（页面、组件、控制器）
-- `lib/routes/`：路由层（路由配置、路由名常量）
-
-## 2. 命名规范
-- **文件**：小写蛇形命名法，如 `service_item.dart`。
-- **类**：大驼峰命名法，如 `ServiceItem`。
-- **变量/方法**：小驼峰命名法，如 `loadServices`。
-- **私有成员**：以下划线开头，如 `_loadServices`。
-- **常量**：小驼峰命名法，如 `baseUrl`。
-
-## 3. 代码组织
-- **导入顺序**：Flutter/Dart 核心库 → 第三方库 → 项目内部导入（相对路径）。
-- **类成员顺序**：静态成员 → 实例变量（私有在前，公有在后） → 构造函数 → getter → 公共方法 → 私有方法。
-
-## 4. 注释规范
-- 类和方法必须使用 `///` 文档注释。
-- 方法参数注释：说明含义和可能取值。
-- 复杂逻辑添加行内注释。
-
-## 5. 类型与参数
-- 可空类型使用 `?` 标记。
-- 必需参数使用 `required`。
-- 可选参数提供默认值。
-
-## 6. 异步与错误处理
-- 异步方法返回 `Future<T>`，使用 `async/await`。
-- 使用 `try-catch` 捕获异常，打印或处理错误。
-
-## 7. 状态管理
-- 使用 `GEt` 实现状态管理。
-- 服务类使用单例模式（私有构造函数 + `static` 实例）。
-- Controllers使用GetX管理， 在`lib/routes/`初始化Controller。
-
-## 8. UI 组件
-- 无状态组件：`StatelessWidget`，所有字段 `final`。
-- 有状态组件：`StatefulWidget`，私有状态类以 `_` 开头。
-- 使用 `flutter_screenutil` 进行屏幕适配：`100.w`、`100.h`、`18.sp`。
-
-## 9. 网络请求
-- 通过 `Repository` 层调用 `DioClient` 发送请求。
-- 数据模型提供 `fromJson` 工厂方法，并进行类型转换与空值处理。
-
-## 10. 示例要求
-生成代码时，请包含必要的 import 语句（按顺序），添加注释，遵循命名和结构规范。确保代码可以直接复制到项目中运行。
-
-现在请根据以上规范，编写代码。
+现在请根据以上规范，实现以下功能：

@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:door_to_door_service/data/models/address_model.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
