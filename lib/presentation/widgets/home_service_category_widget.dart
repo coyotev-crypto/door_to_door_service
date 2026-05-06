@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/screen_adapter.dart';
+import '../../data/models/category_model.dart';
 
+/// 首页分类推荐组件
 class HomeServiceCategoryWidget extends StatelessWidget {
-  final List<CategoryItem> categories;
+  /// 分类列表
+  final List<CategoryModel> categories;
+
+  /// 分类点击回调
   final Function(int) onCategoryTap;
 
   const HomeServiceCategoryWidget({
@@ -11,6 +16,17 @@ class HomeServiceCategoryWidget extends StatelessWidget {
     required this.onCategoryTap,
   });
 
+  static const _categoryColors = [
+    Color(0xFF4CAF50),
+    Color(0xFF2196F3),
+    Color(0xFFFF9800),
+    Color(0xFF9C27B0),
+    Color(0xFFE91E63),
+    Color(0xFF00BCD4),
+    Color(0xFF8BC34A),
+    Color(0xFF3F51B5),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +34,6 @@ class HomeServiceCategoryWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
@@ -27,37 +42,18 @@ class HomeServiceCategoryWidget extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '新人推荐',
+                      '服务分类',
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(width: 8.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 2.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4.r),
-                      ),
-                      child: Text(
-                        'NEW',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 TextButton(
                   onPressed: () {
-                    // TODO: 跳转到更多推荐页面
+                    // TODO: 跳转到分类页面
                   },
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
@@ -76,8 +72,6 @@ class HomeServiceCategoryWidget extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12.h),
-
-          // 分类网格
           Container(
             height: 200.h,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -91,27 +85,26 @@ class HomeServiceCategoryWidget extends StatelessWidget {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                final color = _categoryColors[index % _categoryColors.length];
                 return GestureDetector(
                   onTap: () => onCategoryTap(index),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // 分类图标
                       Container(
                         width: 56.w,
                         height: 56.w,
                         decoration: BoxDecoration(
-                          color: category.color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                         child: Icon(
-                          category.icon,
-                          color: category.color,
+                          Icons.category_rounded,
+                          color: color,
                           size: 28.sp,
                         ),
                       ),
                       SizedBox(height: 8.h),
-                      // 分类名称
                       Text(
                         category.name,
                         style: TextStyle(
@@ -132,16 +125,4 @@ class HomeServiceCategoryWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-class CategoryItem {
-  final String name;
-  final IconData icon;
-  final Color color;
-
-  CategoryItem({
-    required this.name,
-    required this.icon,
-    required this.color,
-  });
 }

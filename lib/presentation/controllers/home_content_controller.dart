@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import '../../data/models/category_item.dart';
+import '../../data/models/category_model.dart';
 import '../../data/models/service_item.dart';
 import '../../data/repositories/category_repository.dart';
 import 'service_controller.dart';
@@ -14,7 +13,7 @@ class HomeContentController extends GetxController {
 
   // 分类相关状态
   final RxInt _selectedCategoryIndex = 0.obs;
-  final RxList<CategoryItem> _categories = <CategoryItem>[].obs;
+  final RxList<CategoryModel> _categories = <CategoryModel>[].obs;
   final RxBool _isLoadingCategories = false.obs;
   final CategoryRepository _categoryRepository = CategoryRepository();
 
@@ -42,7 +41,7 @@ class HomeContentController extends GetxController {
   RxInt get selectedCategoryIndexObs => _selectedCategoryIndex;
 
   /// 获取分类列表
-  List<CategoryItem> get categories => _categories;
+  List<CategoryModel> get categories => _categories;
 
   /// 是否正在加载分类
   bool get isLoadingCategories => _isLoadingCategories.value;
@@ -121,45 +120,27 @@ class HomeContentController extends GetxController {
       final response = await _categoryRepository.getPrimaryCategories();
 
       if (response.list != null && response.list!.isNotEmpty) {
-        final categories = response.list!;
-
-        // 保留"全部"分类，添加从后端获取的分类
         _categories.clear();
-        _categories.add(CategoryItem(
+        // 添加"全部"占位分类
+        _categories.add(CategoryModel(
+          id: 0,
           name: '全部',
-          icon: Icons.apps_rounded,
-          color: const Color(0xFF4CAF50),
+          parentId: 0,
+          sort: 0,
+          hotValue: 0,
+          serviceCount: 0,
+          status: 1,
+          createTime: DateTime.now(),
+          updateTime: DateTime.now(),
         ));
-
         // 添加后端返回的分类
-        for (var category in categories) {
-          _categories.add(CategoryItem(
-            name: category.name,
-            icon: Icons.category_rounded,
-            color: _getColorForIndex(_categories.length),
-          ));
-        }
+        _categories.addAll(response.list!);
       }
     } catch (e) {
       print('加载服务分类失败: $e');
     } finally {
       _isLoadingCategories.value = false;
     }
-  }
-
-  /// 根据索引获取颜色
-  Color _getColorForIndex(int index) {
-    final colors = [
-      const Color(0xFF4CAF50),
-      const Color(0xFF2196F3),
-      const Color(0xFFFF9800),
-      const Color(0xFF9C27B0),
-      const Color(0xFFE91E63),
-      const Color(0xFF00BCD4),
-      const Color(0xFF8BC34A),
-      const Color(0xFF3F51B5),
-    ];
-    return colors[index % colors.length];
   }
 
   /// 处理分类选择
