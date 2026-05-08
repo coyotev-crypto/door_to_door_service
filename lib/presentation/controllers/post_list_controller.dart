@@ -18,41 +18,44 @@ class PostListController extends GetxController {
 
   int get pageSize => 10;
 
-  @override
-  void onInit() {
-    super.onInit();
-    loadPosts(refresh: true);
-  }
-
-  Future<void> loadPosts({bool refresh = false}) async {
-    if (isLoading.value) return;
-
-    if (refresh) {
-      currentPage.value = 1;
-      hasMore.value = true;
-    }
-
+  /// 下拉刷新
+  Future<void> onRefresh() async {
+    currentPage.value = 1;
+    hasMore.value = true;
     isLoading.value = true;
     try {
       final response = await _repository.getPostList(
-        pageIndex: currentPage.value,
+        pageIndex: 1,
         pageSize: pageSize,
         sortBy: sortBy.value,
       );
-
-      final list = response.list ?? [];
-      if (refresh) {
-        posts.value = list;
-      } else {
-        posts.addAll(list);
-      }
-      hasMore.value = list.length >= pageSize;
-      if (!refresh) currentPage.value++;
+      posts.value = response.list ?? [];
+      hasMore.value = (response.list ?? []).length >= pageSize;
     } catch (e) {
-      LogUtil.e('加载帖子列表失败: $e', tag: _tag);
-      if (refresh) {
-        ToastUtil.showError('加载失败，请重试');
-      }
+      LogUtil.e('刷新帖子列表失败: $e', tag: _tag);
+      ToastUtil.showError('加载失败，请重试');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// 上拉加载更多
+  Future<void> onLoadMore() async {
+    if (isLoading.value || !hasMore.value) return;
+    isLoading.value = true;
+    try {
+      final nextPage = currentPage.value + 1;
+      final response = await _repository.getPostList(
+        pageIndex: nextPage,
+        pageSize: pageSize,
+        sortBy: sortBy.value,
+      );
+      final list = response.list ?? [];
+      posts.addAll(list);
+      hasMore.value = list.length >= pageSize;
+      if (list.isNotEmpty) currentPage.value = nextPage;
+    } catch (e) {
+      LogUtil.e('加载更多失败: $e', tag: _tag);
     } finally {
       isLoading.value = false;
     }
@@ -79,7 +82,10 @@ class PostListController extends GetxController {
     Get.toNamed(RouteNames.postDetail, arguments: post);
   }
 
-  void navigateToCreate() {
-    Get.toNamed(RouteNames.postCreate);
+  Future<void> navigateToCreate() async {
+    final result = await Get.toNamed(RouteNames.postCreate);
+    if (result == true) {
+      onRefresh();
+    }
   }
 }
