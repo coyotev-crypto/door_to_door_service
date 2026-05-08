@@ -133,7 +133,9 @@ class PostCreateController extends GetxController {
 
       if (response.isSuccess) {
         ToastUtil.showSuccess('发布成功');
-        Get.back(result: true);
+        Future.delayed(const Duration(milliseconds: 800), () {
+          Get.back(result: true);
+        });
       }
     } catch (e) {
       LogUtil.e('发布失败: $e', tag: _tag);
