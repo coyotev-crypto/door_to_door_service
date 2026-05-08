@@ -155,28 +155,28 @@ class ApiEndpoints {
   // ========== 社区帖子相关 ==========
 
   /// 帖子列表
-  static const String getPostList = '/post/list';
+  static const String getPostList = '/community-post/list';
 
   /// 帖子详情
-  static const String getPostDetail = '/post/{id}';
+  static const String getPostDetail = '/community-post/{id}';
 
   /// 发布帖子
-  static const String createPost = '/post';
+  static const String createPost = '/community-post';
 
   /// 删除帖子
-  static const String deletePost = '/post/{id}';
+  static const String deletePost = '/community-post/{id}';
 
   /// 帖子点赞
-  static const String togglePostLike = '/post/{id}/like';
+  static const String togglePostLike = '/community-post/{id}/like';
 
   /// 帖子收藏
-  static const String togglePostCollect = '/post/{id}/collect';
+  static const String togglePostCollect = '/community-post/{id}/collect';
 
   /// 评论列表
-  static const String getComments = '/post/{id}/comments';
+  static const String getComments = '/community-post/{id}/comments';
 
   /// 发表评论
-  static const String createComment = '/post/{id}/comments';
+  static const String createComment = '/community-post/{id}/comments';
 
   /// 删除评论
   static const String deleteComment = '/comment/{id}';
