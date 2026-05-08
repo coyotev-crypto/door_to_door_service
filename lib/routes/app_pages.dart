@@ -7,11 +7,17 @@ import 'package:door_to_door_service/presentation/controllers/provider_service_c
 import 'package:door_to_door_service/presentation/controllers/provider_service_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/favorite_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/post_list_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/post_create_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/post_detail_controller.dart';
 import 'package:get/get.dart';
 import 'route_names.dart';
 import '../presentation/screens/splash_screen.dart';
 import '../presentation/screens/auth/login_screen.dart';
 import '../presentation/screens/account/forgot_password_screen.dart';
+import '../presentation/screens/community/post_list_page.dart';
+import '../presentation/screens/community/post_create_page.dart';
+import '../presentation/screens/community/post_detail_page.dart';
 import '../presentation/screens/order/order_create_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/account/profile_edit_screen.dart';
@@ -73,6 +79,7 @@ class AppPages {
             Get.lazyPut(() => ServiceController()),
             Get.lazyPut(() => ProfileController()),
             Get.lazyPut(() => HomeContentController()),
+            Get.lazyPut(() => PostListController()),
             Get.put(() => AgoraChatService()),
           ]),
     ),
@@ -140,6 +147,25 @@ class AppPages {
       page: () => const OrderCreateScreen(),
       binding:
           BindingsBuilder(() => Get.lazyPut(() => OrderController())),
+    ),
+    // 社区相关路由
+    GetPage(
+      name: RouteNames.postList,
+      page: () => const PostListPage(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => PostListController())),
+    ),
+    GetPage(
+      name: RouteNames.postCreate,
+      page: () => const PostCreatePage(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => PostCreateController())),
+    ),
+    GetPage(
+      name: RouteNames.postDetail,
+      page: () => const PostDetailPage(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => PostDetailController())),
     ),
     // 入驻相关路由
     GetPage(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import 'home_content_widget.dart';
+import 'community/post_list_page.dart';
 import '../widgets/home_bottom_nav_widget.dart';
 import 'chat/message_page_widget.dart';
 import 'account/profile_widget.dart';
@@ -37,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           isRefreshing: _controller.isLoading.value,
         );
       case 1:
-        return Container();
+        return const PostListPage();
       case 2:
         return const MessagePageWidget();
       case 3:

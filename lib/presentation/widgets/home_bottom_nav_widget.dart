@@ -39,8 +39,8 @@ class HomeBottomNavWidget extends StatelessWidget {
             ),
             _buildNavItem(
               context,
-              icon: Icons.category_rounded,
-              label: '分类',
+              icon: Icons.forum_rounded,
+              label: '社区',
               index: 1,
               isSelected: currentIndex == 1,
             ),
