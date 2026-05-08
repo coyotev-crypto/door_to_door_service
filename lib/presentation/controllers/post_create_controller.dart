@@ -19,7 +19,6 @@ class PostCreateController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final RxList<File> images = <File>[].obs;
-  final RxList<String> tags = <String>[].obs;
   final RxBool isSubmitting = false.obs;
   final RxInt charCount = 0.obs;
 
@@ -74,24 +73,6 @@ class PostCreateController extends GetxController {
     images.removeAt(index);
   }
 
-  void addTag(String tag) {
-    final trimmed = tag.trim();
-    if (trimmed.isEmpty) return;
-    if (tags.contains(trimmed)) {
-      ToastUtil.showError('标签已存在');
-      return;
-    }
-    if (tags.length >= 5) {
-      ToastUtil.showError('最多添加5个标签');
-      return;
-    }
-    tags.add(trimmed);
-  }
-
-  void removeTag(String tag) {
-    tags.remove(tag);
-  }
-
   /// 提交发布
   Future<void> submit() async {
     if (!formKey.currentState!.validate()) return;
@@ -111,10 +92,6 @@ class PostCreateController extends GetxController {
       ToastUtil.showError('正文至少$minContentLength字');
       return;
     }
-    if (tags.isEmpty) {
-      ToastUtil.showError('请至少添加一个标签');
-      return;
-    }
 
     isSubmitting.value = true;
     try {
@@ -128,14 +105,12 @@ class PostCreateController extends GetxController {
         title: title,
         content: content,
         images: uploadedUrls,
-        tags: tags.toList(),
+        tags: [],
       );
-
+      LogUtil.i('发布帖子: ${response.isSuccess}', tag: _tag);
       if (response.isSuccess) {
+        Get.back(result: true);
         ToastUtil.showSuccess('发布成功');
-        Future.delayed(const Duration(milliseconds: 800), () {
-          Get.back(result: true);
-        });
       }
     } catch (e) {
       LogUtil.e('发布失败: $e', tag: _tag);

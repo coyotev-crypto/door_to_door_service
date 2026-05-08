@@ -131,27 +131,6 @@ class PostCreatePage extends GetView<PostCreateController> {
                         ),
                     ],
                   )),
-              SizedBox(height: 24.h),
-              // 标签
-              _buildSectionTitle('标签（至少1个，最多5个）'),
-              SizedBox(height: 8.h),
-              _buildTagInput(context),
-              SizedBox(height: 8.h),
-              Obx(() => Wrap(
-                    spacing: 8.w,
-                    children: controller.tags.map((tag) {
-                      return Chip(
-                        label: Text('#$tag',
-                            style: TextStyle(fontSize: 12.sp)),
-                        deleteIcon:
-                            Icon(Icons.close, size: 14.sp),
-                        onDeleted: () => controller.removeTag(tag),
-                        materialTapTargetSize:
-                            MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                      );
-                    }).toList(),
-                  )),
               SizedBox(height: 40.h),
               // 提交
               Obx(() => PrimaryButton(
@@ -164,57 +143,6 @@ class PostCreatePage extends GetView<PostCreateController> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTagInput(BuildContext context) {
-    final tagController = TextEditingController();
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: 40.h,
-            child: TextField(
-              controller: tagController,
-              decoration: InputDecoration(
-                hintText: '输入标签后按添加',
-                hintStyle:
-                    TextStyle(fontSize: 13.sp, color: Colors.grey[400]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                isDense: true,
-              ),
-              style: TextStyle(fontSize: 13.sp),
-              onSubmitted: (value) {
-                controller.addTag(value);
-                tagController.clear();
-              },
-            ),
-          ),
-        ),
-        SizedBox(width: 8.w),
-        SizedBox(
-          height: 40.h,
-          child: ElevatedButton(
-            onPressed: () {
-              controller.addTag(tagController.text);
-              tagController.clear();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r)),
-            ),
-            child:
-                Text('添加', style: TextStyle(fontSize: 13.sp)),
-          ),
-        ),
-      ],
     );
   }
 
