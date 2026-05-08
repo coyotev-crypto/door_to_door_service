@@ -40,7 +40,7 @@ class PostRepository {
   }
 
   /// 发布帖子
-  Future<BaseResponse<PostModel>> createPost({
+  Future<BaseResponse<dynamic>> createPost({
     required String title,
     required String content,
     required List<String> images,
@@ -55,10 +55,7 @@ class PostRepository {
         'tags': tags,
       },
     );
-    return BaseResponse<PostModel>.fromJson(
-      response.data,
-      dataParser: (data) => PostModel.fromJson(data as Map<String, dynamic>),
-    );
+    return BaseResponse<dynamic>.fromJson(response.data);
   }
 
   /// 删除帖子
@@ -107,7 +104,7 @@ class PostRepository {
   }
 
   /// 发表评论
-  Future<BaseResponse<CommentModel>> createComment({
+  Future<BaseResponse<dynamic>> createComment({
     required int postId,
     required String content,
     int? parentId,
@@ -121,11 +118,7 @@ class PostRepository {
         if (parentId != null) 'parentId': parentId,
       },
     );
-    return BaseResponse<CommentModel>.fromJson(
-      response.data,
-      dataParser: (data) =>
-          CommentModel.fromJson(data as Map<String, dynamic>),
-    );
+    return BaseResponse<dynamic>.fromJson(response.data);
   }
 
   /// 删除评论
