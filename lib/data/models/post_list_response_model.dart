@@ -10,13 +10,14 @@ class PostListResponseModel {
   PostListResponseModel({this.list, this.count, this.pageIndex, this.pageSize});
 
   factory PostListResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>?;
     return PostListResponseModel(
-      list: (json['data'] as List<dynamic>?)
+      list: (data?['list'] as List<dynamic>?)
           ?.map((e) => PostModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      count: json['count'] as int?,
-      pageIndex: json['pageIndex'] as int?,
-      pageSize: json['pageSize'] as int?,
+      count: data?['count'] as int?,
+      pageIndex: data?['pageIndex'] as int?,
+      pageSize: data?['pageSize'] as int?,
     );
   }
 }
