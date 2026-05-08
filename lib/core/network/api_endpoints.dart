@@ -152,6 +152,38 @@ class ApiEndpoints {
   /// 注销账号
   static const String deleteAccount = '/user/account';
 
+  // ========== 社区帖子相关 ==========
+
+  /// 帖子列表
+  static const String getPostList = '/post/list';
+
+  /// 帖子详情
+  static const String getPostDetail = '/post/{id}';
+
+  /// 发布帖子
+  static const String createPost = '/post';
+
+  /// 删除帖子
+  static const String deletePost = '/post/{id}';
+
+  /// 帖子点赞
+  static const String togglePostLike = '/post/{id}/like';
+
+  /// 帖子收藏
+  static const String togglePostCollect = '/post/{id}/collect';
+
+  /// 评论列表
+  static const String getComments = '/post/{id}/comments';
+
+  /// 发表评论
+  static const String createComment = '/post/{id}/comments';
+
+  /// 删除评论
+  static const String deleteComment = '/comment/{id}';
+
+  /// 评论点赞
+  static const String toggleCommentLike = '/comment/{id}/like';
+
   // ========== 服务商资质相关 ==========
 
   /// 提交服务商资质材料
