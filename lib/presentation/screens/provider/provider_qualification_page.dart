@@ -124,21 +124,23 @@ class ProviderQualificationPage
               Row(
                 children: [
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '本人近期照',
-                      imageUrl: controller.recentPhoto,
-                      onTap: () => controller.pickImage('recentPhoto'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '本人近期照',
+                          imageUrl: controller.recentPhoto,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController.typeRecentPhoto),
+                          height: 140.w,
+                        )),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '健康证',
-                      imageUrl: controller.healthCert,
-                      onTap: () => controller.pickImage('healthCert'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '健康证',
+                          imageUrl: controller.healthCert,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController.typeHealthCert),
+                          height: 140.w,
+                        )),
                   ),
                 ],
               ),
@@ -146,21 +148,25 @@ class ProviderQualificationPage
               Row(
                 children: [
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '从业证明（选填）',
-                      imageUrl: controller.qualificationCert,
-                      onTap: () => controller.pickImage('qualificationCert'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '从业证明（选填）',
+                          imageUrl: controller.qualificationCert,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController
+                                  .typeQualificationCert),
+                          height: 140.w,
+                        )),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '无犯罪记录证明',
-                      imageUrl: controller.noCriminalRecord,
-                      onTap: () => controller.pickImage('noCriminalRecord'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '无犯罪记录证明',
+                          imageUrl: controller.noCriminalRecord,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController
+                                  .typeNoCriminalRecord),
+                          height: 140.w,
+                        )),
                   ),
                 ],
               ),
@@ -168,37 +174,40 @@ class ProviderQualificationPage
               Row(
                 children: [
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '身份证正面',
-                      imageUrl: controller.idCardFront,
-                      onTap: () => controller.pickImage('idCardFront'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '身份证正面',
+                          imageUrl: controller.idCardFront,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController.typeIdCardFront),
+                          height: 140.w,
+                        )),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
-                    child: ImageUploadCard(
-                      title: '身份证反面',
-                      imageUrl: controller.idCardBack,
-                      onTap: () => controller.pickImage('idCardBack'),
-                      height: 140.w,
-                    ),
+                    child: Obx(() => ImageUploadCard(
+                          title: '身份证反面',
+                          imageUrl: controller.idCardBack,
+                          onTap: () => controller.pickImage(
+                              ProviderQualificationController.typeIdCardBack),
+                          height: 140.w,
+                        )),
                   ),
                 ],
               ),
               SizedBox(height: 16.h),
-              ImageUploadCard(
-                title: '证书（选填）',
-                imageUrl: controller.otherCert,
-                onTap: () => controller.pickImage('otherCert'),
-              ),
+              Obx(() => ImageUploadCard(
+                    title: '证书（选填）',
+                    imageUrl: controller.otherCert,
+                    onTap: () => controller.pickImage(
+                        ProviderQualificationController.typeOtherCert),
+                  )),
               SizedBox(height: 16.h),
-              CertificateLevelSelector(
-                selectedLevel: controller.certificateLevel,
-                onLevelChanged: (value) {
-                  controller.updateCertificateLevel(value);
-                },
-              ),
+              Obx(() => CertificateLevelSelector(
+                    selectedLevel: controller.certificateLevel,
+                    onLevelChanged: (value) {
+                      controller.updateCertificateLevel(value);
+                    },
+                  )),
               SizedBox(height: 24.h),
               Obx(() => Row(
                     children: [
@@ -242,7 +251,7 @@ class ProviderQualificationPage
                   )),
               SizedBox(height: 32.h),
               Obx(() => PrimaryButton(
-                    text: '提交审核',
+                    text: controller.isEditMode ? '更新审核' : '提交审核',
                     isLoading: controller.isUploading,
                     onPressed: controller.submitQualifications,
                   )),

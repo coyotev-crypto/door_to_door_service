@@ -60,8 +60,17 @@ class ApiEndpoints {
   /// 获取服务详情
   static const String getServiceDetail = '/service/detail';
 
+  /// 根据ID获取服务详情
+  static const String getServiceById = '/service/{id}';
+
   /// 更新服务
   static const String updateService = '/service/{id}';
+
+  /// 创建服务
+  static const String createService = '/service';
+
+  /// 获取我的服务列表
+  static const String getMyServices = '/service/my';
 
   static const String toggleFavoriteService = '/service/favorite';
 
@@ -146,5 +155,13 @@ class ApiEndpoints {
   // ========== 服务商资质相关 ==========
 
   /// 提交服务商资质材料
-  static const String submitProviderQualification = '/provider/qualification';
+  static const String submitProviderQualification =
+      '/service-provider-qualification';
+
+  /// 获取当前用户资质认证数据
+  static const String getMyQualification = '/service-provider-qualification/my';
+
+  /// 更新服务商资质材料
+  static const String updateProviderQualification =
+      '/service-provider-qualification/{id}';
 }

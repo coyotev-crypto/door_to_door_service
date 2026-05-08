@@ -280,9 +280,9 @@ class ProfileController extends GetxController {
     Get.toNamed(RouteNames.providerQualification);
   }
 
-  /// 跳转到完善服务页面
+  /// 跳转到服务管理列表页面
   void navigateToProviderService() {
-    Get.toNamed(RouteNames.providerService);
+    Get.toNamed(RouteNames.providerServiceList);
   }
 
   /// 跳转到账户安全页

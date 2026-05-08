@@ -22,6 +22,10 @@ class RouteNames {
   static const String providerJoin = '/provider-join';
   static const String providerQualification = '/provider-join/qualification';
   static const String providerService = '/provider-join/service';
+  static const String providerServiceList = '/provider-join/service/list';
+
+  // 订单相关
+  static const String orderCreate = '/order/create';
 
   // 服务相关
   static const String category = '/category';

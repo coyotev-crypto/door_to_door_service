@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import '../../../routes/route_names.dart';
 import '../../controllers/favorite_controller.dart';
 import '../../widgets/empty_placeholder_widget.dart';
 import '../../widgets/loading_indicator.dart';
@@ -114,8 +115,8 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
                   Get.toNamed('/service/detail/${favorite.service.id}');
                 },
                 onOrderTap: () {
-                  // TODO: 跳转到下单页
-                  Get.toNamed('/order/create/${favorite.service.id}');
+                  Get.toNamed(RouteNames.orderCreate,
+                      arguments: favorite.service);
                 },
                 onFavoriteTap: () async {
                   final serviceController = Get.find<ServiceController>();

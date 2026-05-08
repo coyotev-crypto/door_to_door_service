@@ -1,5 +1,7 @@
+import '../models/service_item.dart';
 import '../models/service_list_response_model.dart';
 import '../models/favorite_list_response_model.dart';
+import '../../core/network/base_response.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_endpoints.dart';
 
@@ -13,7 +15,6 @@ class ServiceRepository {
     int? categoryId,
     int pageIndex = 1,
     int pageSize = 10,
-    String? ratingOrder,
     String? priceOrder,
     String? orderCountOrder,
     String? distanceOrder,
@@ -34,10 +35,6 @@ class ServiceRepository {
 
       if (categoryId != null) {
         queryParams['categoryId'] = categoryId;
-      }
-
-      if (ratingOrder != null) {
-        queryParams['ratingOrder'] = ratingOrder;
       }
 
       if (priceOrder != null) {
@@ -140,5 +137,107 @@ class ServiceRepository {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// 创建服务
+  Future<BaseResponse<dynamic>> createService({
+    required int categoryId,
+    required String name,
+    required double price,
+    required String providerName,
+    required String address,
+    required double deliveryRange,
+    double? originalPrice,
+    double? travelFee,
+    double? latitude,
+    double? longitude,
+    int status = 1,
+  }) async {
+    final response = await _dioClient.post(
+      ApiEndpoints.createService,
+      data: {
+        'address': address,
+        'categoryId': categoryId,
+        'deliveryRange': deliveryRange,
+        'latitude': latitude,
+        'longitude': longitude,
+        'name': name,
+        'originalPrice': originalPrice,
+        'price': price,
+        'providerName': providerName,
+        'status': status,
+        'travelFee': travelFee,
+      },
+    );
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 更新服务
+  Future<BaseResponse<dynamic>> updateService({
+    required int id,
+    required int categoryId,
+    required String name,
+    required double price,
+    required String providerName,
+    required String address,
+    required double deliveryRange,
+    double? originalPrice,
+    double? travelFee,
+    double? latitude,
+    double? longitude,
+    int status = 1,
+  }) async {
+    final path = ApiEndpoints.updateService.replaceAll('{id}', id.toString());
+    final response = await _dioClient.put(
+      path,
+      data: {
+        'address': address,
+        'categoryId': categoryId,
+        'deliveryRange': deliveryRange,
+        'id': id,
+        'latitude': latitude,
+        'longitude': longitude,
+        'name': name,
+        'originalPrice': originalPrice,
+        'price': price,
+        'providerName': providerName,
+        'status': status,
+        'travelFee': travelFee,
+      },
+    );
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 获取我的服务列表
+  Future<BaseResponse<List<ServiceItem>>> getMyServices({
+    int pageIndex = 1,
+    int pageSize = 20,
+  }) async {
+    final response = await _dioClient.get(
+      ApiEndpoints.getMyServices,
+      queryParameters: {
+        'pageIndex': pageIndex,
+        'pageSize': pageSize,
+      },
+    );
+    return BaseResponse<List<ServiceItem>>.fromJson(
+      response.data,
+      dataParser: (data) {
+        final list = data as List<dynamic>;
+        return list
+            .map((e) => ServiceItem.fromJson(e as Map<String, dynamic>))
+            .toList();
+      },
+    );
+  }
+
+  /// 根据ID获取服务详情
+  Future<BaseResponse<ServiceItem>> getServiceById(int id) async {
+    final path = ApiEndpoints.getServiceById.replaceAll('{id}', id.toString());
+    final response = await _dioClient.get(path);
+    return BaseResponse<ServiceItem>.fromJson(
+      response.data,
+      dataParser: (data) => ServiceItem.fromJson(data as Map<String, dynamic>),
+    );
   }
 }

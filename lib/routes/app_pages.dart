@@ -1,7 +1,10 @@
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/profile_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/provider_qualification_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/provider_service_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/provider_service_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/favorite_controller.dart';
 import 'package:get/get.dart';
@@ -9,10 +12,13 @@ import 'route_names.dart';
 import '../presentation/screens/splash_screen.dart';
 import '../presentation/screens/auth/login_screen.dart';
 import '../presentation/screens/account/forgot_password_screen.dart';
+import '../presentation/screens/order/order_create_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/account/profile_edit_screen.dart';
 import '../presentation/screens/provider/provider_join_page.dart';
 import '../presentation/screens/provider/provider_qualification_page.dart';
+import '../presentation/screens/provider/provider_service_page.dart';
+import '../presentation/screens/provider/provider_service_list_page.dart';
 import '../presentation/screens/settings_screen.dart';
 import '../presentation/screens/agreement/privacy_policy_screen.dart';
 import '../presentation/screens/agreement/user_agreement_screen.dart';
@@ -128,6 +134,13 @@ class AppPages {
       page: () => const ProfileEditScreen(),
       binding: BindingsBuilder(() => Get.lazyPut(() => ProfileController())),
     ),
+    // 订单相关路由
+    GetPage(
+      name: RouteNames.orderCreate,
+      page: () => const OrderCreateScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => OrderController())),
+    ),
     // 入驻相关路由
     GetPage(
       name: RouteNames.providerJoin,
@@ -138,6 +151,18 @@ class AppPages {
       name: RouteNames.providerQualification,
       page: () => const ProviderQualificationPage(),
       binding: BindingsBuilder(() => Get.lazyPut(() => ProviderQualificationController())),
+    ),
+    GetPage(
+      name: RouteNames.providerService,
+      page: () => const ProviderServicePage(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => ProviderServiceController())),
+    ),
+    GetPage(
+      name: RouteNames.providerServiceList,
+      page: () => const ProviderServiceListPage(),
+      binding: BindingsBuilder(
+          () => Get.lazyPut(() => ProviderServiceListController())),
     ),
 
     // 账户安全相关路由

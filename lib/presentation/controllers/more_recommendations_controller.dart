@@ -120,7 +120,6 @@ class MoreRecommendationsController extends GetxController {
       final response = await _serviceRepository.getServiceList(
         pageIndex: _currentPage.value,
         pageSize: _pageSize.value,
-        ratingOrder: _ratingOrder.value,
         priceOrder: _priceOrder.value,
         orderCountOrder: _salesOrder.value,
         distanceOrder: _distanceOrder.value,

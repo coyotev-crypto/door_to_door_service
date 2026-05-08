@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import '../../../routes/route_names.dart';
 import '../../controllers/more_recommendations_controller.dart';
 import '../../controllers/service_controller.dart';
 import '../../widgets/service_card_widget.dart';
@@ -52,7 +53,8 @@ class MoreRecommendationsScreen extends GetView<MoreRecommendationsController> {
                   // TODO: 跳转到服务详情
                 },
                 onOrderTap: () {
-                  // TODO: 跳转到下单页面
+                  Get.toNamed(RouteNames.orderCreate,
+                      arguments: service);
                 },
                 onFavoriteTap: () async {
                   final serviceController = Get.find<ServiceController>();

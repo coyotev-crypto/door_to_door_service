@@ -58,7 +58,8 @@ class ImageUploadCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
-
+    final normalizedImageUrl = _normalizeImageUrl(imageUrl);
+    final hasImage = normalizedImageUrl.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -86,11 +87,11 @@ class ImageUploadCard extends StatelessWidget {
               border: showBorder
                   ? Border.all(
                       color: borderColor ??
-                          (imageUrl != null ? Colors.transparent : Colors.grey[200]!),
+                          (hasImage ? Colors.transparent : Colors.grey[200]!),
                       width: 1.5,
                     )
                   : null,
-              boxShadow: imageUrl != null
+              boxShadow: hasImage
                   ? [
                       BoxShadow(
                         color: primaryColor.withOpacity(0.1),
@@ -100,7 +101,7 @@ class ImageUploadCard extends StatelessWidget {
                     ]
                   : null,
             ),
-            child: imageUrl != null
+            child: hasImage
                 ? _buildImage(context)
                 : _buildUploadPlaceholder(context, primaryColor),
           ),
@@ -111,35 +112,60 @@ class ImageUploadCard extends StatelessWidget {
 
   /// 构建已上传的图片
   Widget _buildImage(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
-      child: Image.network(
-        imageUrl!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: errorIcon ??
-                Icon(
-                  Icons.broken_image,
-                  size: 48.sp,
-                  color: Colors.grey[400],
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
+          child: Image.network(
+            imageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Center(
+                child: errorIcon ??
+                    Icon(
+                      Icons.broken_image,
+                      size: 48.sp,
+                      color: Colors.grey[400],
+                    ),
+              );
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                  strokeWidth: 2,
+                  color: Theme.of(context).primaryColor,
                 ),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-              strokeWidth: 2,
-              color: Theme.of(context).primaryColor,
+              );
+            },
+          ),
+        ),
+        // 重新上传标签
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: Container(
+            margin: EdgeInsets.all(6.w),
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.55),
+              borderRadius: BorderRadius.circular(6.r),
             ),
-          );
-        },
-      ),
+            child: Text(
+              '重新上传',
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -151,20 +177,31 @@ class ImageUploadCard extends StatelessWidget {
         children: [
           uploadIcon ??
               Icon(
-                Icons.add_photo_alternate_rounded,
-                size: 48.sp,
-                color: primaryColor.withOpacity(0.5),
+                Icons.add_a_photo_outlined,
+                size: 24.sp,
+                color: Colors.grey[600],
               ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 6.h),
           Text(
             uploadText ?? '点击上传',
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               color: Colors.grey[600],
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// 规范化图片地址
+  /// [url] 原始图片地址
+  String _normalizeImageUrl(String? url) {
+    final value = (url ?? '').trim();
+    if (value.isEmpty) return '';
+    if (value.toLowerCase() == 'null' || value.toLowerCase() == 'undefined') {
+      return '';
+    }
+    return value;
   }
 }

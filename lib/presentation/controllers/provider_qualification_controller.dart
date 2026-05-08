@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:door_to_door_service/core/services/image_upload_service.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
-import 'package:door_to_door_service/routes/route_names.dart';
+import 'package:door_to_door_service/data/models/provider_qualification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +11,15 @@ import '../../data/repositories/provider_repository.dart';
 
 /// 服务商资质材料控制器
 class ProviderQualificationController extends GetxController {
+  // 图片类型常量
+  static const String typeRecentPhoto = 'recentPhoto';
+  static const String typeHealthCert = 'healthCert';
+  static const String typeQualificationCert = 'qualificationCert';
+  static const String typeOtherCert = 'otherCert';
+  static const String typeIdCardFront = 'idCardFront';
+  static const String typeIdCardBack = 'idCardBack';
+  static const String typeNoCriminalRecord = 'noCriminalRecord';
+
   final String _tag = 'ProviderQualificationController';
   final ImagePicker _imagePicker = ImagePicker();
   final ImageUploadService _imageUploadService = ImageUploadService();
@@ -33,6 +42,9 @@ class ProviderQualificationController extends GetxController {
   final Rx<AddressModel?> _selectedCity = Rx<AddressModel?>(null);
   final RxBool _isUploading = false.obs;
   final RxBool _agreedToTerms = false.obs;
+  final RxBool _isLoading = false.obs;
+  final Rxn<ProviderQualificationModel> _qualificationData =
+      Rxn<ProviderQualificationModel>();
 
   // 资质材料图片URL
   final RxString _recentPhoto = ''.obs;
@@ -82,6 +94,24 @@ class ProviderQualificationController extends GetxController {
   /// 无犯罪记录证明
   String get noCriminalRecord => _noCriminalRecord.value;
 
+  /// 是否正在加载
+  bool get isLoading => _isLoading.value;
+
+  /// 资质记录ID，非空表示编辑模式
+  int? get qualificationId => _qualificationData.value?.id;
+
+  /// 是否为编辑模式
+  bool get isEditMode => qualificationId != null;
+
+  /// 资质认证数据
+  ProviderQualificationModel? get qualificationData => _qualificationData.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchMyQualification();
+  }
+
   @override
   void onClose() {
     nameController.dispose();
@@ -117,15 +147,6 @@ class ProviderQualificationController extends GetxController {
     _agreedToTerms.value = !_agreedToTerms.value;
   }
 
-  /// 选择合作城市
-  Future<void> selectCity() async {
-    final result = await Get.toNamed(RouteNames.mapSelect);
-    if (result != null && result is AddressModel) {
-      _selectedCity.value = result;
-      cityController.text = result.name;
-    }
-  }
-
   /// 选择图片
   Future<void> pickImage(String type) async {
     try {
@@ -144,25 +165,25 @@ class ProviderQualificationController extends GetxController {
 
       // 更新对应的图片URL
       switch (type) {
-        case 'recentPhoto':
+        case typeRecentPhoto:
           _recentPhoto.value = imageUrl;
           break;
-        case 'healthCert':
+        case typeHealthCert:
           _healthCert.value = imageUrl;
           break;
-        case 'qualificationCert':
+        case typeQualificationCert:
           _qualificationCert.value = imageUrl;
           break;
-        case 'otherCert':
+        case typeOtherCert:
           _otherCert.value = imageUrl;
           break;
-        case 'idCardFront':
+        case typeIdCardFront:
           _idCardFront.value = imageUrl;
           break;
-        case 'idCardBack':
+        case typeIdCardBack:
           _idCardBack.value = imageUrl;
           break;
-        case 'noCriminalRecord':
+        case typeNoCriminalRecord:
           _noCriminalRecord.value = imageUrl;
           break;
       }
@@ -182,12 +203,6 @@ class ProviderQualificationController extends GetxController {
     // 验证性别
     if (_gender.value.isEmpty) {
       ToastUtil.showError('请选择性别');
-      return false;
-    }
-
-    // 验证合作城市
-    if (_selectedCity.value == null) {
-      ToastUtil.showError('请选择意向合作城市');
       return false;
     }
 
@@ -230,22 +245,28 @@ class ProviderQualificationController extends GetxController {
 
   /// 提交资质材料
   Future<void> submitQualifications() async {
-    // 验证表单
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     _isUploading.value = true;
     try {
-      // 调用API提交资质材料
-      await _providerRepository.submitQualification(
+      if (isEditMode) {
+        await _updateQualifications();
+      } else {
+        await _createQualifications();
+      }
+    } finally {
+      _isUploading.value = false;
+    }
+  }
+
+  /// 创建资质材料
+  Future<void> _createQualifications() async {
+    try {
+      final response = await _providerRepository.submitQualification(
         name: nameController.text.trim(),
         phone: phoneController.text.trim(),
         age: int.parse(ageController.text.trim()),
         gender: _gender.value,
-        cityId: _selectedCity.value?.id ?? 0,
-        cityName: _selectedCity.value?.name ?? '',
-        serviceRange: double.parse(serviceRangeController.text.trim()),
         emergencyContact: emergencyContactController.text.trim(),
         emergencyPhone: emergencyPhoneController.text.trim(),
         recentPhoto: _recentPhoto.value,
@@ -256,17 +277,108 @@ class ProviderQualificationController extends GetxController {
         idCardBack: _idCardBack.value,
         noCriminalRecord: _noCriminalRecord.value,
         certificateLevel: _certificateLevel.value ?? '',
-        latitude: _selectedCity.value?.latitude ?? 0.0,
-        longitude: _selectedCity.value?.longitude ?? 0.0,
       );
-
-      ToastUtil.showSuccess('资质材料已提交，请等待审核');
-      Get.back();
+      if (response.isSuccess) {
+        ToastUtil.showSuccess('资质材料已提交，请等待审核');
+        Get.back();
+      }
     } catch (e) {
       LogUtil.e('提交资质材料失败: $e', tag: _tag);
-      ToastUtil.showError('提交失败: $e');
-    } finally {
-      _isUploading.value = false;
+      ToastUtil.showError('$e');
     }
+  }
+
+  /// 更新资质材料
+  Future<void> _updateQualifications() async {
+    try {
+      final response = await _providerRepository.updateQualification(
+        id: qualificationId!,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        age: int.parse(ageController.text.trim()),
+        gender: _gender.value,
+        emergencyContact: emergencyContactController.text.trim(),
+        emergencyPhone: emergencyPhoneController.text.trim(),
+        recentPhoto: _recentPhoto.value,
+        healthCert: _healthCert.value,
+        qualificationCert: _qualificationCert.value,
+        otherCert: _otherCert.value,
+        idCardFront: _idCardFront.value,
+        idCardBack: _idCardBack.value,
+        noCriminalRecord: _noCriminalRecord.value,
+        certificateLevel: _certificateLevel.value ?? '',
+      );
+      if (response.isSuccess) {
+        ToastUtil.showSuccess('资质材料已更新，请等待审核');
+        Get.back();
+      }
+    } catch (e) {
+      LogUtil.e('更新资质材料失败: $e', tag: _tag);
+      ToastUtil.showError('$e');
+    }
+  }
+
+  /// 获取当前用户资质认证数据
+  ///
+  /// 从服务器获取当前用户的资质认证信息，并更新UI状态
+  Future<void> fetchMyQualification() async {
+    _isLoading.value = true;
+    try {
+      final response = await _providerRepository.getMyQualification();
+      if (response.isSuccess && response.data != null) {
+        _qualificationData.value = response.data;
+        // 更新表单数据
+        _updateFormData(response.data!);
+      }
+    } catch (e) {
+      LogUtil.e('获取资质认证数据失败: $e', tag: _tag);
+      ToastUtil.showError('获取资质认证数据失败: $e');
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  /// 更新表单数据
+  ///
+  /// [data] 资质认证数据
+  void _updateFormData(ProviderQualificationModel data) {
+    nameController.text = data.name ?? '';
+    phoneController.text = data.phone ?? '';
+    ageController.text = data.age?.toString() ?? '';
+    emergencyContactController.text = data.emergencyContact ?? '';
+    emergencyPhoneController.text = data.emergencyPhone ?? '';
+
+    if (data.gender != null &&
+        (data.gender == 'male' || data.gender == 'female')) {
+      _gender.value = data.gender!;
+    }
+
+    if (data.certificateLevel != null) {
+      _certificateLevel.value = data.certificateLevel;
+    }
+
+    // 更新图片URL
+    if (data.recentPhoto != null) {
+      _recentPhoto.value = data.recentPhoto!;
+    }
+    if (data.healthCert != null) {
+      _healthCert.value = data.healthCert!;
+    }
+    if (data.qualificationCert != null) {
+      _qualificationCert.value = data.qualificationCert!;
+    }
+    if (data.otherCert != null) {
+      _otherCert.value = data.otherCert!;
+    }
+    if (data.idCardFront != null) {
+      _idCardFront.value = data.idCardFront!;
+    }
+    if (data.idCardBack != null) {
+      _idCardBack.value = data.idCardBack!;
+    }
+    if (data.noCriminalRecord != null) {
+      _noCriminalRecord.value = data.noCriminalRecord!;
+    }
+    _agreedToTerms.value = true;
   }
 }

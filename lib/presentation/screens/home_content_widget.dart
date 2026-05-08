@@ -187,7 +187,9 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
                                             // TODO: 跳转到服务详情
                                           },
                                           onOrderTap: () {
-                                            // TODO: 跳转到下单页面
+                                            Get.toNamed(
+                                                RouteNames.orderCreate,
+                                                arguments: service);
                                           },
                                           onFavoriteTap: () async {
                                             final newFavoriteState =
