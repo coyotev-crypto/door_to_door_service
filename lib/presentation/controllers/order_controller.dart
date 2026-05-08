@@ -111,8 +111,8 @@ class OrderController extends GetxController {
             : null,
       );
       if (response.isSuccess) {
-        ToastUtil.showSuccess('下单成功');
         Get.back(result: true);
+        ToastUtil.showSuccess('下单成功');
       }
     } catch (e) {
       LogUtil.e('下单失败: $e', tag: _tag);

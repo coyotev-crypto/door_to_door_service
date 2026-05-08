@@ -255,8 +255,8 @@ class ProviderServiceController extends GetxController {
         status: _status.value,
       );
       if (response.isSuccess) {
-        ToastUtil.showSuccess('服务创建成功');
         Get.back(result: true);
+        ToastUtil.showSuccess('服务创建成功');
       }
     } catch (e) {
       LogUtil.e('创建服务失败: $e', tag: _tag);
@@ -283,8 +283,8 @@ class ProviderServiceController extends GetxController {
         status: _status.value,
       );
       if (response.isSuccess) {
-        ToastUtil.showSuccess('服务更新成功');
         Get.back(result: true);
+        ToastUtil.showSuccess('服务更新成功');
       }
     } catch (e) {
       LogUtil.e('更新服务失败: $e', tag: _tag);

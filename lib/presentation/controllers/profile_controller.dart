@@ -259,10 +259,9 @@ class ProfileController extends GetxController {
       // 更新控制器中的用户信息
       _user.value = updatedUser;
 
-      ToastUtil.showSuccess('用户信息更新成功');
-
       // 返回上一页
       Get.back();
+      ToastUtil.showSuccess('用户信息更新成功');
     } catch (e) {
       ToastUtil.showError('更新用户信息失败: $e');
     } finally {

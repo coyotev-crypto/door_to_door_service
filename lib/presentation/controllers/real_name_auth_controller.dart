@@ -168,25 +168,24 @@ class RealNameAuthController extends GetxController {
     _isSubmitting.value = true;
     try {
       if (_hasRealNameAuth.value) {
-        // 已存在实名认证信息，执行更新操作
         await _userRepository.updateRealNameAuth(
           realName: realName,
           idCardNumber: idCardNumber,
           idCardFrontImageUrl: frontImageUrl,
           idCardBackImageUrl: backImageUrl,
         );
+        Get.back(result: true);
         ToastUtil.showSuccess('实名认证更新成功');
       } else {
-        // 不存在实名认证信息，执行创建操作
         await _userRepository.createRealNameAuth(
           realName: realName,
           idCardNumber: idCardNumber,
           idCardFrontImageUrl: frontImageUrl,
           idCardBackImageUrl: backImageUrl,
         );
+        Get.back(result: true);
         ToastUtil.showSuccess('实名认证提交成功');
       }
-      Get.back(result: true);
     } catch (e) {
       ToastUtil.showError('实名认证提交失败: $e');
     } finally {

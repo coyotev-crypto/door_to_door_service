@@ -279,8 +279,8 @@ class ProviderQualificationController extends GetxController {
         certificateLevel: _certificateLevel.value ?? '',
       );
       if (response.isSuccess) {
-        ToastUtil.showSuccess('资质材料已提交，请等待审核');
         Get.back();
+        ToastUtil.showSuccess('资质材料已提交，请等待审核');
       }
     } catch (e) {
       LogUtil.e('提交资质材料失败: $e', tag: _tag);
@@ -309,8 +309,8 @@ class ProviderQualificationController extends GetxController {
         certificateLevel: _certificateLevel.value ?? '',
       );
       if (response.isSuccess) {
-        ToastUtil.showSuccess('资质材料已更新，请等待审核');
         Get.back();
+        ToastUtil.showSuccess('资质材料已更新，请等待审核');
       }
     } catch (e) {
       LogUtil.e('更新资质材料失败: $e', tag: _tag);
