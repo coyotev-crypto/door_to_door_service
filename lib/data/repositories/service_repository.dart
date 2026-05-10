@@ -147,13 +147,13 @@ class ServiceRepository {
     required String providerName,
     required String address,
     required double deliveryRange,
-    double? originalPrice,
     double? travelFee,
     double? latitude,
     double? longitude,
     int status = 1,
     List<Map<String, dynamic>>? timeSlots,
     List<Map<String, dynamic>>? specialDateSlots,
+    List<Map<String, dynamic>>? prices,
   }) async {
     final response = await _dioClient.post(
       ApiEndpoints.createService,
@@ -164,13 +164,13 @@ class ServiceRepository {
         'latitude': latitude,
         'longitude': longitude,
         'name': name,
-        'originalPrice': originalPrice,
         'price': price,
         'providerName': providerName,
         'status': status,
         'travelFee': travelFee,
         'timeSlots': timeSlots ?? [],
         'specialDateSlots': specialDateSlots ?? [],
+        'prices': prices ?? [],
       },
     );
     return BaseResponse<dynamic>.fromJson(response.data);
@@ -185,13 +185,13 @@ class ServiceRepository {
     required String providerName,
     required String address,
     required double deliveryRange,
-    double? originalPrice,
     double? travelFee,
     double? latitude,
     double? longitude,
     int status = 1,
     List<Map<String, dynamic>>? timeSlots,
     List<Map<String, dynamic>>? specialDateSlots,
+    List<Map<String, dynamic>>? prices,
   }) async {
     final path = ApiEndpoints.updateService.replaceAll('{id}', id.toString());
     final response = await _dioClient.put(
@@ -204,13 +204,13 @@ class ServiceRepository {
         'latitude': latitude,
         'longitude': longitude,
         'name': name,
-        'originalPrice': originalPrice,
         'price': price,
         'providerName': providerName,
         'status': status,
         'travelFee': travelFee,
         'timeSlots': timeSlots ?? [],
         'specialDateSlots': specialDateSlots ?? [],
+        'prices': prices ?? [],
       },
     );
     return BaseResponse<dynamic>.fromJson(response.data);

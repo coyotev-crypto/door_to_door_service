@@ -104,7 +104,6 @@ class ProviderServiceListController extends GetxController {
         providerName: service.providerName ?? '',
         address: service.address ?? '',
         deliveryRange: service.deliveryRange ?? 0,
-        originalPrice: service.originalPrice,
         travelFee: service.travelFee,
         latitude: service.latitude,
         longitude: service.longitude,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/models/service_item.dart';
+import '../../core/themes/app_theme.dart';
 
-/// 服务卡片 Widget
+/// 服务卡片 — 温润质感风格
 class ServiceCardWidget extends StatelessWidget {
   final ServiceItem service;
   final VoidCallback? onTap;
@@ -23,234 +24,184 @@ class ServiceCardWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          decoration: const BoxDecoration(color: Colors.white),
           child: Row(
             children: [
-              // 服务图片
+              // 头像图片
               Container(
-                width: 100.w,
-                height: 100.w,
+                width: 84.w,
+                height: 84.w,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Stack(
-                  children: [
-                    if (service.avatar != null && service.avatar!.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.r),
-                        child: Image.network(
-                          service.avatar!,
-                          width: 100.w,
-                          height: 100.w,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                          color: AppTheme.gold.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3)),
+                    ]),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: service.avatar != null && service.avatar!.isNotEmpty
+                      ? Image.network(service.avatar!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.spa_rounded,
-                              size: 40.sp, color: Colors.grey[400]),
-                        ),
-                      )
-                    else
-                      Center(
-                        child: Icon(Icons.spa_rounded,
-                            size: 40.sp, color: Colors.grey[400]),
-                      ),
-                    if (service.isNew)
-                      Positioned(
-                        top: 4.h,
-                        left: 4.w,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 6.w,
-                            vertical: 2.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                          child: Text(
-                            '新人特惠',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
+                          cacheWidth: 256,
+                          errorBuilder: (_, __, ___) => _placeholder())
+                      : _placeholder(),
                 ),
               ),
-              // 服务人员信息
+              SizedBox(width: 14.w),
+              // 信息区
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 12.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 服务人员名称和距离
-                      Row(
-                        children: [
-                          Text(
-                            service.providerName ?? '服务人员',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 服务商名 + 距离
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(service.providerName ?? '服务人员',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.textPrimary)),
+                        ),
+                        if (service.distance != null &&
+                            service.distance!.isNotEmpty)
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: 6.w,
-                              vertical: 2.h,
-                            ),
+                                horizontal: 6.w, vertical: 2.h),
                             decoration: BoxDecoration(
-                              color: Colors.blue[50],
-                              borderRadius: BorderRadius.circular(4.r),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.location_on_rounded,
-                                  size: 10.sp,
-                                  color: Colors.blue,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  service.distance ?? '未知',
+                                color: const Color(0xFFF5F0E8),
+                                borderRadius: BorderRadius.circular(4.r)),
+                            child:
+                                Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.location_on_rounded,
+                                  size: 10.sp, color: AppTheme.leather),
+                              SizedBox(width: 2.w),
+                              Text(service.distance!,
                                   style: TextStyle(
-                                    fontSize: 10.sp,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
+                                      fontSize: 10.sp,
+                                      color: AppTheme.leather)),
+                            ]),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-                      // 服务项目名称
-                      Text(
-                        service.name,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: Colors.grey[600],
-                        ),
+                      ],
+                    ),
+                    SizedBox(height: 3.h),
+                    // 服务名称
+                    Text(service.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 8.h),
-                      // 评分和收藏
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.star_rounded,
-                            size: 14.sp,
-                            color: Colors.orange,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${service.rating}',
+                        style: TextStyle(
+                            fontSize: 13.sp, color: AppTheme.textSecondary)),
+                    SizedBox(height: 6.h),
+                    // 评分 · 单数 · 收藏
+                    Row(
+                      children: [
+                        Icon(Icons.star_rounded,
+                            size: 13.sp, color: AppTheme.gold),
+                        SizedBox(width: 2.w),
+                        Text('${service.rating}',
                             style: TextStyle(
-                              fontSize: 13.sp,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Text(
-                            '${service.orderCount}单',
+                                fontSize: 12.sp,
+                                color: AppTheme.textSecondary)),
+                        SizedBox(width: 10.w),
+                        Text('${service.orderCount}单',
                             style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.favorite_rounded,
-                                size: 12.sp,
-                                color: Colors.grey[400],
-                              ),
-                              SizedBox(width: 2.w),
-                              Text(
-                                '${service.favoriteCount}人收藏',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: onFavoriteTap,
-                            child: Icon(
-                              service.isFavorite ?? false
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              size: 18.sp,
-                              color: service.isFavorite ?? false
-                                  ? Colors.red
-                                  : Colors.grey[400],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      // 价格和出行费用
-                      Row(
-                        children: [
-                          Text(
-                            '¥${service.price}',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          if (service.travelFee != null) ...[
-                            SizedBox(width: 8.w),
-                            Text(
-                              '出行费¥${service.travelFee}',
-                              style: TextStyle(
                                 fontSize: 11.sp,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                          const Spacer(),
-                          // 去下单按钮
-                          GestureDetector(
-                            onTap: onOrderTap,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 6.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(16.r),
-                              ),
-                              child: Text(
-                                '去下单',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
+                                color: AppTheme.textMuted)),
+                        SizedBox(width: 10.w),
+                        Icon(Icons.favorite_rounded,
+                            size: 11.sp, color: AppTheme.rose),
+                        SizedBox(width: 2.w),
+                        Text('${service.favoriteCount ?? 0}',
+                            style: TextStyle(
+                                fontSize: 11.sp,
+                                color: AppTheme.textMuted)),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: onFavoriteTap,
+                          child: Icon(
+                            service.isFavorite == true
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 18.sp,
+                            color: service.isFavorite == true
+                                ? AppTheme.rose
+                                : const Color(0xFFD0C8BF),
                           ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    // 价格 + 下单按钮
+                    Row(
+                      children: [
+                        Text('¥${service.price.toStringAsFixed(0)}',
+                            style: TextStyle(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.gold)),
+                        SizedBox(width: 4.w),
+                        Text('/${service.defaultDurationMinutes}分钟',
+                            style: TextStyle(
+                                fontSize: 11.sp,
+                                color: AppTheme.textMuted)),
+                        if (service.travelFee != null &&
+                            service.travelFee! > 0) ...[
+                          SizedBox(width: 6.w),
+                          Text('出行¥${service.travelFee!.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: AppTheme.textMuted)),
                         ],
-                      ),
-                    ],
-                  ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: onOrderTap,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.w, vertical: 7.h),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [
+                                AppTheme.gold,
+                                AppTheme.amber
+                              ]),
+                              borderRadius: BorderRadius.circular(16.r),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: AppTheme.gold
+                                        .withOpacity(0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2))
+                              ],
+                            ),
+                            child: Text('去下单',
+                                style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      color: AppTheme.creamFill,
+      child: Center(
+          child: Icon(Icons.spa_rounded,
+              size: 36.sp, color: const Color(0xFFD0C8BF))),
     );
   }
 }

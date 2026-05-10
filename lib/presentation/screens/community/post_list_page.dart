@@ -150,10 +150,12 @@ class _PostListPageState extends State<PostListPage> {
         itemCount: controller.posts.length,
         itemBuilder: (context, index) {
           final post = controller.posts[index];
-          return PostCard(
-            post: post,
-            onTap: () => controller.navigateToDetail(post),
-            onLike: () => controller.toggleLike(post.id),
+          return RepaintBoundary(
+            child: PostCard(
+              post: post,
+              onTap: () => controller.navigateToDetail(post),
+              onLike: () => controller.toggleLike(post.id),
+            ),
           );
         },
       ),

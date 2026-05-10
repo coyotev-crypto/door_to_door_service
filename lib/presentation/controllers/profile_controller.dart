@@ -290,8 +290,7 @@ class ProfileController extends GetxController {
 
   /// 跳转到订单列表页
   void navigateToOrderList(int initialTabIndex) {
-    // TODO: 实现订单列表页面
-    ToastUtil.showError('订单列表功能开发中');
+    Get.toNamed(RouteNames.orderList, arguments: initialTabIndex);
   }
 
   /// 跳转到地址管理页

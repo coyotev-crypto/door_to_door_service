@@ -1,326 +1,179 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../core/themes/app_theme.dart';
 import '../../controllers/profile_controller.dart';
 import '../../widgets/profile_header_widget.dart';
 import '../../widgets/profile_function_item_widget.dart';
 
-/// 个人中心页面组件
+/// 个人中心页面 — 温润质感
 class ProfileWidget extends StatelessWidget {
-  final ProfileController controller = Get.find<ProfileController>();
-
+  final ProfileController ctrl = Get.find<ProfileController>();
   ProfileWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() {
-        // 已登录状态
-        return _buildLoggedInView(context, controller);
-      }),
-    );
-  }
-
-  /// 构建已登录视图
-  Widget _buildLoggedInView(
-      BuildContext context, ProfileController controller) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        await controller.refreshUserInfo();
-      },
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          // 用户信息头部
-          ProfileHeaderWidget(controller: controller),
-          // 订单管理
-          _buildOrderManagement(context, controller),
-          SizedBox(height: 16.h),
-          // 常用功能
-          _buildCommonFunctions(context, controller),
-          SizedBox(height: 16.h),
-          // 入驻功能
-          _buildProviderFunctions(context, controller),
-          SizedBox(height: 16.h),
-          // 退出登录按钮
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: ElevatedButton(
-              onPressed: () => controller.logout(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.red,
-                padding: EdgeInsets.symmetric(vertical: 14.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  side: BorderSide(color: Colors.red.withOpacity(0.2)),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                '退出登录',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
+    return Obx(() => RefreshIndicator(
+          onRefresh: () async => await ctrl.refreshUserInfo(),
+          child: ListView(padding: EdgeInsets.zero, children: [
+            SizedBox(height: 14.h),
+            ProfileHeaderWidget(controller: ctrl),
+            SizedBox(height: 14.h),
+            _orderCard(),
+            SizedBox(height: 14.h),
+            _menuCard([
+              _fnItem(Icons.location_on_rounded, '地址管理',
+                  () => ctrl.navigateToAddressManage()),
+              _fnItem(Icons.favorite_rounded, '我的收藏',
+                  () => ctrl.navigateToFavorites()),
+            ]),
+            SizedBox(height: 14.h),
+            _menuCard([
+              _sectionTitle('服务商入驻'),
+              _fnItem(Icons.description_rounded, '资质材料',
+                  () => ctrl.navigateToProviderQualification()),
+              _fnItem(Icons.room_service_rounded, '完善服务',
+                  () => ctrl.navigateToProviderService()),
+            ]),
+            SizedBox(height: 20.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: GestureDetector(
+                onTap: () => ctrl.logout(),
+                child: Container(
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14.r),
+                      border:
+                          Border.all(color: AppTheme.danger.withOpacity(0.2))),
+                  child: Center(
+                      child: Text('退出登录',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.danger))),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 32.h),
-        ],
-      ),
-    );
+            SizedBox(height: 32.h),
+          ]),
+        ));
   }
 
-  /// 构建订单管理
-  Widget _buildOrderManagement(
-      BuildContext context, ProfileController controller) {
+  Widget _orderCard() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 订单标题和全部订单
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '我的订单',
-                style: TextStyle(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+                color: const Color(0xFF2D2A26).withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ]),
+      child: Column(children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text('我的订单',
+              style: TextStyle(
                   fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => controller.navigateToOrderList(0),
-                behavior: HitTestBehavior.opaque,
-                child: Row(
-                  children: [
-                    Text(
-                      '全部订单',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    SizedBox(width: 4.w),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20.sp,
-                      color: Colors.grey[600],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary)),
+          GestureDetector(
+            onTap: () => ctrl.navigateToOrderList(0),
+            behavior: HitTestBehavior.opaque,
+            child: Row(children: [
+              Text('全部订单',
+                  style: TextStyle(fontSize: 13.sp, color: AppTheme.textMuted)),
+              SizedBox(width: 2.w),
+              Icon(Icons.chevron_right_rounded,
+                  size: 18.sp, color: AppTheme.textMuted)
+            ]),
           ),
-          SizedBox(height: 20.h),
-          // 订单状态
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildOrderStatusItem(
-                icon: Icons.payment_rounded,
-                label: '待支付',
-                count: controller.pendingPaymentCount,
-                onTap: () => controller.navigateToOrderList(0),
-              ),
-              _buildOrderStatusItem(
-                icon: Icons.access_time_rounded,
-                label: '待服务',
-                count: controller.pendingServiceCount,
-                onTap: () => controller.navigateToOrderList(1),
-              ),
-              _buildOrderStatusItem(
-                icon: Icons.local_shipping_rounded,
-                label: '进行中',
-                count: controller.inProgressCount,
-                onTap: () => controller.navigateToOrderList(2),
-              ),
-              _buildOrderStatusItem(
-                icon: Icons.check_circle_rounded,
-                label: '已完成',
-                count: controller.completedCount,
-                onTap: () => controller.navigateToOrderList(3),
-              ),
-            ],
-          ),
-        ],
-      ),
+        ]),
+        SizedBox(height: 18.h),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          _orderStat(Icons.payment_rounded, '待支付', ctrl.pendingPaymentCount,
+              () => ctrl.navigateToOrderList(0)),
+          _orderStat(Icons.access_time_rounded, '待服务', ctrl.pendingServiceCount,
+              () => ctrl.navigateToOrderList(1)),
+          _orderStat(Icons.play_circle_rounded, '进行中', ctrl.inProgressCount,
+              () => ctrl.navigateToOrderList(2)),
+          _orderStat(Icons.check_circle_rounded, '已完成', ctrl.completedCount,
+              () => ctrl.navigateToOrderList(3)),
+        ]),
+      ]),
     );
   }
 
-  /// 构建订单状态项
-  Widget _buildOrderStatusItem({
-    required IconData icon,
-    required String label,
-    required int count,
-    required VoidCallback onTap,
-  }) {
+  Widget _orderStat(
+      IconData icon, String label, int count, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Icon(
-                icon,
-                size: 28.sp,
-                color: Colors.black87,
-              ),
-              if (count > 0)
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 2.h,
-                    ),
+      child: Column(children: [
+        Stack(children: [
+          Icon(icon, size: 26.sp, color: AppTheme.textSecondary),
+          if (count > 0)
+            Positioned(
+                right: -4,
+                top: -4,
+                child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
                     decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 16.w,
-                      minHeight: 16.h,
-                    ),
-                    child: Text(
-                      count > 99 ? '99+' : count.toString(),
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            label,
+                        color: AppTheme.danger,
+                        borderRadius: BorderRadius.circular(10.r)),
+                    constraints:
+                        BoxConstraints(minWidth: 16.w, minHeight: 16.h),
+                    child: Text(count > 99 ? '99+' : '$count',
+                        style: TextStyle(
+                            fontSize: 10.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center))),
+        ]),
+        SizedBox(height: 8.h),
+        Text(label,
+            style: TextStyle(fontSize: 12.sp, color: AppTheme.textMuted)),
+      ]),
+    );
+  }
+
+  Widget _menuCard(List<Widget> children) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+                color: const Color(0xFF2D2A26).withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ]),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 6.h),
+      child: Row(children: [
+        Icon(Icons.business_center_rounded, size: 18.sp, color: AppTheme.gold),
+        SizedBox(width: 8.w),
+        Text(title,
             style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary)),
+      ]),
     );
   }
 
-  /// 构建常用功能
-  Widget _buildCommonFunctions(
-      BuildContext context, ProfileController controller) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildFunctionItem(
-            icon: Icons.location_on_rounded,
-            label: '地址管理',
-            onTap: () => controller.navigateToAddressManage(),
-          ),
-          _buildFunctionItem(
-            icon: Icons.favorite_rounded,
-            label: '我的收藏',
-            onTap: () => controller.navigateToFavorites(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 构建入驻功能
-  Widget _buildProviderFunctions(
-      BuildContext context, ProfileController controller) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.business_center_rounded,
-                  size: 20.sp,
-                  color: Theme.of(context).primaryColor,
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  '服务商入驻',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _buildFunctionItem(
-            icon: Icons.description_rounded,
-            label: '资质材料',
-            onTap: () => controller.navigateToProviderQualification(),
-          ),
-          _buildFunctionItem(
-            icon: Icons.room_service_rounded,
-            label: '完善服务',
-            onTap: () => controller.navigateToProviderService(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 构建功能项
-  Widget _buildFunctionItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return ProfileFunctionItemWidget(
-      icon: icon,
-      label: label,
-      onTap: onTap,
-    );
+  Widget _fnItem(IconData icon, String label, VoidCallback onTap) {
+    return ProfileFunctionItemWidget(icon: icon, label: label, onTap: onTap);
   }
 }

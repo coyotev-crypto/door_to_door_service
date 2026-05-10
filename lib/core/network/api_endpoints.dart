@@ -41,7 +41,7 @@ class ApiEndpoints {
   // ========== 订单相关 ==========
 
   /// 创建订单
-  static const String createOrder = '/order/create';
+  static const String createOrder = '/order';
 
   /// 获取订单列表
   static const String getOrderList = '/order/list';

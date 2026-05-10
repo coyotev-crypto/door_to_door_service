@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/models/service_item.dart';
-import 'empty_placeholder_widget.dart';
+import '../../core/themes/app_theme.dart';
 
-/// 新人推荐 Widget
+/// 新人推荐 — 温润质感风格
 class NewcomerRecommendationWidget extends StatelessWidget {
   final List<ServiceItem> services;
   final VoidCallback? onMorePressed;
@@ -23,285 +23,171 @@ class NewcomerRecommendationWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题
+          // 标题行
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.h),
+            padding: EdgeInsets.only(top: 16.h, bottom: 12.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Text(
-                      '新人推荐',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                    Container(width: 2.w, height: 18.h,
+                      margin: EdgeInsets.only(bottom: 2.h),
+                      decoration: BoxDecoration(
+                        color: AppTheme.gold, borderRadius: BorderRadius.circular(1.r),
                       ),
                     ),
+                    SizedBox(width: 10.w),
+                    Text('新人推荐',
+                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
                     SizedBox(width: 8.w),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 2.h,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
-                      child: Text(
-                        'NEW',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text('NEW', style: TextStyle(fontSize: 9.sp, color: Colors.white, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                     ),
                   ],
                 ),
-                // 只在列表不为空时显示更多按钮
                 if (services.isNotEmpty)
-                  TextButton(
-                    onPressed: onMorePressed,
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      '更多',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                  GestureDetector(
+                    onTap: onMorePressed,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('更多', style: TextStyle(fontSize: 13.sp, color: AppTheme.amber)),
+                      SizedBox(width: 2.w),
+                      Icon(Icons.chevron_right_rounded, size: 18.sp, color: AppTheme.amber),
+                    ]),
                   ),
               ],
             ),
           ),
-          // 服务卡片列表 - 以人为主的布局
+          // 卡片列表
           SizedBox(
-            height: 200.h,
-            child: services.isEmpty
-                ? const EmptyPlaceholderWidget(
-                    message: '暂无新人推荐',
-                    iconSize: 60,
-                    verticalPadding: 20,
-                  )
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    cacheExtent: 5 * 180.w, // 缓存5个item的宽度
-                    itemCount: services.length,
-                    itemBuilder: (context, index) {
-                      final service = services[index];
-                      return RepaintBoundary(
-                        child: GestureDetector(
-                        onTap: () => onServiceTap?.call(service),
-                        child: Container(
-                          width: 180.w,
-                          margin: EdgeInsets.only(right: 12.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 服务人员头像和基本信息
-                              Expanded(
-                                flex: 2,
-                                child: Stack(
-                                  children: [
-                                    // 背景渐变
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Theme.of(context)
-                                                .primaryColor
-                                                .withOpacity(0.1),
-                                            Colors.white,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(16.r),
-                                        ),
-                                      ),
-                                    ),
-                                    // 服务人员头像
-                                    Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(top: 20.h),
-                                        child: Container(
-                                          width: 80.w,
-                                          height: 80.w,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.grey[200],
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 3,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.1),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          clipBehavior: Clip.antiAlias,
-                                          child: service.avatar != null &&
-                                                  service.avatar!.isNotEmpty
-                                              ? Image.network(
-                                                  service.avatar!,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (_, __, ___) =>
-                                                      Icon(Icons.person_rounded,
-                                                          size: 40.sp,
-                                                          color:
-                                                              Colors.grey[400]),
-                                                )
-                                              : Icon(Icons.person_rounded,
-                                                  size: 40.sp,
-                                                  color: Colors.grey[400]),
-                                        ),
-                                      ),
-                                    ),
-                                    // 新人标签
-                                    if (service.isNew)
-                                      Positioned(
-                                        top: 8.h,
-                                        left: 8.w,
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8.w,
-                                            vertical: 4.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(12.r),
-                                          ),
-                                          child: Text(
-                                            '新人特惠',
-                                            style: TextStyle(
-                                              fontSize: 10.sp,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              // 服务人员和服务信息
-                              Padding(
-                                padding: EdgeInsets.all(12.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    // 服务人员姓名
-                                    Text(
-                                      service.providerName ?? '未命名',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    // 评分和收藏
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.star_rounded,
-                                          size: 14.sp,
-                                          color: Colors.orange,
-                                        ),
-                                        SizedBox(width: 4.w),
-                                        Text(
-                                          service.rating.toString(),
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                        SizedBox(width: 12.w),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.favorite_rounded,
-                                              size: 12.sp,
-                                              color: Colors.grey[400],
-                                            ),
-                                            SizedBox(width: 2.w),
-                                            Text(
-                                              '${service.favoriteCount ?? 0}',
-                                              style: TextStyle(
-                                                fontSize: 11.sp,
-                                                color: Colors.grey[500],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8.h),
-                                    // 价格
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '¥${service.price.toStringAsFixed(0)}',
-                                          style: TextStyle(
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        if (service.originalPrice != null) ...[
-                                          SizedBox(width: 8.w),
-                                          Text(
-                                            '¥${service.originalPrice?.toStringAsFixed(0)}',
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey[400],
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      );
-                    },
-                  ),
+            height: 210.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              cacheExtent: 5 * 172.w,
+              itemCount: services.length,
+              itemBuilder: (context, index) => _buildCard(context, services[index]),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCard(BuildContext context, ServiceItem service) {
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: () => onServiceTap?.call(service),
+        child: Container(
+          width: 172.w,
+          margin: EdgeInsets.only(right: 12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.r),
+            boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, 6))],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 头像区
+              Expanded(
+                flex: 3,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: [Color(0xFFF5F0E8), Colors.white],
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 76.w, height: 76.w,
+                          margin: EdgeInsets.only(top: 12.h),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: [BoxShadow(color: AppTheme.textPrimary.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 3))],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: service.avatar != null && service.avatar!.isNotEmpty
+                              ? Image.network(service.avatar!, fit: BoxFit.cover,
+                                  cacheWidth: 256,
+                                  errorBuilder: (_, __, ___) => _avatarPlaceholder())
+                              : _avatarPlaceholder(),
+                        ),
+                      ),
+                      if (service.isNew)
+                        Positioned(
+                          top: 10.h, left: 10.w,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Text('新人特惠', style: TextStyle(fontSize: 9.sp, color: Colors.white, fontWeight: FontWeight.w700)),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              // 信息区
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(service.providerName ?? '未命名',
+                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                      SizedBox(height: 4.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.star_rounded, size: 13.sp, color: AppTheme.gold),
+                          SizedBox(width: 3.w),
+                          Text(service.rating.toStringAsFixed(1),
+                              style: TextStyle(fontSize: 12.sp, color: AppTheme.textSecondary)),
+                          SizedBox(width: 10.w),
+                          Icon(Icons.favorite_rounded, size: 11.sp, color: AppTheme.rose),
+                          SizedBox(width: 2.w),
+                          Text('${service.favoriteCount ?? 0}',
+                              style: TextStyle(fontSize: 11.sp, color: AppTheme.textMuted)),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text('¥${service.price.toStringAsFixed(0)}',
+                            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800, color: AppTheme.gold)),
+                        SizedBox(width: 3.w),
+                        Text('/${service.defaultDurationMinutes}分钟',
+                            style: TextStyle(fontSize: 10.sp, color: AppTheme.textMuted)),
+                      ]),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _avatarPlaceholder() {
+    return Container(
+      color: AppTheme.creamFill,
+      child: Icon(Icons.person_rounded, size: 36.sp, color: const Color(0xFFD0C8BF)),
     );
   }
 }

@@ -12,25 +12,27 @@ class OrderRepository {
   /// 创建订单
   Future<BaseResponse<dynamic>> createOrder({
     required int serviceId,
+    required int durationMinutes,
+    required String startTime,
     required String addressName,
     required double latitude,
     required double longitude,
     required String contactName,
     required String contactPhone,
     String? remark,
-    String? serviceTime,
   }) async {
     final response = await _dioClient.post(
       ApiEndpoints.createOrder,
       data: {
         'serviceId': serviceId,
+        'durationMinutes': durationMinutes,
+        'startTime': startTime,
         'addressName': addressName,
         'latitude': latitude,
         'longitude': longitude,
         'contactName': contactName,
         'contactPhone': contactPhone,
         'remark': remark ?? '',
-        'serviceTime': serviceTime ?? '',
       },
     );
     return BaseResponse<dynamic>.fromJson(response.data);
@@ -38,7 +40,7 @@ class OrderRepository {
 
   /// 获取订单列表
   Future<BaseResponse<List<OrderModel>>> getOrderList({
-    int? status,
+    String? status,
     int pageIndex = 1,
     int pageSize = 10,
   }) async {
@@ -56,10 +58,18 @@ class OrderRepository {
     return BaseResponse<List<OrderModel>>.fromJson(
       response.data,
       dataParser: (data) {
-        final list = data as List<dynamic>;
-        return list
-            .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
-            .toList();
+        if (data is List) {
+          return data
+              .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+        final map = data as Map<String, dynamic>;
+        if (map['list'] is List) {
+          return (map['list'] as List)
+              .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+        return <OrderModel>[];
       },
     );
   }

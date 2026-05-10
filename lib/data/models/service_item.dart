@@ -7,7 +7,6 @@ class ServiceItem {
   final int? categoryId;
   final String? categoryName;
   final int? status;
-  final double? originalPrice;
   final bool isNew;
   final String? providerName;
   final String? distance;
@@ -22,6 +21,7 @@ class ServiceItem {
   final String? avatar;
   final List<Map<String, dynamic>>? timeSlots;
   final List<Map<String, dynamic>>? specialDateSlots;
+  final List<Map<String, dynamic>>? prices;
 
   ServiceItem({
     required this.id,
@@ -30,7 +30,6 @@ class ServiceItem {
     required this.price,
     this.categoryId,
     this.categoryName,
-    this.originalPrice,
     this.isNew = false,
     this.providerName,
     this.distance,
@@ -46,7 +45,16 @@ class ServiceItem {
     this.avatar,
     this.timeSlots,
     this.specialDateSlots,
+    this.prices,
   });
+
+  /// 默认展示时长（分钟），从 prices 第一项取
+  int get defaultDurationMinutes {
+    if (prices != null && prices!.isNotEmpty) {
+      return (prices!.first['durationMinutes'] as num?)?.toInt() ?? 60;
+    }
+    return 60;
+  }
 
   /// 获取距离的数值（用于排序）
   double get distanceValue {
@@ -59,17 +67,28 @@ class ServiceItem {
   }
 
   /// 从JSON创建实例
+  /// 从 prices 数组中取第一个价格作为默认展示价格
+  static double _priceFromJson(Map<String, dynamic> json) {
+    final topPrice = (json['price'] as num?)?.toDouble();
+    if (topPrice != null && topPrice > 0) return topPrice;
+    final prices = json['prices'] as List<dynamic>?;
+    if (prices != null && prices.isNotEmpty) {
+      final first = prices.first as Map<String, dynamic>;
+      return (first['price'] as num?)?.toDouble() ?? 0.0;
+    }
+    return 0.0;
+  }
+
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
     return ServiceItem(
       id: json['id'] as int? ?? 0,
       name: json['name'] as String? ?? '',
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      price: _priceFromJson(json),
       categoryId: json['categoryId'] is String
           ? int.tryParse(json['categoryId'] as String)
           : json['categoryId'] as int?,
       categoryName: json['categoryName'] as String?,
-      originalPrice: (json['originalPrice'] as num?)?.toDouble(),
       isNew: json['isNew'] as bool? ?? false,
       providerName: json['providerName'] as String?,
       distance: json['distance'] as String?,
@@ -88,6 +107,9 @@ class ServiceItem {
       specialDateSlots: (json['specialDateSlots'] as List<dynamic>?)
           ?.map((e) => Map<String, dynamic>.from(e as Map))
           .toList(),
+      prices: (json['prices'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
       status: json['status'] is String
           ? int.tryParse(json['status'] as String)
           : json['status'] as int?,
@@ -103,7 +125,6 @@ class ServiceItem {
       'price': price,
       'categoryId': categoryId,
       'categoryName': categoryName,
-      'originalPrice': originalPrice,
       'isNew': isNew,
       'providerName': providerName,
       'distance': distance,
@@ -126,7 +147,6 @@ class ServiceItem {
     String? name,
     double? rating,
     double? price,
-    double? originalPrice,
     int? categoryId,
     String? categoryName,
     bool? isNew,
@@ -150,7 +170,6 @@ class ServiceItem {
       price: price ?? this.price,
       categoryId: categoryId ?? this.categoryId,
       categoryName: categoryName ?? this.categoryName,
-      originalPrice: originalPrice ?? this.originalPrice,
       isNew: isNew ?? this.isNew,
       providerName: providerName ?? this.providerName,
       distance: distance ?? this.distance,

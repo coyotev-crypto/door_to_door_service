@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/data/models/favorite_list_response_model.dart';
@@ -122,6 +123,7 @@ class FavoriteController extends GetxController {
   /// [serviceId] 服务ID
   /// [isFavorite] 是否收藏
   Future<void> toggleFavorite(int serviceId, bool isFavorite) async {
+    LoadingUtil.show();
     try {
       await _serviceRepository.toggleFavorite(
         serviceId: serviceId,
@@ -131,12 +133,16 @@ class FavoriteController extends GetxController {
       // 更新本地收藏列表中的收藏状态
       final index = _favorites.indexWhere((item) => item.serviceId == serviceId);
       if (index != -1) {
-        final updatedService = _favorites[index].service.copyWith(isFavorite: isFavorite);
+        final fav = _favorites[index];
+        final updatedService = fav.service.copyWith(
+          isFavorite: isFavorite,
+          favoriteCount: _nextFavoriteCount(fav.service.favoriteCount, isFavorite),
+        );
         _favorites[index] = FavoriteItem(
-          id: _favorites[index].id,
-          userId: _favorites[index].userId,
-          serviceId: _favorites[index].serviceId,
-          createTime: _favorites[index].createTime,
+          id: fav.id,
+          userId: fav.userId,
+          serviceId: fav.serviceId,
+          createTime: fav.createTime,
           service: updatedService,
         );
       }
@@ -144,7 +150,14 @@ class FavoriteController extends GetxController {
       _errorMessage.value = e.toString();
       ToastUtil.showError('操作失败: $e');
       rethrow;
+    } finally {
+      LoadingUtil.dismiss();
     }
+  }
+
+  int _nextFavoriteCount(int? current, bool isFavorite) {
+    final c = current ?? 0;
+    return isFavorite ? c + 1 : (c > 0 ? c - 1 : 0);
   }
 
   /// 从收藏列表中移除服务

@@ -4,6 +4,7 @@ import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:door_to_door_service/core/services/auth_service.dart';
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../data/models/login_device_model.dart';
@@ -158,6 +159,7 @@ class AccountSecurityController extends GetxController {
     }
 
     _isChangingPassword.value = true;
+    LoadingUtil.show();
     try {
       await _securityRepository.changePassword(
         oldPassword: oldPasswordController.text,
@@ -172,6 +174,7 @@ class AccountSecurityController extends GetxController {
       return false;
     } finally {
       _isChangingPassword.value = false;
+      LoadingUtil.dismiss();
     }
   }
 
@@ -191,6 +194,7 @@ class AccountSecurityController extends GetxController {
     }
 
     _isSettingPaymentPassword.value = true;
+    LoadingUtil.show();
     try {
       final response = await _securityRepository.setPaymentPassword(
         payPassword: setPasswordController.text,
@@ -209,6 +213,7 @@ class AccountSecurityController extends GetxController {
       return false;
     } finally {
       _isSettingPaymentPassword.value = false;
+      LoadingUtil.dismiss();
     }
   }
 
@@ -236,6 +241,7 @@ class AccountSecurityController extends GetxController {
     }
 
     _isChangingPhone.value = true;
+    LoadingUtil.show();
     try {
       final response = await _securityRepository.changePhoneNumber(
         newPhone: newPhoneController.text,
@@ -253,6 +259,7 @@ class AccountSecurityController extends GetxController {
       return false;
     } finally {
       _isChangingPhone.value = false;
+      LoadingUtil.dismiss();
     }
   }
 
@@ -280,6 +287,7 @@ class AccountSecurityController extends GetxController {
   Future<bool> removeLoginDevice({
     required String deviceId,
   }) async {
+    LoadingUtil.show();
     try {
       await _securityRepository.removeLoginDevice(
         deviceId: deviceId,
@@ -290,6 +298,8 @@ class AccountSecurityController extends GetxController {
     } catch (e) {
       ToastUtil.showError('设备移除失败: $e');
       return false;
+    } finally {
+      LoadingUtil.dismiss();
     }
   }
 
@@ -298,6 +308,7 @@ class AccountSecurityController extends GetxController {
   Future<bool> deleteAccount({
     required String smsCode,
   }) async {
+    LoadingUtil.show();
     try {
       await _securityRepository.deleteAccount(
         smsCode: smsCode,
@@ -307,6 +318,8 @@ class AccountSecurityController extends GetxController {
     } catch (e) {
       ToastUtil.showError('账号注销失败: $e');
       return false;
+    } finally {
+      LoadingUtil.dismiss();
     }
   }
 

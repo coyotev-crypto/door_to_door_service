@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -95,6 +96,7 @@ class PostDetailController extends GetxController {
       ToastUtil.showError('请输入评论内容');
       return;
     }
+    LoadingUtil.show();
     try {
       await _repository.createComment(
         postId: post.value!.id,
@@ -106,6 +108,8 @@ class PostDetailController extends GetxController {
       loadComments();
     } catch (e) {
       ToastUtil.showError('$e');
+    } finally {
+      LoadingUtil.dismiss();
     }
   }
 
@@ -128,7 +132,12 @@ class PostDetailController extends GetxController {
       createTime: c.createTime,
     );
     comments.refresh();
-    await _repository.toggleCommentLike(commentId);
+    LoadingUtil.show();
+    try {
+      await _repository.toggleCommentLike(commentId);
+    } catch (_) {} finally {
+      LoadingUtil.dismiss();
+    }
   }
 
   /// 删除评论
@@ -144,12 +153,15 @@ class PostDetailController extends GetxController {
       ],
     ));
     if (confirmed != true) return;
+    LoadingUtil.show();
     try {
       await _repository.deleteComment(commentId);
       comments.removeWhere((c) => c.id == commentId);
       ToastUtil.showSuccess('已删除');
     } catch (e) {
       ToastUtil.showError('$e');
+    } finally {
+      LoadingUtil.dismiss();
     }
   }
 
@@ -165,14 +177,24 @@ class PostDetailController extends GetxController {
       isLiked: newLiked,
       likeCount: newLiked ? p.likeCount + 1 : p.likeCount - 1,
     );
-    await _repository.toggleLike(p.id);
+    LoadingUtil.show();
+    try {
+      await _repository.toggleLike(p.id);
+    } catch (_) {} finally {
+      LoadingUtil.dismiss();
+    }
   }
 
   Future<void> toggleCollect() async {
     if (post.value == null) return;
     final p = post.value!;
     post.value = p.copyWith(isCollected: !p.isCollected);
-    await _repository.toggleCollect(p.id);
+    LoadingUtil.show();
+    try {
+      await _repository.toggleCollect(p.id);
+    } catch (_) {} finally {
+      LoadingUtil.dismiss();
+    }
   }
 
   void share() {

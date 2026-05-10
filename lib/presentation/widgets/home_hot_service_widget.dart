@@ -165,17 +165,6 @@ class HomeHotServiceWidget extends StatelessWidget {
                                       color: Theme.of(context).primaryColor,
                                     ),
                                   ),
-                                  if (service.originalPrice != null) ...[
-                                    SizedBox(width: 4.w),
-                                    Text(
-                                      '¥${service.originalPrice}',
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        color: Colors.grey[400],
-                                        decoration: TextDecoration.lineThrough,
-                                      ),
-                                    ),
-                                  ],
                                 ],
                               ),
                             ],

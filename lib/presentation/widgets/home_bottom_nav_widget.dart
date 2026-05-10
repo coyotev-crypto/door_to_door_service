@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/screen_adapter.dart';
+import '../../core/themes/app_theme.dart';
 
 class HomeBottomNavWidget extends StatelessWidget {
   final int currentIndex;
@@ -22,7 +23,7 @@ class HomeBottomNavWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: const Color(0xFF2D2A26).withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -3)),
+          BoxShadow(color: AppTheme.textPrimary.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -3)),
         ],
       ),
       child: SafeArea(
@@ -40,7 +41,7 @@ class HomeBottomNavWidget extends StatelessWidget {
   }
 
   Widget _buildItem(BuildContext context, {required IconData icon, required String label, required bool selected, required int index}) {
-    final color = selected ? const Color(0xFFC4956A) : const Color(0xFFB8A99A);
+    final color = selected ? AppTheme.gold : AppTheme.textMuted;
     return Expanded(
       child: GestureDetector(
         onTap: () => onTap(index),
@@ -52,7 +53,7 @@ class HomeBottomNavWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.all(selected ? 6.w : 4.w),
               decoration: selected
-                  ? BoxDecoration(color: const Color(0xFFC4956A).withOpacity(0.10), borderRadius: BorderRadius.circular(10.r))
+                  ? BoxDecoration(color: AppTheme.gold.withOpacity(0.10), borderRadius: BorderRadius.circular(10.r))
                   : null,
               child: Icon(icon, size: 24.sp, color: color),
             ),

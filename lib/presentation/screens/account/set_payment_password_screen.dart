@@ -1,201 +1,145 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../core/themes/app_theme.dart';
 import '../../controllers/account_security_controller.dart';
-import '../../widgets/primary_button.dart';
-import '../../widgets/primary_input_field.dart';
-import '../../widgets/info_tip_widget.dart';
 
-/// 设置支付密码页面
+/// 设置支付密码 — 温润质感
 class SetPaymentPasswordScreen extends GetView<AccountSecurityController> {
   const SetPaymentPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final c = controller;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
-        title: const Text(
-          '设置支付密码',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        title: Text('设置支付密码', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+        centerTitle: true, backgroundColor: Colors.white, elevation: 0, scrolledUnderElevation: 0.5,
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_rounded, size: 20.sp, color: AppTheme.textPrimary), onPressed: () => Get.back()),
       ),
       body: Form(
-        key: controller.setPaymentPasswordFormKey,
+        key: c.setPaymentPasswordFormKey,
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 40.h),
           children: [
+            _infoBanner(),
             SizedBox(height: 24.h),
-
-            // 提示信息
-            const InfoTipWidget(
-              message: '支付密码用于支付时的安全验证，请妥善保管',
-            ),
-
-            SizedBox(height: 24.h),
-
-            // 手机号显示
-            Obx(() {
-              final authService = Get.find<AuthService>();
-              final phoneNumber = authService.user?.phoneNumber ?? '';
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.phone_outlined,
-                      size: 20.sp,
-                      color: Colors.grey[600],
+            _phoneDisplay(),
+            SizedBox(height: 28.h),
+            Obx(() => _pwField(ctrl: c.setPasswordController, label: '支付密码', hint: '请输入6位数字支付密码', obscure: c.obscureSetPassword, onToggle: c.toggleSetPasswordVisibility, validator: (v) => v == null || v.isEmpty ? '请输入支付密码' : v.length != 6 || !RegExp(r'^\d{6}$').hasMatch(v) ? '支付密码必须为6位数字' : null)),
+            SizedBox(height: 16.h),
+            Obx(() => _pwField(ctrl: c.setConfirmPasswordController, label: '确认密码', hint: '请再次输入支付密码', obscure: c.obscureSetConfirmPassword, onToggle: c.toggleSetConfirmPasswordVisibility, validator: (v) => v == null || v.isEmpty ? '请再次输入支付密码' : v != c.setPasswordController.text ? '两次输入的密码不一致' : null)),
+            SizedBox(height: 16.h),
+            _label('验证码'), SizedBox(height: 8.h),
+            Row(children: [
+              Expanded(child: TextFormField(
+                controller: c.setSmsCodeController, keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(6)],
+                style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
+                decoration: _dec(hint: '请输入验证码', prefix: Icons.sms_outlined),
+              )),
+              SizedBox(width: 12.w),
+              Obx(() {
+                final cd = c.smsCodeController.countdown.value;
+                final active = cd == 0;
+                return GestureDetector(
+                  onTap: active ? c.sendSetPaymentPasswordSmsCode : null,
+                  child: Container(
+                    height: 52.h, width: 110.w,
+                    decoration: BoxDecoration(
+                      gradient: active ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    SizedBox(width: 12.w),
-                    Text(
-                      '验证码将发送至: $phoneNumber',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-
+                    child: Center(child: Text(active ? '获取验证码' : '${cd}s', style: TextStyle(fontSize: 13.sp, color: active ? Colors.white : AppTheme.textMuted, fontWeight: FontWeight.w600))),
+                  ),
+                );
+              }),
+            ]),
             SizedBox(height: 32.h),
-
-            // 支付密码
-            Obx(() => PrimaryInputField(
-                  controller: controller.setPasswordController,
-                  label: '支付密码',
-                  hintText: '请输入6位数字支付密码',
-                  obscureText: controller.obscureSetPassword,
-                  keyboardType: TextInputType.number,
-                  prefixIcon: const Icon(Icons.payment_outlined),
-                  maxLength: 6,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      controller.obscureSetPassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      controller.toggleSetPasswordVisibility();
-                    },
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入支付密码';
-                    }
-                    if (value.length != 6) {
-                      return '支付密码必须为6位数字';
-                    }
-                    if (!RegExp(r'^\d{6}$').hasMatch(value)) {
-                      return '支付密码必须为6位数字';
-                    }
-                    return null;
-                  },
-                )),
-
-            const SizedBox(height: 16),
-
-            // 确认密码
-            Obx(() => PrimaryInputField(
-                  controller: controller.setConfirmPasswordController,
-                  label: '确认密码',
-                  hintText: '请再次输入支付密码',
-                  obscureText: controller.obscureSetConfirmPassword,
-                  maxLength: 6,
-                  keyboardType: TextInputType.number,
-                  prefixIcon: const Icon(Icons.payment_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      controller.obscureSetConfirmPassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      controller.toggleSetConfirmPasswordVisibility();
-                    },
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请再次输入支付密码';
-                    }
-                    if (value != controller.setPasswordController.text) {
-                      return '两次输入的密码不一致';
-                    }
-                    return null;
-                  },
-                )),
-
-            const SizedBox(height: 16),
-
-            // 验证码
-            PrimaryInputField(
-              controller: controller.setSmsCodeController,
-              label: '验证码',
-              hintText: '请输入验证码',
-              maxLength: 6,
-              keyboardType: TextInputType.number,
-              prefixIcon: const Icon(Icons.verified_user_outlined),
-              trailingButton: SizedBox(
-                width: 120.w,
-                height: 56.h,
-                child: Obx(
-                  () => ElevatedButton(
-                    onPressed: controller.smsCodeController.countdown.value == 0
-                        ? controller.sendSetPaymentPasswordSmsCode
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          controller.smsCodeController.countdown.value == 0
-                              ? AppTheme.servicePrimaryColor
-                              : Colors.grey[300],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    child: Text(
-                      controller.smsCodeController.countdown.value == 0
-                          ? '获取验证码'
-                          : '${controller.smsCodeController.countdown.value}秒后重试',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: controller.smsCodeController.countdown.value == 0
-                            ? Colors.white
-                            : Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // 提交按钮
-            Obx(() => PrimaryButton(
-                  text: '确认设置',
-                  onPressed: controller.isSettingPaymentPassword
-                      ? null
-                      : () => controller.setPaymentPassword(),
-                  isLoading: controller.isSettingPaymentPassword,
-                )),
+            Obx(() => _gradientBtn(loading: c.isSettingPaymentPassword, label: '确认设置', onTap: c.setPaymentPassword)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _infoBanner() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppTheme.gold.withOpacity(0.08), AppTheme.gold.withOpacity(0.03)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(10.r), border: Border.all(color: AppTheme.gold.withOpacity(0.12)),
+      ),
+      child: Row(children: [
+        Icon(Icons.info_outline_rounded, size: 18.sp, color: AppTheme.gold),
+        SizedBox(width: 10.w),
+        Expanded(child: Text('支付密码用于支付时的安全验证，请妥善保管', style: TextStyle(fontSize: 13.sp, color: AppTheme.textSecondary, height: 1.4))),
+      ]),
+    );
+  }
+
+  Widget _phoneDisplay() {
+    final phone = Get.find<AuthService>().user?.phoneNumber ?? '';
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(color: AppTheme.creamBg, borderRadius: BorderRadius.circular(10.r)),
+      child: Row(children: [
+        Icon(Icons.phone_android_rounded, size: 18.sp, color: AppTheme.gold),
+        SizedBox(width: 10.w),
+        Text('验证码将发送至: $phone', style: TextStyle(fontSize: 13.sp, color: AppTheme.textSecondary)),
+      ]),
+    );
+  }
+
+  Widget _label(String t) => Text(t, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppTheme.textPrimary));
+
+  Widget _pwField({required TextEditingController ctrl, required String label, required String hint, required bool obscure, required VoidCallback onToggle, String? Function(String?)? validator}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _label(label),
+      SizedBox(height: 8.h),
+      TextFormField(
+        controller: ctrl, obscureText: obscure, validator: validator, maxLength: 6,
+        keyboardType: TextInputType.number,
+        style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
+        decoration: _dec(hint: hint, prefix: Icons.payment_outlined, suffix: IconButton(
+          icon: Icon(obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20.sp, color: AppTheme.textMuted),
+          onPressed: onToggle,
+        )),
+      ),
+    ]);
+  }
+
+  InputDecoration _dec({required String hint, required IconData prefix, Widget? suffix}) {
+    return InputDecoration(
+      hintText: hint, hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
+      filled: true, fillColor: AppTheme.creamBg,
+      counterText: '',
+      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      prefixIcon: Icon(prefix, size: 18.sp, color: AppTheme.gold), suffixIcon: suffix,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.gold)),
+      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.danger)),
+      focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.danger)),
+    );
+  }
+
+  Widget _gradientBtn({required bool loading, required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: loading ? null : onTap,
+      child: Container(
+        height: 52.h,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+        ),
+        child: Center(child: loading
+            ? SizedBox(width: 22.w, height: 22.w, child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+            : Text(label, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 1.5))),
       ),
     );
   }

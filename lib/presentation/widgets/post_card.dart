@@ -62,6 +62,7 @@ class PostCard extends StatelessWidget {
                 ? Image.network(
                     post.images.first,
                     fit: BoxFit.cover,
+                    cacheWidth: 512,
                     errorBuilder: (_, __, ___) => _buildPlaceholder(),
                   )
                 : _buildPlaceholder(),
@@ -138,7 +139,8 @@ class PostCard extends StatelessWidget {
           CircleAvatar(
             radius: 12.r,
             backgroundImage: post.authorAvatar != null
-                ? NetworkImage(post.authorAvatar!)
+                ? ResizeImage(NetworkImage(post.authorAvatar!),
+                    width: 48, height: 48)
                 : null,
             backgroundColor: Colors.grey[200],
             child: post.authorAvatar == null
@@ -188,15 +190,25 @@ class PostCard extends StatelessWidget {
     return count.toString();
   }
 
+  static final Map<String, String> _timeCache = {};
+
   String _formatTime(String time) {
+    final cached = _timeCache[time];
+    if (cached != null) return cached;
     try {
       final dt = DateTime.parse(time);
       final diff = DateTime.now().difference(dt);
-      if (diff.inMinutes < 60) return '${diff.inMinutes}分钟前';
-      if (diff.inHours < 24) return '${diff.inHours}小时前';
-      if (diff.inDays < 7) return '${diff.inDays}天前';
-      return '${dt.month}-${dt.day}';
+      final result = diff.inMinutes < 60
+          ? '${diff.inMinutes}分钟前'
+          : diff.inHours < 24
+              ? '${diff.inHours}小时前'
+              : diff.inDays < 7
+                  ? '${diff.inDays}天前'
+                  : '${dt.month}-${dt.day}';
+      _timeCache[time] = result;
+      return result;
     } catch (_) {
+      _timeCache[time] = time;
       return time;
     }
   }

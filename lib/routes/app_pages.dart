@@ -1,6 +1,7 @@
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_list_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/payment_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/profile_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/provider_qualification_controller.dart';
@@ -15,11 +16,12 @@ import 'package:get/get.dart';
 import 'route_names.dart';
 import '../presentation/screens/splash_screen.dart';
 import '../presentation/screens/auth/login_screen.dart';
-import '../presentation/screens/account/forgot_password_screen.dart';
 import '../presentation/screens/community/post_list_page.dart';
 import '../presentation/screens/community/post_create_page.dart';
 import '../presentation/screens/community/post_detail_page.dart';
 import '../presentation/screens/order/order_create_screen.dart';
+import '../presentation/screens/order/order_list_page.dart';
+import '../presentation/screens/order/payment_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/account/profile_edit_screen.dart';
 import '../presentation/screens/provider/provider_join_page.dart';
@@ -64,11 +66,6 @@ class AppPages {
     GetPage(
       name: RouteNames.login,
       page: () => const LoginScreen(),
-      binding: BindingsBuilder(() => Get.lazyPut(() => LoginController())),
-    ),
-    GetPage(
-      name: RouteNames.forgotPassword,
-      page: () => const ForgotPasswordScreen(),
       binding: BindingsBuilder(() => Get.lazyPut(() => LoginController())),
     ),
     GetPage(
@@ -153,6 +150,18 @@ class AppPages {
       page: () => const OrderCreateScreen(),
       binding:
           BindingsBuilder(() => Get.lazyPut(() => OrderController())),
+    ),
+    GetPage(
+      name: RouteNames.orderPayment,
+      page: () => const PaymentScreen(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => PaymentController())),
+    ),
+    GetPage(
+      name: RouteNames.orderList,
+      page: () => const OrderListPage(),
+      binding:
+          BindingsBuilder(() => Get.lazyPut(() => OrderListController())),
     ),
     // 社区相关路由
     GetPage(

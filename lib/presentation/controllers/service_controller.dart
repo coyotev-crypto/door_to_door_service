@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:get/get.dart';
@@ -306,6 +307,7 @@ class ServiceController extends GetxController {
     int serviceId,
     bool isFavorite,
   ) async {
+    LoadingUtil.show();
     try {
       await _serviceRepository.toggleFavorite(
         serviceId: serviceId,
@@ -315,27 +317,44 @@ class ServiceController extends GetxController {
       // 更新本地服务列表中的收藏状态
       final index = _services.indexWhere((service) => service.id == serviceId);
       if (index != -1) {
-        _services[index] = _services[index].copyWith(isFavorite: isFavorite);
+        final s = _services[index];
+        _services[index] = s.copyWith(
+          isFavorite: isFavorite,
+          favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
+        );
       }
 
       // 更新筛选后服务列表中的收藏状态
       final filteredIndex =
           _filteredServices.indexWhere((service) => service.id == serviceId);
       if (filteredIndex != -1) {
-        _filteredServices[filteredIndex] =
-            _filteredServices[filteredIndex].copyWith(isFavorite: isFavorite);
+        final s = _filteredServices[filteredIndex];
+        _filteredServices[filteredIndex] = s.copyWith(
+          isFavorite: isFavorite,
+          favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
+        );
       }
 
       // 更新新人推荐列表中的收藏状态
       final newcomerIndex =
           _newcomerServices.indexWhere((service) => service.id == serviceId);
       if (newcomerIndex != -1) {
-        _newcomerServices[newcomerIndex] =
-            _newcomerServices[newcomerIndex].copyWith(isFavorite: isFavorite);
+        final s = _newcomerServices[newcomerIndex];
+        _newcomerServices[newcomerIndex] = s.copyWith(
+          isFavorite: isFavorite,
+          favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
+        );
       }
     } catch (e) {
       _errorMessage.value = e.toString();
       ToastUtil.showError('操作失败: $e');
+    } finally {
+      LoadingUtil.dismiss();
     }
+  }
+
+  int _nextFavoriteCount(int? current, bool isFavorite) {
+    final c = current ?? 0;
+    return isFavorite ? c + 1 : (c > 0 ? c - 1 : 0);
   }
 }

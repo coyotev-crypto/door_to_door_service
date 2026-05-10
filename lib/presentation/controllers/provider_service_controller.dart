@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
 import 'package:door_to_door_service/data/models/category_model.dart';
@@ -38,7 +39,18 @@ class ProviderServiceController extends GetxController {
   final RxList<Map<String, dynamic>> _specialDateSlots =
       <Map<String, dynamic>>[].obs;
 
-  static const List<String> weekdayLabels = ['周一','周二','周三','周四','周五','周六','周日'];
+  // 多时长价格: [{durationMinutes:60, price:268}, ...]
+  final RxList<Map<String, dynamic>> _prices = <Map<String, dynamic>>[].obs;
+
+  static const List<String> weekdayLabels = [
+    '周一',
+    '周二',
+    '周三',
+    '周四',
+    '周五',
+    '周六',
+    '周日'
+  ];
 
   // 表单校验Key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -66,6 +78,7 @@ class ProviderServiceController extends GetxController {
 
   /// 星期时间段列表
   List<Map<String, dynamic>> get weekdaySlots => _weekdaySlots;
+
   /// 特殊日期时间段列表
   List<Map<String, dynamic>> get specialDateSlots => _specialDateSlots;
 
@@ -81,10 +94,12 @@ class ProviderServiceController extends GetxController {
     });
     _weekdaySlots.refresh();
   }
+
   void removeWeekdaySlot(int index) {
     _weekdaySlots.removeAt(index);
     _weekdaySlots.refresh();
   }
+
   void updateWeekdaySlot(int index, String key, String value) {
     _weekdaySlots[index] = {..._weekdaySlots[index], key: value};
     _weekdaySlots.refresh();
@@ -98,13 +113,25 @@ class ProviderServiceController extends GetxController {
     });
     _specialDateSlots.refresh();
   }
+
   void removeSpecialDateSlot(int index) {
     _specialDateSlots.removeAt(index);
     _specialDateSlots.refresh();
   }
+
   void updateSpecialDateSlot(int index, String key, String value) {
     _specialDateSlots[index] = {..._specialDateSlots[index], key: value};
     _specialDateSlots.refresh();
+  }
+
+  /// 多时长价格列表
+  List<Map<String, dynamic>> get prices => _prices;
+
+  void addPrice() => _prices.add({'durationMinutes': 60, 'price': 100.0});
+  void removePrice(int i) => _prices.removeAt(i);
+  void updatePrice(int i, String key, dynamic value) {
+    _prices[i] = {..._prices[i], key: value};
+    _prices.refresh();
   }
 
   /// 构建 timeSlots JSON（数组格式）
@@ -130,7 +157,8 @@ class ProviderServiceController extends GetxController {
       for (var j = i + 1; j < _weekdaySlots.length; j++) {
         final s2 = _weekdaySlots[j];
         if (s['weekday'] != s2['weekday']) continue;
-        if (_overlaps(start, end, s2['startTime'] as String, s2['endTime'] as String)) {
+        if (_overlaps(
+            start, end, s2['startTime'] as String, s2['endTime'] as String)) {
           ToastUtil.showError('${weekdayLabels[w]} 时间段存在重叠');
           return false;
         }
@@ -148,7 +176,8 @@ class ProviderServiceController extends GetxController {
       for (var j = i + 1; j < _specialDateSlots.length; j++) {
         final s2 = _specialDateSlots[j];
         if (s['specialDate'] != s2['specialDate']) continue;
-        if (_overlaps(start, end, s2['startTime'] as String, s2['endTime'] as String)) {
+        if (_overlaps(
+            start, end, s2['startTime'] as String, s2['endTime'] as String)) {
           ToastUtil.showError('${s['specialDate']} 时间段存在重叠');
           return false;
         }
@@ -212,6 +241,14 @@ class ProviderServiceController extends GetxController {
     providerNameController.clear();
     _weekdaySlots.clear();
     _specialDateSlots.clear();
+    _prices.clear();
+    _prices.add({'durationMinutes': 60, 'price': 100.0});
+  }
+
+  /// 从 prices 取第一个价格作为 base price（API 兼容）
+  double get _basePrice {
+    if (_prices.isEmpty) return 0;
+    return (_prices.first['price'] as num?)?.toDouble() ?? 0;
   }
 
   @override
@@ -303,6 +340,10 @@ class ProviderServiceController extends GetxController {
     if (service.specialDateSlots != null) {
       _specialDateSlots.addAll(service.specialDateSlots!);
     }
+    _prices.clear();
+    if (service.prices != null) {
+      _prices.addAll(service.prices!);
+    }
 
     // 设置分类
     if (service.categoryId != null) {
@@ -346,6 +387,7 @@ class ProviderServiceController extends GetxController {
     if (!_validateTimeSlots()) return;
 
     _isSubmitting.value = true;
+    LoadingUtil.show();
     try {
       if (isEditMode) {
         await _updateService();
@@ -354,6 +396,7 @@ class ProviderServiceController extends GetxController {
       }
     } finally {
       _isSubmitting.value = false;
+      LoadingUtil.dismiss();
     }
   }
 
@@ -363,7 +406,7 @@ class ProviderServiceController extends GetxController {
       final response = await _serviceRepository.createService(
         categoryId: _selectedCategory.value!.id,
         name: nameController.text.trim(),
-        price: double.parse(priceController.text.trim()),
+        price: _basePrice,
         providerName: providerNameController.text.trim(),
         address: _selectedCity.value!.name,
         deliveryRange: double.parse(deliveryRangeController.text.trim()),
@@ -375,6 +418,7 @@ class ProviderServiceController extends GetxController {
         status: _status.value,
         timeSlots: _buildTimeSlotsJson(),
         specialDateSlots: _buildSpecialDateSlotsJson(),
+        prices: _prices.toList(),
       );
       if (response.isSuccess) {
         Get.back(result: true);
@@ -393,7 +437,7 @@ class ProviderServiceController extends GetxController {
         id: _serviceData.value!.id,
         categoryId: _selectedCategory.value!.id,
         name: nameController.text.trim(),
-        price: double.parse(priceController.text.trim()),
+        price: _basePrice,
         providerName: providerNameController.text.trim(),
         address: _selectedCity.value!.name,
         deliveryRange: double.parse(deliveryRangeController.text.trim()),
@@ -405,6 +449,7 @@ class ProviderServiceController extends GetxController {
         status: _status.value,
         timeSlots: _buildTimeSlotsJson(),
         specialDateSlots: _buildSpecialDateSlotsJson(),
+        prices: _prices.toList(),
       );
       if (response.isSuccess) {
         Get.back(result: true);

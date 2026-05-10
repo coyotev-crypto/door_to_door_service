@@ -252,17 +252,28 @@ class HomeContentController extends GetxController {
     // 更新服务列表中的收藏状态
     final index = _services.indexWhere((service) => service.id == serviceId);
     if (index != -1) {
-      _services[index] = _services[index].copyWith(isFavorite: isFavorite);
-      // 触发列表更新
+      final s = _services[index];
+      _services[index] = s.copyWith(
+        isFavorite: isFavorite,
+        favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
+      );
       _services.refresh();
     }
 
     // 更新新人推荐列表中的收藏状态
     final newcomerIndex = _newcomerServices.indexWhere((service) => service.id == serviceId);
     if (newcomerIndex != -1) {
-      _newcomerServices[newcomerIndex] = _newcomerServices[newcomerIndex].copyWith(isFavorite: isFavorite);
-      // 触发列表更新
+      final s = _newcomerServices[newcomerIndex];
+      _newcomerServices[newcomerIndex] = s.copyWith(
+        isFavorite: isFavorite,
+        favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
+      );
       _newcomerServices.refresh();
     }
+  }
+
+  int _nextFavoriteCount(int? current, bool isFavorite) {
+    final c = current ?? 0;
+    return isFavorite ? c + 1 : (c > 0 ? c - 1 : 0);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -101,6 +102,7 @@ class LoginController extends GetxController {
     }
 
     isLoading.value = true;
+    LoadingUtil.show();
 
     try {
       final result = isPasswordLogin.value
@@ -143,6 +145,7 @@ class LoginController extends GetxController {
       ToastUtil.showError('$e');
     } finally {
       isLoading.value = false;
+      LoadingUtil.dismiss();
     }
   }
 
@@ -245,6 +248,7 @@ class LoginController extends GetxController {
     }
 
     forgotIsLoading.value = true;
+    LoadingUtil.show();
 
     try {
       // 调用重置密码API
@@ -263,6 +267,7 @@ class LoginController extends GetxController {
       return false;
     } finally {
       forgotIsLoading.value = false;
+      LoadingUtil.dismiss();
     }
   }
 

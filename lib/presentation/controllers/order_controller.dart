@@ -1,3 +1,4 @@
+import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,21 +22,47 @@ class OrderController extends GetxController {
   final Rxn<AddressModel> _selectedAddress = Rxn<AddressModel>();
   final RxString _selectedDate = ''.obs;
   final RxString _selectedTime = ''.obs;
+  final RxInt _selectedDurationMinutes = 60.obs;
 
   bool get isSubmitting => _isSubmitting.value;
   ServiceItem? get service => _service.value;
   AddressModel? get selectedAddress => _selectedAddress.value;
   String get selectedDate => _selectedDate.value;
   String get selectedTime => _selectedTime.value;
+  int get selectedDurationMinutes => _selectedDurationMinutes.value;
+
+  /// 当前所选时长的价格
+  double get selectedPrice {
+    final s = _service.value;
+    if (s == null) return 0;
+    if (s.prices != null && s.prices!.isNotEmpty) {
+      for (final p in s.prices!) {
+        if ((p['durationMinutes'] as int?) == _selectedDurationMinutes.value) {
+          return (p['price'] as num?)?.toDouble() ?? s.price;
+        }
+      }
+    }
+    return s.price;
+  }
+
   String get serviceTimeText {
     if (_selectedDate.value.isEmpty) return '请选择服务时间';
     return '${_selectedDate.value} ${_selectedTime.value.isNotEmpty ? _selectedTime.value : ''}';
   }
 
-  /// 总价 = 服务价格 + 交通费
+  /// 总价 = 所选时长的价格 + 交通费
   double get totalPrice {
     if (_service.value == null) return 0;
-    return _service.value!.price + (_service.value!.travelFee ?? 0);
+    return selectedPrice + (_service.value!.travelFee ?? 0);
+  }
+
+  /// 可选的时长列表
+  List<Map<String, dynamic>> get availableDurations {
+    final s = _service.value;
+    if (s?.prices != null && s!.prices!.isNotEmpty) {
+      return s.prices!;
+    }
+    return [{'durationMinutes': 60, 'price': s?.price ?? 0}];
   }
 
   @override
@@ -56,15 +83,30 @@ class OrderController extends GetxController {
     final args = Get.arguments;
     if (args is ServiceItem) {
       _service.value = args;
+      _initDefaultDuration();
     } else if (args is Map<String, dynamic>) {
       if (args['service'] is ServiceItem) {
         _service.value = args['service'] as ServiceItem;
+        _initDefaultDuration();
       }
       if (args['address'] is AddressModel) {
         _selectedAddress.value = args['address'] as AddressModel;
         _fillAddressInfo(args['address'] as AddressModel);
       }
     }
+  }
+
+  void _initDefaultDuration() {
+    final s = _service.value;
+    if (s?.prices != null && s!.prices!.isNotEmpty) {
+      _selectedDurationMinutes.value =
+          (s.prices!.first['durationMinutes'] as int?) ?? 60;
+    }
+  }
+
+  /// 选择服务时长
+  void selectDuration(int minutes) {
+    _selectedDurationMinutes.value = minutes;
   }
 
   /// 选择日期
@@ -113,6 +155,13 @@ class OrderController extends GetxController {
     }
   }
 
+  /// 构建 ISO8601 格式开始时间（北京时间 UTC+8）
+  String _buildStartTime() {
+    final date = _selectedDate.value; // "2026-05-11"
+    final time = _selectedTime.value; // "09:00"
+    return '${date}T${time}:00+08:00';
+  }
+
   /// 验证并提交订单
   Future<void> submit() async {
     if (_selectedAddress.value == null) {
@@ -141,9 +190,12 @@ class OrderController extends GetxController {
     }
 
     _isSubmitting.value = true;
+    LoadingUtil.show();
     try {
       final response = await _orderRepository.createOrder(
         serviceId: _service.value!.id,
+        durationMinutes: _selectedDurationMinutes.value,
+        startTime: _buildStartTime(),
         addressName: _selectedAddress.value!.name,
         latitude: _selectedAddress.value!.latitude,
         longitude: _selectedAddress.value!.longitude,
@@ -152,10 +204,25 @@ class OrderController extends GetxController {
         remark: remarkController.text.trim().isNotEmpty
             ? remarkController.text.trim()
             : null,
-        serviceTime: '${_selectedDate.value} ${_selectedTime.value}',
       );
       if (response.isSuccess) {
-        Get.back(result: true);
+        final data = response.data;
+        final orderId = data is Map ? (data['orderId'] as int?) : null;
+        final orderNo =
+            data is Map ? (data['orderNo'] as String?) : null;
+        Get.back();
+        if (orderId != null && orderNo != null) {
+          Get.toNamed(
+            RouteNames.orderPayment,
+            arguments: {
+              'orderId': orderId,
+              'orderNo': orderNo,
+              'amount': totalPrice,
+              'serviceName': _service.value?.name ?? '',
+              'durationMinutes': _selectedDurationMinutes.value,
+            },
+          );
+        }
         ToastUtil.showSuccess('下单成功');
       }
     } catch (e) {
@@ -163,6 +230,7 @@ class OrderController extends GetxController {
       ToastUtil.showError('$e');
     } finally {
       _isSubmitting.value = false;
+      LoadingUtil.dismiss();
     }
   }
 }

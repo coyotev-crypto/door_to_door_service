@@ -10,214 +10,154 @@ import '../controllers/home_content_controller.dart';
 import '../controllers/service_controller.dart';
 import '../widgets/home_search_bar_widget.dart';
 import '../widgets/empty_placeholder_widget.dart';
+import '../widgets/section_header_widget.dart';
+import '../../core/themes/app_theme.dart';
 
-/// 首页内容组件
-///
-/// 展示首页的主要内容，包括搜索栏、分类导航、服务列表等
+/// 首页内容组件 — CustomScrollView + Slivers
 class HomeContentWidget extends GetWidget<HomeContentController> {
   final Future<void> Function() onRefresh;
   final bool isRefreshing;
   final serviceController = Get.find<ServiceController>();
-  HomeContentWidget({
-    super.key,
-    required this.onRefresh,
-    this.isRefreshing = false,
-  });
 
-  /// 下拉刷新
+  HomeContentWidget(
+      {super.key, required this.onRefresh, this.isRefreshing = false});
+
   Future<void> _onRefresh() async {
     try {
       await controller.refreshServices();
     } catch (e) {
       if (Get.context?.mounted == true) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('刷新失败: $e')),
-        );
+        ScaffoldMessenger.of(Get.context!)
+            .showSnackBar(SnackBar(content: Text('刷新失败: $e')));
       }
     }
   }
 
-  /// 上拉加载
   Future<void> _onLoad() async {
     try {
       await controller.loadMoreServices();
     } catch (e) {
       if (Get.context?.mounted == true) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('加载更多失败: $e')),
-        );
+        ScaffoldMessenger.of(Get.context!)
+            .showSnackBar(SnackBar(content: Text('加载更多失败: $e')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return RepaintBoundary(
-        child: Column(
-          children: [
-            // 固定在顶部的搜索栏和分类导航
-            Container(
+    return Column(
+      children: [
+        // 固定顶部：搜索栏 + 分类导航
+        RepaintBoundary(
+          child: Container(
+            decoration: BoxDecoration(
               color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 搜索栏
-                  RepaintBoundary(
+              boxShadow: [
+                BoxShadow(
+                    color: AppTheme.textPrimary.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2))
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RepaintBoundary(
                     child: HomeSearchBarWidget(
-                      onSearchTap: () {
-                        Get.toNamed(RouteNames.search);
+                  onSearchTap: () => Get.toNamed(RouteNames.search),
+                )),
+                GetBuilder<HomeContentController>(
+                  id: 'category',
+                  builder: (ctrl) => CategoryFilterBarWidget(
+                    categories: ctrl.categories,
+                    selectedIndex: ctrl.selectedCategoryIndex,
+                    onCategorySelected: (index) =>
+                        ctrl.handleCategorySelected(index),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // 可滚动内容区 — Slivers 避免 shrinkWrap
+        Expanded(
+          child: Obx(
+            () => EasyRefresh(
+              controller: controller.refreshController,
+              onRefresh: _onRefresh,
+              onLoad: _onLoad,
+              child: CustomScrollView(
+                cacheExtent: 800,
+                slivers: [
+                  // 新人推荐
+                  if (controller.newcomerServices.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: RepaintBoundary(
+                        child: NewcomerRecommendationWidget(
+                          services: controller.newcomerServices,
+                          onMorePressed: () {
+                            Get.toNamed(RouteNames.moreRecommendations,
+                                arguments: {
+                                  'provinceId': controller.provinceId,
+                                  'cityId': controller.cityId,
+                                  'areaId': controller.areaId,
+                                });
+                          },
+                          onServiceTap: (service) {/* TODO */},
+                        ),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(
+                      child: SectionHeaderWidget(
+                          title: '推荐商户', badge: '精选')),
+                  // 服务列表
+                  if (controller.services.isEmpty)
+                    const SliverFillRemaining(
+                      child: EmptyPlaceholderWidget(
+                          message: '暂无推荐商户', constrainHeight: true),
+                    )
+                  else
+                    SliverList.builder(
+                      itemCount: controller.services.length,
+                      itemBuilder: (context, index) {
+                        final service = controller.services[index];
+                        return RepaintBoundary(
+                          child: Column(
+                            children: [
+                              ServiceCardWidget(
+                                service: service,
+                                onTap: () {/* TODO */},
+                                onOrderTap: () => Get.toNamed(
+                                    RouteNames.orderCreate,
+                                    arguments: service),
+                                onFavoriteTap: () async {
+                                  final s =
+                                      !(service.isFavorite ?? false);
+                                  await serviceController.toggleFavorite(
+                                      service.id, s);
+                                  controller.updateServiceFavorite(
+                                      service.id, s);
+                                },
+                              ),
+                              if (index <
+                                  controller.services.length - 1)
+                                Divider(
+                                    height: 1,
+                                    indent: 16.w,
+                                    endIndent: 16.w,
+                                    color: AppTheme.warmBorder),
+                            ],
+                          ),
+                        );
                       },
                     ),
-                  ),
-                  // 分类筛选导航栏
-                  GetBuilder<HomeContentController>(
-                    id: 'category',
-                    builder: (controller) => CategoryFilterBarWidget(
-                      categories: controller.categories,
-                      selectedIndex: controller.selectedCategoryIndex,
-                      onCategorySelected: (index) {
-                        controller.handleCategorySelected(index);
-                      },
-                    ),
-                  ),
                 ],
               ),
             ),
-            // 可滚动的内容区域
-            Expanded(
-              child: EasyRefresh(
-                controller: controller.refreshController,
-                onRefresh: _onRefresh,
-                onLoad: _onLoad,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      // 新人推荐 — 为空则整个隐藏
-                      if (controller.newcomerServices.isNotEmpty)
-                        RepaintBoundary(
-                          child: NewcomerRecommendationWidget(
-                            services: controller.newcomerServices,
-                            onMorePressed: () {
-                              Get.toNamed(RouteNames.moreRecommendations,
-                                  arguments: {
-                                    'provinceId': controller.provinceId,
-                                    'cityId': controller.cityId,
-                                    'areaId': controller.areaId,
-                                  });
-                            },
-                            onServiceTap: (service) {
-                              // TODO: 跳转到服务详情
-                            },
-                          ),
-                        ),
-                      // 热门服务
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 12.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 标题
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 12.h),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '推荐商户',
-                                        style: TextStyle(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8.w),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 2.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Text(
-                                          'HOT',
-                                          style: TextStyle(
-                                            fontSize: 10.sp,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // 服务列表
-                            controller.services.isEmpty
-                                ? const EmptyPlaceholderWidget(
-                                    message: '暂无推荐商户',
-                                    constrainHeight: true,
-                                  )
-                                : RepaintBoundary(
-                                    child: ListView.separated(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      cacheExtent: 5 * 140.h, // 缓存5个item的高度
-                                      itemCount: controller.services.length,
-                                      separatorBuilder: (context, index) =>
-                                          Divider(
-                                        height: 1,
-                                        color: Colors.grey[200],
-                                      ),
-                                      itemBuilder: (context, index) {
-                                        final service =
-                                            controller.services[index];
-                                        return ServiceCardWidget(
-                                          service: service,
-                                          onTap: () {
-                                            // TODO: 跳转到服务详情
-                                          },
-                                          onOrderTap: () {
-                                            Get.toNamed(RouteNames.orderCreate,
-                                                arguments: service);
-                                          },
-                                          onFavoriteTap: () async {
-                                            final newFavoriteState =
-                                                !(service.isFavorite ?? false);
-                                            await serviceController
-                                                .toggleFavorite(
-                                              service.id,
-                                              newFavoriteState,
-                                            );
-                                            // 更新本地服务列表中的收藏状态
-                                            controller.updateServiceFavorite(
-                                                service.id, newFavoriteState);
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      );
-    });
+      ],
+    );
   }
 }

@@ -9,6 +9,7 @@ import 'chat/message_page_widget.dart';
 import 'account/profile_widget.dart';
 import '../../core/utils/screen_adapter.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/themes/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F2),
+      backgroundColor: AppTheme.creamBg,
       body: SafeArea(
         child: SizedBox.expand(
           child: Stack(

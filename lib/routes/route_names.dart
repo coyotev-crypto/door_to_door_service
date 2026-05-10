@@ -7,8 +7,6 @@ class RouteNames {
   // 认证相关
   static const String splash = '/splash';
   static const String login = '/login';
-  static const String forgotPassword = '/forgot-password';
-
   // 主页面
   static const String home = '/';
   static const String profile = '/profile';
@@ -23,6 +21,8 @@ class RouteNames {
 
   // 订单相关
   static const String orderCreate = '/order/create';
+  static const String orderPayment = '/order/payment';
+  static const String orderList = '/order/list';
 
   // 社区相关
   static const String postList = '/community';
