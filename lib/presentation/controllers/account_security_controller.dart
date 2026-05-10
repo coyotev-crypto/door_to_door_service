@@ -137,7 +137,7 @@ class AccountSecurityController extends GetxController {
     _isLoadingDevices.value = true;
     try {
       final devices = await _securityRepository.getLoginDevices();
-      // _devices.assignAll(devices);
+      _devices.assignAll(devices.data ?? []);
     } catch (e) {
       ToastUtil.showError('加载登录设备失败: $e');
     } finally {
@@ -165,7 +165,7 @@ class AccountSecurityController extends GetxController {
       );
       ToastUtil.showSuccess('密码修改成功，请重新登录');
       // 导航到登录页面
-      Get.offAllNamed('/login');
+      Get.offAllNamed(RouteNames.login);
       return true;
     } catch (e) {
       ToastUtil.showError('密码修改失败: $e');

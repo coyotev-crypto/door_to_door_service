@@ -262,7 +262,7 @@ class LocationService extends GetxService {
       await prefs.setString(_keyDistrict, location.district ?? '');
       await prefs.setString(_keyAddress, location.address ?? '');
     } catch (e) {
-      // 忽略存储错误
+      LogUtil.w('保存位置失败: $e', tag: _tag);
     }
   }
 

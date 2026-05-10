@@ -54,7 +54,7 @@ import '../presentation/controllers/account_security_controller.dart';
 import '../core/services/agora_chat_service.dart';
 
 class AppPages {
-  static const String initial = RouteNames.initial;
+  static const String initial = RouteNames.splash;
 
   static final routes = [
     GetPage(
@@ -100,6 +100,10 @@ class AppPages {
       page: () => const UserAgreementScreen(),
       binding:
           BindingsBuilder(() => Get.lazyPut(() => UserAgreementController())),
+    ),
+    GetPage(
+      name: RouteNames.category,
+      page: () => const PostListPage(),
     ),
     GetPage(
       name: RouteNames.moreRecommendations,

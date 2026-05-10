@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:door_to_door_service/core/utils/screen_adapter.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
 
@@ -127,7 +128,7 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
 
   /// 从地图选择地址
   Future<void> _selectFromMap() async {
-    final result = await Get.toNamed('/map/select');
+    final result = await Get.toNamed(RouteNames.mapSelect);
 
     if (result != null && result is AddressModel) {
       setState(() {

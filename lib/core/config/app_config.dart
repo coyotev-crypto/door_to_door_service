@@ -13,6 +13,9 @@ class AppConfig {
   /// 连接超时时间（秒）
   static const int connectTimeout = 30;
 
+  /// 发送超时时间（秒）
+  static const int sendTimeout = 30;
+
   /// 接收超时时间（秒）
   static const int receiveTimeout = 30;
 

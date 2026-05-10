@@ -4,9 +4,6 @@ class RouteNames {
   // 私有构造函数，防止实例化
   RouteNames._();
 
-  // 初始路由
-  static const String initial = '/splash';
-
   // 认证相关
   static const String splash = '/splash';
   static const String login = '/login';

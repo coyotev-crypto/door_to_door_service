@@ -110,7 +110,7 @@ class PostDetailController extends GetxController {
   }
 
   /// 评论点赞
-  void toggleCommentLike(int commentId) {
+  Future<void> toggleCommentLike(int commentId) async {
     final index = _findCommentIndex(commentId);
     if (index == -1) return;
     final c = comments[index];
@@ -128,7 +128,7 @@ class PostDetailController extends GetxController {
       createTime: c.createTime,
     );
     comments.refresh();
-    _repository.toggleCommentLike(commentId);
+    await _repository.toggleCommentLike(commentId);
   }
 
   /// 删除评论
@@ -157,7 +157,7 @@ class PostDetailController extends GetxController {
     return comments.indexWhere((c) => c.id == id);
   }
 
-  void toggleLike() {
+  Future<void> toggleLike() async {
     if (post.value == null) return;
     final p = post.value!;
     final newLiked = !p.isLiked;
@@ -165,14 +165,14 @@ class PostDetailController extends GetxController {
       isLiked: newLiked,
       likeCount: newLiked ? p.likeCount + 1 : p.likeCount - 1,
     );
-    _repository.toggleLike(p.id);
+    await _repository.toggleLike(p.id);
   }
 
-  void toggleCollect() {
+  Future<void> toggleCollect() async {
     if (post.value == null) return;
     final p = post.value!;
     post.value = p.copyWith(isCollected: !p.isCollected);
-    _repository.toggleCollect(p.id);
+    await _repository.toggleCollect(p.id);
   }
 
   void share() {

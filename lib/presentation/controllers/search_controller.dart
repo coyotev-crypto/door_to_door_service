@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/utils/log_util.dart';
 import '../../data/models/service_item.dart';
 import 'service_controller.dart';
 
@@ -98,7 +99,7 @@ class SearchController extends GetxController {
         _searchHistory.addAll(historyList);
       }
     } catch (e) {
-      // 加载失败时使用默认搜索历史
+      LogUtil.w('加载搜索历史失败: $e');
     }
   }
 

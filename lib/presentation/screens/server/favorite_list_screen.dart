@@ -111,6 +111,7 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
               return ServiceCardWidget(
                 service: favorite.service,
                 onTap: () {
+                  // TODO: replace with actual service detail route
                   Get.toNamed('/service/detail/${favorite.service.id}');
                 },
                 onOrderTap: () {

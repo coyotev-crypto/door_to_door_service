@@ -181,14 +181,13 @@ class ProfileController extends GetxController {
 
   /// 跳转到登录页
   void navigateToLogin() {
-    Get.toNamed('/login');
+    Get.toNamed(RouteNames.login);
   }
 
   /// 跳转到个人信息编辑页
   void navigateToProfileEdit() {
-    // 初始化编辑用户信息
     _initEditUserInfo();
-    Get.toNamed('/profile-edit');
+    Get.toNamed(RouteNames.profileEdit);
   }
 
   /// 初始化编辑用户信息
@@ -319,7 +318,7 @@ class ProfileController extends GetxController {
 
   /// 跳转到设置页
   void navigateToSettings() {
-    Get.toNamed('/settings');
+    Get.toNamed(RouteNames.settings);
   }
 
   /// 退出登录
@@ -346,7 +345,7 @@ class ProfileController extends GetxController {
     try {
       // TODO: 调用退出登录API
       await _authService.logout();
-      Get.offAllNamed('/login');
+      Get.offAllNamed(RouteNames.login);
     } catch (e) {
       ToastUtil.showError('退出登录失败: $e');
     }

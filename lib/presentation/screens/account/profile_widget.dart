@@ -42,9 +42,6 @@ class ProfileWidget extends StatelessWidget {
           // 入驻功能
           _buildProviderFunctions(context, controller),
           SizedBox(height: 16.h),
-          // 其他功能
-          // _buildOtherFunctions(context, controller),
-          // SizedBox(height: 16.h),
           // 退出登录按钮
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -255,16 +252,6 @@ class ProfileWidget extends StatelessWidget {
             label: '我的收藏',
             onTap: () => controller.navigateToFavorites(),
           ),
-          // _buildFunctionItem(
-          //   icon: Icons.confirmation_number_rounded,
-          //   label: '优惠券',
-          //   onTap: () => controller.navigateToCoupons(),
-          // ),
-          // _buildFunctionItem(
-          //   icon: Icons.support_agent_rounded,
-          //   label: '客服中心',
-          //   onTap: () => controller.navigateToCustomerService(),
-          // ),
         ],
       ),
     );
@@ -318,42 +305,6 @@ class ProfileWidget extends StatelessWidget {
             icon: Icons.room_service_rounded,
             label: '完善服务',
             onTap: () => controller.navigateToProviderService(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 构建其他功能
-  Widget _buildOtherFunctions(
-      BuildContext context, ProfileController controller) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildFunctionItem(
-            icon: Icons.settings_rounded,
-            label: '设置',
-            onTap: () => controller.navigateToSettings(),
-          ),
-          _buildFunctionItem(
-            icon: Icons.info_rounded,
-            label: '关于我们',
-            onTap: () {
-              // TODO: 实现关于我们页面
-              Get.snackbar('提示', '关于我们功能开发中');
-            },
           ),
         ],
       ),

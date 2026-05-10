@@ -3,6 +3,7 @@ import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../routes/route_names.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
@@ -134,7 +135,7 @@ class LoginController extends GetxController {
 
       if (context.mounted) {
         // 登录成功,跳转到首页
-        Navigator.pushReplacementNamed(context, '/');
+        Get.offAllNamed(RouteNames.home);
       }
     } on DioException catch (e) {
       ToastUtil.showError(e.message ?? '登录失败');

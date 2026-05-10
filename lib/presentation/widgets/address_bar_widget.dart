@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:door_to_door_service/core/utils/screen_adapter.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
+import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
 
 /// 地址栏组件
@@ -26,7 +27,7 @@ class AddressBarWidget extends StatelessWidget {
         final displayText = _getDisplayText(address);
 
         return GestureDetector(
-          onTap: onTap ?? () => Get.toNamed('/address/select'),
+          onTap: onTap ?? () => Get.toNamed(RouteNames.addressSelect),
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             child: Row(
