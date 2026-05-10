@@ -11,7 +11,7 @@ class PostDetailPage extends GetView<PostDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F5F2),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -128,7 +128,7 @@ class PostDetailPage extends GetView<PostDetailController> {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      color: Colors.grey[100],
+      color: const Color(0xFFF9F7F4),
       child: Center(
         child: Icon(Icons.image_rounded, size: 48.sp, color: Colors.grey[300]),
       ),
@@ -225,7 +225,7 @@ class PostDetailPage extends GetView<PostDetailController> {
   Widget _buildDivider() {
     return Container(
       height: 6.h,
-      color: Colors.grey[50],
+      color: const Color(0xFFF9F7F4),
     );
   }
 
@@ -279,7 +279,7 @@ class PostDetailPage extends GetView<PostDetailController> {
       decoration: depth > 0
           ? BoxDecoration(
               border:
-                  Border(left: BorderSide(color: Colors.grey[200]!, width: 2)),
+                  Border(left: BorderSide(color: const Color(0xFFE8E2D8), width: 2)),
             )
           : null,
       child: Padding(
@@ -443,13 +443,13 @@ class PostDetailPage extends GetView<PostDetailController> {
                       TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.r),
-                    borderSide: BorderSide(color: Colors.grey[200]!),
+                    borderSide: BorderSide(color: const Color(0xFFE8E2D8)),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                   isDense: true,
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: const Color(0xFFF9F7F4),
                 ),
                 style: TextStyle(fontSize: 14.sp),
               ),
@@ -605,7 +605,7 @@ class _ImageGalleryState extends State<_ImageGallery> {
                     widget.images[index],
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[100],
+                      color: const Color(0xFFF9F7F4),
                       child: Center(
                         child: Icon(Icons.image_rounded,
                             size: 48.sp, color: Colors.grey[300]),

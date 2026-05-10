@@ -12,7 +12,7 @@ class PostCreatePage extends GetView<PostCreateController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F5F2),
       appBar: AppBar(
         title: Text('发布笔记',
             style: TextStyle(
@@ -21,7 +21,7 @@ class PostCreatePage extends GetView<PostCreateController> {
                 color: Colors.black87)),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0, scrolledUnderElevation: 0.5,
       ),
       body: Form(
         key: controller.formKey,
@@ -102,7 +102,7 @@ class PostCreatePage extends GetView<PostCreateController> {
                   width: imageSize,
                   height: imageSize,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: const Color(0xFFF9F7F4),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Center(
@@ -120,7 +120,7 @@ class PostCreatePage extends GetView<PostCreateController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xFFF9F7F4),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: TextFormField(
@@ -144,7 +144,7 @@ class PostCreatePage extends GetView<PostCreateController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xFFF9F7F4),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(

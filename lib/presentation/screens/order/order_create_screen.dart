@@ -13,7 +13,7 @@ class OrderCreateScreen extends GetView<OrderController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F5F2),
       appBar: AppBar(
         title: Text(
           '确认下单',
@@ -25,7 +25,7 @@ class OrderCreateScreen extends GetView<OrderController> {
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 0, scrolledUnderElevation: 0.5,
       ),
       body: Obx(() {
         final service = controller.service;
@@ -93,9 +93,9 @@ class OrderCreateScreen extends GetView<OrderController> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xFFF9F7F4),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: const Color(0xFFE8E2D8)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +153,7 @@ class OrderCreateScreen extends GetView<OrderController> {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey[300]!),
           borderRadius: BorderRadius.circular(8.r),
-          color: Colors.grey[50],
+          color: const Color(0xFFF9F7F4),
         ),
         child: Row(
           children: [
@@ -189,9 +189,9 @@ class OrderCreateScreen extends GetView<OrderController> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xFFF9F7F4),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: const Color(0xFFE8E2D8)),
       ),
       child: Column(
         children: [
@@ -253,7 +253,7 @@ class OrderCreateScreen extends GetView<OrderController> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
                 borderRadius: BorderRadius.circular(8.r),
-                color: Colors.grey[50],
+                color: const Color(0xFFF9F7F4),
               ),
               child: Row(
                 children: [
@@ -286,7 +286,7 @@ class OrderCreateScreen extends GetView<OrderController> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
                 borderRadius: BorderRadius.circular(8.r),
-                color: Colors.grey[50],
+                color: const Color(0xFFF9F7F4),
               ),
               child: Row(
                 children: [
