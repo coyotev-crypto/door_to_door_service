@@ -1,5 +1,6 @@
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/order_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/profile_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/provider_qualification_controller.dart';
@@ -80,6 +81,7 @@ class AppPages {
             Get.lazyPut(() => ProfileController()),
             Get.lazyPut(() => HomeContentController()),
             Get.lazyPut(() => PostListController()),
+            Get.lazyPut(() => OrderListController()),
             Get.put(() => AgoraChatService()),
           ]),
     ),

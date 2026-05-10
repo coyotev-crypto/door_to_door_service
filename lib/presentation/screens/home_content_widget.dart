@@ -94,23 +94,24 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     children: [
-                      // 新人推荐
-                      RepaintBoundary(
-                        child: NewcomerRecommendationWidget(
-                          services: controller.newcomerServices,
-                          onMorePressed: () {
-                            Get.toNamed(RouteNames.moreRecommendations,
-                                arguments: {
-                                  'provinceId': controller.provinceId,
-                                  'cityId': controller.cityId,
-                                  'areaId': controller.areaId,
-                                });
-                          },
-                          onServiceTap: (service) {
-                            // TODO: 跳转到服务详情
-                          },
+                      // 新人推荐 — 为空则整个隐藏
+                      if (controller.newcomerServices.isNotEmpty)
+                        RepaintBoundary(
+                          child: NewcomerRecommendationWidget(
+                            services: controller.newcomerServices,
+                            onMorePressed: () {
+                              Get.toNamed(RouteNames.moreRecommendations,
+                                  arguments: {
+                                    'provinceId': controller.provinceId,
+                                    'cityId': controller.cityId,
+                                    'areaId': controller.areaId,
+                                  });
+                            },
+                            onServiceTap: (service) {
+                              // TODO: 跳转到服务详情
+                            },
+                          ),
                         ),
-                      ),
                       // 热门服务
                       Container(
                         padding: EdgeInsets.symmetric(
@@ -187,8 +188,7 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
                                             // TODO: 跳转到服务详情
                                           },
                                           onOrderTap: () {
-                                            Get.toNamed(
-                                                RouteNames.orderCreate,
+                                            Get.toNamed(RouteNames.orderCreate,
                                                 arguments: service);
                                           },
                                           onFavoriteTap: () async {

@@ -56,8 +56,8 @@ class LocationService extends GetxService {
       if (Platform.isAndroid) {
         BMFMapSDK.setCoordType(BMF_COORD_TYPE.BD09LL);
       }
+      await _loadLastLocation(); // 先加载缓存，首屏立即显示本地城市
       _requestPermissionAndStart();
-      _loadLastLocation();
       if (isDebug) {
         LogUtil.d('定位服务初始化完成', tag: _tag);
       }

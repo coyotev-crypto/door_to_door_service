@@ -109,11 +109,6 @@ class AccountSecurityController extends GetxController {
   // 更换手机号状态
   bool get isChangingPhone => _isChangingPhone.value;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // loadLoginDevices();
-  }
 
   @override
   void onClose() {

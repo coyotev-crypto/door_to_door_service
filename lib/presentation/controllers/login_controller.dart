@@ -4,6 +4,7 @@ import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
 import '../../core/utils/toast_util.dart';
 import '../../core/services/auth_service.dart';
@@ -116,11 +117,20 @@ class LoginController extends GetxController {
         throw Exception(result.message ?? '登录失败');
       }
 
-      // Token已在auth_repository中保存，更新AuthService登录状态
+      // 保存Token并更新登录状态
       await _authService.login(
         token: result.token!,
         expireSeconds: result.expire,
       );
+
+      // 登录后立即获取用户信息并持久化
+      try {
+        final userRepository = UserRepository();
+        final userInfo = await userRepository.getUserInfo();
+        await _authService.updateUser(userInfo);
+      } catch (e) {
+        LogUtil.e('获取用户信息失败: $e', tag: 'LoginController');
+      }
 
       if (context.mounted) {
         // 登录成功,跳转到首页
@@ -128,6 +138,9 @@ class LoginController extends GetxController {
       }
     } on DioException catch (e) {
       ToastUtil.showError(e.message ?? '登录失败');
+    } catch (e) {
+      ToastUtil.showError('$e');
+    } finally {
       isLoading.value = false;
     }
   }

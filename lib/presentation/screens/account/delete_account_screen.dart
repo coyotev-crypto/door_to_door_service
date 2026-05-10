@@ -175,7 +175,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       ),
                     ),
                     child: Text(
-                      _canSendSms ? '获取验证码' : '${_countdown}秒后重试',
+                      _canSendSms ? '获取验证码' : '$_countdown秒后重试',
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: _canSendSms ? Colors.white : Colors.grey[600],

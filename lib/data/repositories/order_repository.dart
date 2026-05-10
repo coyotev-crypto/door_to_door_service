@@ -10,7 +10,7 @@ class OrderRepository {
   OrderRepository() : _dioClient = DioClient.instance;
 
   /// 创建订单
-  Future<BaseResponse<OrderModel>> createOrder({
+  Future<BaseResponse<dynamic>> createOrder({
     required int serviceId,
     required String addressName,
     required double latitude,
@@ -18,6 +18,7 @@ class OrderRepository {
     required String contactName,
     required String contactPhone,
     String? remark,
+    String? serviceTime,
   }) async {
     final response = await _dioClient.post(
       ApiEndpoints.createOrder,
@@ -29,12 +30,10 @@ class OrderRepository {
         'contactName': contactName,
         'contactPhone': contactPhone,
         'remark': remark ?? '',
+        'serviceTime': serviceTime ?? '',
       },
     );
-    return BaseResponse<OrderModel>.fromJson(
-      response.data,
-      dataParser: (data) => OrderModel.fromJson(data as Map<String, dynamic>),
-    );
+    return BaseResponse<dynamic>.fromJson(response.data);
   }
 
   /// 获取订单列表

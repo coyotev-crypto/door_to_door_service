@@ -31,9 +31,10 @@ class TokenService {
       // 保存Token
       await prefs.setString(_tokenKey, token);
 
-      // 计算并保存Token过期时间
+      // 保存Token过期时间：若为秒数则转为ISO时间戳存储
       if (expireSeconds != null) {
-        await prefs.setString(_tokenExpireKey, expireSeconds);
+        final expireStr = _parseExpiry(expireSeconds);
+        await prefs.setString(_tokenExpireKey, expireStr);
       }
 
       // 保存刷新Token
@@ -42,7 +43,8 @@ class TokenService {
 
         // 计算并保存刷新Token过期时间
         if (refreshExpireSeconds != null) {
-          await prefs.setString(_refreshTokenExpireKey, refreshExpireSeconds);
+          final expireStr = _parseExpiry(refreshExpireSeconds);
+          await prefs.setString(_refreshTokenExpireKey, expireStr);
         }
       }
 
@@ -149,5 +151,15 @@ class TokenService {
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  /// 将过期时间统一转为 ISO 8601 时间戳字符串
+  /// 支持秒数格式（如 "7200"）和日期时间格式
+  static String _parseExpiry(String expire) {
+    final seconds = int.tryParse(expire);
+    if (seconds != null) {
+      return DateTime.now().add(Duration(seconds: seconds)).toIso8601String();
+    }
+    return expire;
   }
 }

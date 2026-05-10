@@ -2,27 +2,38 @@ import 'package:flutter/material.dart';
 import '../../core/utils/screen_adapter.dart';
 import '../../data/models/post_model.dart';
 
-/// 帖子网格卡片
+/// 小红书风格笔记卡片
+///
+/// 布局从上到下：图片区 → 标题 → 用户信息
 class PostCard extends StatelessWidget {
   final PostModel post;
   final VoidCallback? onTap;
   final VoidCallback? onLike;
 
-  const PostCard({super.key, required this.post, this.onTap, this.onLike});
+  const PostCard({
+    super.key,
+    required this.post,
+    this.onTap,
+    this.onLike,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: theme.brightness == Brightness.light
+                  ? Colors.black.withOpacity(0.04)
+                  : Colors.white.withOpacity(0.04),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
@@ -30,136 +41,160 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 封面图
-            if (post.images.isNotEmpty)
-              AspectRatio(
-                aspectRatio: 16 / 10,
-                child: Image.network(
-                  post.images.first,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
-                ),
-              )
-            else
-              AspectRatio(
-                aspectRatio: 16 / 10,
-                child: _buildPlaceholderImage(),
-              ),
-            // 内容区
-            Padding(
-              padding: EdgeInsets.all(12.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  // 作者信息
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 10.r,
-                        backgroundImage: post.authorAvatar != null
-                            ? NetworkImage(post.authorAvatar!)
-                            : null,
-                        backgroundColor: Colors.grey[200],
-                        child: post.authorAvatar == null
-                            ? Icon(Icons.person, size: 12.sp, color: Colors.grey)
-                            : null,
-                      ),
-                      SizedBox(width: 6.w),
-                      Expanded(
-                        child: Text(
-                          post.authorName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
-                        ),
-                      ),
-                      Text(
-                        _formatTime(post.createTime),
-                        style: TextStyle(fontSize: 10.sp, color: Colors.grey[400]),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8.h),
-                  // 互动数据
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: onLike,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              post.isLiked
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              size: 14.sp,
-                              color:
-                                  post.isLiked ? Colors.red : Colors.grey[400],
-                            ),
-                            SizedBox(width: 2.w),
-                            Text(
-                              '${post.likeCount}',
-                              style: TextStyle(
-                                  fontSize: 11.sp, color: Colors.grey[500]),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.chat_bubble_outline_rounded,
-                              size: 14.sp, color: Colors.grey[400]),
-                          SizedBox(width: 2.w),
-                          Text(
-                            '${post.commentCount}',
-                            style: TextStyle(
-                                fontSize: 11.sp, color: Colors.grey[500]),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            _buildImageArea(theme),
+            _buildTitle(theme),
+            _buildFooter(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPlaceholderImage() {
+  /// 图片区域：3:4 竖图 + 点赞浮层
+  Widget _buildImageArea(ThemeData theme) {
+    return Stack(
+      children: [
+        AspectRatio(
+          aspectRatio: 3 / 4,
+          child: ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+            child: post.images.isNotEmpty
+                ? Image.network(
+                    post.images.first,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                  )
+                : _buildPlaceholder(),
+          ),
+        ),
+        // 点赞浮层
+        Positioned(
+          right: 8.w,
+          bottom: 8.h,
+          child: GestureDetector(
+            onTap: onLike,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.45),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    post.isLiked ? Icons.favorite : Icons.favorite_border,
+                    size: 16.sp,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    _formatCount(post.likeCount),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 标题：最多两行，超出省略
+  Widget _buildTitle(ThemeData theme) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 0),
+      child: Text(
+        post.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+          color: theme.brightness == Brightness.light
+              ? Colors.black87
+              : Colors.white,
+          height: 1.38,
+        ),
+      ),
+    );
+  }
+
+  /// 底部：用户头像 + 昵称 + 时间
+  Widget _buildFooter(ThemeData theme) {
+    final textColor = theme.brightness == Brightness.light
+        ? Colors.grey[600]!
+        : Colors.grey[400]!;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 10.h),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 12.r,
+            backgroundImage: post.authorAvatar != null
+                ? NetworkImage(post.authorAvatar!)
+                : null,
+            backgroundColor: Colors.grey[200],
+            child: post.authorAvatar == null
+                ? Icon(Icons.person, size: 14.sp, color: Colors.grey[400])
+                : null,
+          ),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    post.authorName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                Text(
+                  ' · ${_formatTime(post.createTime)}',
+                  style: TextStyle(fontSize: 11.sp, color: Colors.grey[400]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
     return Container(
       color: Colors.grey[100],
       child: Center(
-        child: Icon(Icons.image_rounded, size: 32.sp, color: Colors.grey[300]),
+        child: Icon(Icons.image_rounded, size: 36.sp, color: Colors.grey[300]),
       ),
     );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 10000) return '${(count / 10000).toStringAsFixed(1)}w';
+    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}k';
+    return count.toString();
   }
 
   String _formatTime(String time) {
     try {
       final dt = DateTime.parse(time);
-      final now = DateTime.now();
-      final diff = now.difference(dt);
+      final diff = DateTime.now().difference(dt);
       if (diff.inMinutes < 60) return '${diff.inMinutes}分钟前';
       if (diff.inHours < 24) return '${diff.inHours}小时前';
-      if (diff.inDays < 30) return '${diff.inDays}天前';
+      if (diff.inDays < 7) return '${diff.inDays}天前';
       return '${dt.month}-${dt.day}';
     } catch (_) {
       return time;

@@ -36,13 +36,23 @@ class ServiceCardWidget extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
-                    Center(
-                      child: Icon(
-                        Icons.spa_rounded,
-                        size: 40.sp,
-                        color: Colors.grey[400],
+                    if (service.avatar != null && service.avatar!.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Image.network(
+                          service.avatar!,
+                          width: 100.w,
+                          height: 100.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(Icons.spa_rounded,
+                              size: 40.sp, color: Colors.grey[400]),
+                        ),
+                      )
+                    else
+                      Center(
+                        child: Icon(Icons.spa_rounded,
+                            size: 40.sp, color: Colors.grey[400]),
                       ),
-                    ),
                     if (service.isNew)
                       Positioned(
                         top: 4.h,

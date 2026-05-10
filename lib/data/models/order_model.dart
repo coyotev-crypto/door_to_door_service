@@ -11,6 +11,7 @@ class OrderModel {
   final double? longitude;
   final String? contactName;
   final String? contactPhone;
+  final String? serviceTime;
   final String? remark;
   final int status; // 0-待支付,1-待服务,2-进行中,3-已完成,4-已取消
   final String? createTime;
@@ -28,6 +29,7 @@ class OrderModel {
     this.longitude,
     this.contactName,
     this.contactPhone,
+    this.serviceTime,
     this.remark,
     this.status = 0,
     this.createTime,
@@ -49,6 +51,7 @@ class OrderModel {
       longitude: (json['longitude'] as num?)?.toDouble(),
       contactName: json['contactName'] as String?,
       contactPhone: json['contactPhone'] as String?,
+      serviceTime: json['serviceTime'] as String?,
       remark: json['remark'] as String?,
       status: json['status'] is String
           ? int.parse(json['status'])
@@ -71,6 +74,7 @@ class OrderModel {
       'longitude': longitude,
       'contactName': contactName,
       'contactPhone': contactPhone,
+      'serviceTime': serviceTime,
       'remark': remark,
       'status': status,
       'createTime': createTime,

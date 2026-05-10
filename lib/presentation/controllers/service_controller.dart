@@ -46,6 +46,7 @@ class ServiceController extends GetxController {
   // 用户位置
   final Rx<double?> _userLatitude = Rx<double?>(null);
   final Rx<double?> _userLongitude = Rx<double?>(null);
+  bool _hasRefreshedWithGps = false; // GPS更新后仅刷新一次
 
   // 筛选后的服务列表
   final RxList<ServiceItem> _filteredServices = <ServiceItem>[].obs;
@@ -61,8 +62,8 @@ class ServiceController extends GetxController {
 
   @override
   void onClose() {
-    // 清除位置更新回调
     _locationService.onLocationUpdated = null;
+    _hasRefreshedWithGps = false;
     super.onClose();
   }
 
@@ -271,16 +272,18 @@ class ServiceController extends GetxController {
 
   /// 初始化位置更新回调
   void _initLocationCallback() {
-    // 设置位置更新回调
+    // 设置位置更新回调：GPS定位成功后触发一次刷新
     _locationService.onLocationUpdated = (latitude, longitude) {
+      final shouldRefresh = !_hasRefreshedWithGps;
+      _hasRefreshedWithGps = true;
       setUserLocation(
         latitude: latitude,
         longitude: longitude,
-        refresh: false, // 不自动刷新，由调用方决定
+        refresh: shouldRefresh,
       );
     };
 
-    // 如果 LocationService 已经有位置信息，立即设置
+    // 如果 LocationService 已经有位置信息（缓存），立即设置但不刷新
     final currentLocation = _locationService.currentLocation;
     if (currentLocation != null &&
         currentLocation.latitude != null &&

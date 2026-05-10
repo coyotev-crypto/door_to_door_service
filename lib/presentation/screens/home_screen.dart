@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import 'home_content_widget.dart';
 import 'community/post_list_page.dart';
+import 'order/order_list_page.dart';
 import '../widgets/home_bottom_nav_widget.dart';
 import 'chat/message_page_widget.dart';
 import 'account/profile_widget.dart';
 import '../../core/utils/screen_adapter.dart';
+import '../../core/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +33,10 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   Widget _buildPageByIndex(int index) {
     switch (index) {
       case 0:
+        final user = AuthService.instance.user;
+        if (user?.roleId == 3) {
+          return const OrderListPage();
+        }
         return HomeContentWidget(
           onRefresh: () async {
             await _controller.refreshHome();

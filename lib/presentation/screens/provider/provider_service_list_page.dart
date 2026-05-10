@@ -12,19 +12,16 @@ class ProviderServiceListPage extends GetView<ProviderServiceListController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(
-          '服务管理',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
+        title: Text('服务管理',
+            style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87)),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 0.5,
       ),
       body: Obx(() {
         if (controller.isLoading) {
@@ -43,14 +40,21 @@ class ProviderServiceListPage extends GetView<ProviderServiceListController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.room_service_rounded,
-              size: 64.sp, color: Colors.grey[300]),
-          SizedBox(height: 16.h),
-          Text(
-            '暂无服务',
-            style: TextStyle(fontSize: 16.sp, color: Colors.grey[500]),
+          Container(
+            width: 80.w,
+            height: 80.w,
+            decoration:
+                BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle),
+            child: Icon(Icons.room_service_rounded,
+                size: 36.sp, color: Colors.grey[300]),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 16.h),
+          Text('暂无服务',
+              style: TextStyle(fontSize: 16.sp, color: Colors.grey[500])),
+          SizedBox(height: 8.h),
+          Text('点击下方按钮添加第一个服务',
+              style: TextStyle(fontSize: 13.sp, color: Colors.grey[400])),
+          SizedBox(height: 32.h),
           _buildAddButton(context),
         ],
       ),
@@ -63,18 +67,29 @@ class ProviderServiceListPage extends GetView<ProviderServiceListController> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () => controller.loadServices(),
-            child: ListView.separated(
+            child: ListView.builder(
               padding: EdgeInsets.all(16.w),
               itemCount: controller.services.length,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
               itemBuilder: (context, index) {
-                return _buildServiceCard(context, controller.services[index]);
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: _buildServiceCard(context, controller.services[index]),
+                );
               },
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.all(16.w),
+        Container(
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, -2))
+            ],
+          ),
           child: _buildAddButton(context),
         ),
       ],
@@ -86,129 +101,122 @@ class ProviderServiceListPage extends GetView<ProviderServiceListController> {
     return GestureDetector(
       onTap: () => controller.navigateToEdit(service),
       child: Container(
-        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[200]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2))
           ],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 8.r,
-                        height: 8.r,
-                        decoration: BoxDecoration(
-                          color: isOnShelf
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey[300]!,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          service.name,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => controller.toggleStatus(service),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 4.h),
+        child: Padding(
+          padding: EdgeInsets.all(14.w),
+          child: Row(
+            children: [
+              // 服务图片
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Container(
+                  width: 72.w,
+                  height: 72.w,
+                  color: Colors.grey[100],
+                  child: service.avatar != null && service.avatar!.isNotEmpty
+                      ? Image.network(service.avatar!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(Icons.spa_rounded,
+                              size: 28.sp, color: Colors.grey[300]))
+                      : Icon(Icons.spa_rounded,
+                          size: 28.sp, color: Colors.grey[300]),
+                ),
+              ),
+              SizedBox(width: 14.w),
+              // 信息区
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 6.r,
+                          height: 6.r,
                           decoration: BoxDecoration(
                             color: isOnShelf
-                                ? Colors.red.withOpacity(0.08)
-                                : Colors.green.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(6.r),
-                            border: Border.all(
-                              color: isOnShelf
-                                  ? Colors.red.withOpacity(0.3)
-                                  : Colors.green.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Text(
-                            isOnShelf ? '下架' : '上架',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: isOnShelf ? Colors.red : Colors.green,
-                              fontWeight: FontWeight.w500,
-                            ),
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey[300]!,
+                            shape: BoxShape.circle,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 6.h),
-                  Row(
-                    children: [
-                      Text(
-                        '¥${service.price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      if (service.originalPrice != null) ...[
-                        SizedBox(width: 8.w),
-                        Text(
-                          '¥${service.originalPrice!.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: Colors.grey[400],
-                            decoration: TextDecoration.lineThrough,
-                          ),
+                        SizedBox(width: 6.w),
+                        Expanded(
+                          child: Text(service.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87)),
                         ),
                       ],
-                    ],
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    service.providerName ?? '',
-                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[500]),
-                  ),
-                  if (service.categoryName != null) ...[
+                    ),
                     SizedBox(height: 4.h),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(4.r),
-                      ),
-                      child: Text(
-                        service.categoryName!,
+                    Text(service.providerName ?? '',
                         style: TextStyle(
-                          fontSize: 11.sp,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
+                            fontSize: 12.sp, color: Colors.grey[500])),
+                    SizedBox(height: 6.h),
+                    Row(
+                      children: [
+                        Text('¥${service.price.toStringAsFixed(2)}',
+                            style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor)),
+                        if (service.categoryName != null) ...[
+                          SizedBox(width: 10.w),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 6.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Text(service.categoryName!,
+                                style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: Theme.of(context).primaryColor)),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
-            SizedBox(width: 8.w),
-            Icon(Icons.chevron_right_rounded, size: 20.sp, color: Colors.grey),
-          ],
+              SizedBox(width: 8.w),
+              // 上下架按钮
+              GestureDetector(
+                onTap: () => controller.toggleStatus(service),
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: isOnShelf
+                        ? Colors.red.withOpacity(0.06)
+                        : Colors.green.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(isOnShelf ? '下架' : '上架',
+                      style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                          color: isOnShelf ? Colors.red[400] : Colors.green)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

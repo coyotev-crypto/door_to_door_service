@@ -95,7 +95,8 @@ class PostRepository {
     return BaseResponse<List<CommentModel>>.fromJson(
       response.data,
       dataParser: (data) {
-        final list = data as List<dynamic>;
+        final dataMap = data as Map<String, dynamic>;
+        final list = dataMap['list'] as List<dynamic>? ?? [];
         return list
             .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
             .toList();

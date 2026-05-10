@@ -74,12 +74,7 @@ class AuthService extends GetxService {
           'email': prefs.getString('$_userKey.email'),
           'gender': prefs.getString('$_userKey.gender'),
           'remark': prefs.getString('$_userKey.remark'),
-          'realName': prefs.getString('$_userKey.realName'),
-          'idCardNumber': prefs.getString('$_userKey.idCardNumber'),
-          'realNameAuthStatus': prefs.getString('$_userKey.realNameAuthStatus'),
-          'idCardFrontImageUrl':
-              prefs.getString('$_userKey.idCardFrontImageUrl'),
-          'idCardBackImageUrl': prefs.getString('$_userKey.idCardBackImageUrl'),
+          'hasPaymentPassword': prefs.getString('$_userKey.hasPaymentPassword'),
           'createdAt': prefs.getString('$_userKey.createdAt'),
           'updatedAt': prefs.getString('$_userKey.updatedAt'),
         };
@@ -114,6 +109,10 @@ class AuthService extends GetxService {
       if (user.remark != null) {
         await prefs.setString('$_userKey.remark', user.remark!);
       }
+      if (user.hasPaymentPassword != null) {
+        await prefs.setString('$_userKey.hasPaymentPassword',
+            user.hasPaymentPassword.toString());
+      }
       if (user.createdAt != null) {
         await prefs.setString(
             '$_userKey.createdAt', user.createdAt!.toIso8601String());
@@ -141,6 +140,7 @@ class AuthService extends GetxService {
       await prefs.remove('$_userKey.email');
       await prefs.remove('$_userKey.gender');
       await prefs.remove('$_userKey.remark');
+      await prefs.remove('$_userKey.hasPaymentPassword');
       await prefs.remove('$_userKey.createdAt');
       await prefs.remove('$_userKey.updatedAt');
 

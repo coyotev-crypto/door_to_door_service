@@ -190,8 +190,9 @@ class DioClient {
         LogUtil.d('GET请求已取消: $requestKey', tag: 'DioClient');
         return Response(
           requestOptions: e.requestOptions,
-          statusCode: 499, // 使用499表示客户端关闭请求
+          statusCode: 499,
           statusMessage: '请求已取消',
+          data: <String, dynamic>{'code': 499, 'msg': '请求已取消'},
         );
       }
 
@@ -422,8 +423,9 @@ class DioClient {
         LogUtil.d('下载请求已取消: $urlPath', tag: 'DioClient');
         return Response(
           requestOptions: e.requestOptions,
-          statusCode: 499, // 使用499表示客户端关闭请求
+          statusCode: 499,
           statusMessage: '请求已取消',
+          data: <String, dynamic>{'code': 499, 'msg': '请求已取消'},
         );
       }
       rethrow;

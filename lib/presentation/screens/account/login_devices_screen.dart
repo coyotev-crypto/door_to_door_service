@@ -29,7 +29,7 @@ class LoginDevicesScreen extends GetView<AccountSecurityController> {
       ),
       body: Obx(() {
         if (controller.isLoadingDevices) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               color: AppTheme.servicePrimaryColor,
             ),
@@ -270,7 +270,7 @@ class _DeviceItem extends StatelessWidget {
                     onPressed: onRemove,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
-                      side: BorderSide(color: Colors.red),
+                      side: const BorderSide(color: Colors.red),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),

@@ -111,7 +111,6 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
               return ServiceCardWidget(
                 service: favorite.service,
                 onTap: () {
-                  // TODO: 跳转到服务详情页
                   Get.toNamed('/service/detail/${favorite.service.id}');
                 },
                 onOrderTap: () {

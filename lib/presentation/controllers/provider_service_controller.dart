@@ -31,6 +31,15 @@ class ProviderServiceController extends GetxController {
   final Rxn<AddressModel> _selectedCity = Rxn<AddressModel>();
   final Rxn<ServiceItem> _serviceData = Rxn<ServiceItem>();
 
+  // 星期时间段: [{weekday:1, startTime:"09:00:00", endTime:"12:00:00"}, ...]
+  final RxList<Map<String, dynamic>> _weekdaySlots =
+      <Map<String, dynamic>>[].obs;
+  // 特殊日期时间段: [{specialDate:"2026-05-01", startTime:"08:00:00", endTime:"20:00:00"}, ...]
+  final RxList<Map<String, dynamic>> _specialDateSlots =
+      <Map<String, dynamic>>[].obs;
+
+  static const List<String> weekdayLabels = ['周一','周二','周三','周四','周五','周六','周日'];
+
   // 表单校验Key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -54,6 +63,102 @@ class ProviderServiceController extends GetxController {
 
   /// 是否为编辑模式
   bool get isEditMode => _serviceData.value != null;
+
+  /// 星期时间段列表
+  List<Map<String, dynamic>> get weekdaySlots => _weekdaySlots;
+  /// 特殊日期时间段列表
+  List<Map<String, dynamic>> get specialDateSlots => _specialDateSlots;
+
+  /// 获取某星期几的时间段
+  List<Map<String, dynamic>> slotsForWeekday(int w) =>
+      _weekdaySlots.where((s) => s['weekday'] == w).toList();
+
+  void addWeekdaySlot(int weekday) {
+    _weekdaySlots.add({
+      'weekday': weekday,
+      'startTime': '09:00:00',
+      'endTime': '18:00:00',
+    });
+    _weekdaySlots.refresh();
+  }
+  void removeWeekdaySlot(int index) {
+    _weekdaySlots.removeAt(index);
+    _weekdaySlots.refresh();
+  }
+  void updateWeekdaySlot(int index, String key, String value) {
+    _weekdaySlots[index] = {..._weekdaySlots[index], key: value};
+    _weekdaySlots.refresh();
+  }
+
+  void addSpecialDateSlot(String date) {
+    _specialDateSlots.add({
+      'specialDate': date,
+      'startTime': '09:00:00',
+      'endTime': '18:00:00',
+    });
+    _specialDateSlots.refresh();
+  }
+  void removeSpecialDateSlot(int index) {
+    _specialDateSlots.removeAt(index);
+    _specialDateSlots.refresh();
+  }
+  void updateSpecialDateSlot(int index, String key, String value) {
+    _specialDateSlots[index] = {..._specialDateSlots[index], key: value};
+    _specialDateSlots.refresh();
+  }
+
+  /// 构建 timeSlots JSON（数组格式）
+  List<Map<String, dynamic>> _buildTimeSlotsJson() => _weekdaySlots.toList();
+
+  /// 构建 specialDateSlots JSON
+  List<Map<String, dynamic>> _buildSpecialDateSlotsJson() =>
+      _specialDateSlots.toList();
+
+  /// 校验时间段：开始<结束，同一天不重叠
+  bool _validateTimeSlots() {
+    // 校验星期时间段
+    for (var i = 0; i < _weekdaySlots.length; i++) {
+      final s = _weekdaySlots[i];
+      final start = s['startTime'] as String;
+      final end = s['endTime'] as String;
+      final w = (s['weekday'] as int) - 1;
+      if (start.compareTo(end) >= 0) {
+        ToastUtil.showError('${weekdayLabels[w]} 开始时间必须早于结束时间');
+        return false;
+      }
+      // 检查同一天重叠
+      for (var j = i + 1; j < _weekdaySlots.length; j++) {
+        final s2 = _weekdaySlots[j];
+        if (s['weekday'] != s2['weekday']) continue;
+        if (_overlaps(start, end, s2['startTime'] as String, s2['endTime'] as String)) {
+          ToastUtil.showError('${weekdayLabels[w]} 时间段存在重叠');
+          return false;
+        }
+      }
+    }
+    // 校验特殊日期时间段
+    for (var i = 0; i < _specialDateSlots.length; i++) {
+      final s = _specialDateSlots[i];
+      final start = s['startTime'] as String;
+      final end = s['endTime'] as String;
+      if (start.compareTo(end) >= 0) {
+        ToastUtil.showError('${s['specialDate']} 开始时间必须早于结束时间');
+        return false;
+      }
+      for (var j = i + 1; j < _specialDateSlots.length; j++) {
+        final s2 = _specialDateSlots[j];
+        if (s['specialDate'] != s2['specialDate']) continue;
+        if (_overlaps(start, end, s2['startTime'] as String, s2['endTime'] as String)) {
+          ToastUtil.showError('${s['specialDate']} 时间段存在重叠');
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  bool _overlaps(String s1, String e1, String s2, String e2) =>
+      s1.compareTo(e2) < 0 && s2.compareTo(e1) < 0;
 
   /// 服务数据
   ServiceItem? get serviceData => _serviceData.value;
@@ -79,11 +184,13 @@ class ProviderServiceController extends GetxController {
         final service = args['service'] as ServiceItem;
         _serviceData.value = service;
         _populateForm(service);
+        loadServiceDetail(service.id); // 从详情接口获取时间段等完整数据
         return;
       }
     } else if (args is ServiceItem) {
       _serviceData.value = args;
       _populateForm(args);
+      loadServiceDetail(args.id);
       return;
     }
 
@@ -103,6 +210,8 @@ class ProviderServiceController extends GetxController {
     travelFeeController.clear();
     deliveryRangeController.clear();
     providerNameController.clear();
+    _weekdaySlots.clear();
+    _specialDateSlots.clear();
   }
 
   @override
@@ -185,6 +294,16 @@ class ProviderServiceController extends GetxController {
       );
     }
 
+    // 预填时间段数据
+    _weekdaySlots.clear();
+    if (service.timeSlots != null) {
+      _weekdaySlots.addAll(service.timeSlots!);
+    }
+    _specialDateSlots.clear();
+    if (service.specialDateSlots != null) {
+      _specialDateSlots.addAll(service.specialDateSlots!);
+    }
+
     // 设置分类
     if (service.categoryId != null) {
       final category = _categories.firstWhereOrNull(
@@ -224,6 +343,7 @@ class ProviderServiceController extends GetxController {
   /// 提交服务
   Future<void> submit() async {
     if (!_validateForm()) return;
+    if (!_validateTimeSlots()) return;
 
     _isSubmitting.value = true;
     try {
@@ -253,6 +373,8 @@ class ProviderServiceController extends GetxController {
         latitude: _selectedCity.value?.latitude,
         longitude: _selectedCity.value?.longitude,
         status: _status.value,
+        timeSlots: _buildTimeSlotsJson(),
+        specialDateSlots: _buildSpecialDateSlotsJson(),
       );
       if (response.isSuccess) {
         Get.back(result: true);
@@ -281,6 +403,8 @@ class ProviderServiceController extends GetxController {
         latitude: _selectedCity.value?.latitude,
         longitude: _selectedCity.value?.longitude,
         status: _status.value,
+        timeSlots: _buildTimeSlotsJson(),
+        specialDateSlots: _buildSpecialDateSlotsJson(),
       );
       if (response.isSuccess) {
         Get.back(result: true);

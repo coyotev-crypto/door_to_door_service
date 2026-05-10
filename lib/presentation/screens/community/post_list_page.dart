@@ -46,24 +46,39 @@ class _PostListPageState extends State<PostListPage> {
     }
     await controller.onLoadMore();
     _refreshController.finishLoad(
-      controller.hasMore.value ? IndicatorResult.success : IndicatorResult.noMore,
+      controller.hasMore.value
+          ? IndicatorResult.success
+          : IndicatorResult.noMore,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (controller.isLoading.value && controller.posts.isEmpty) {
-        return _buildSkeletonGrid(context);
-      }
-      if (controller.posts.isEmpty) {
-        return EasyRefresh(
-          onRefresh: _onRefresh,
-          child: _buildEmptyView(context),
-        );
-      }
-      return _buildGridView(context);
-    });
+    return Stack(
+      children: [
+        Obx(() {
+          if (controller.isLoading.value && controller.posts.isEmpty) {
+            return _buildSkeletonGrid(context);
+          }
+          if (controller.posts.isEmpty) {
+            return EasyRefresh(
+              onRefresh: _onRefresh,
+              child: _buildEmptyView(context),
+            );
+          }
+          return _buildGridView(context);
+        }),
+        Positioned(
+          right: 16.w,
+          bottom: 16.h,
+          child: FloatingActionButton(
+            onPressed: () => controller.navigateToCreate(),
+            backgroundColor: Theme.of(context).primaryColor,
+            child: Icon(Icons.add_rounded, size: 28.sp),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildSkeletonGrid(BuildContext context) {
@@ -73,7 +88,7 @@ class _PostListPageState extends State<PostListPage> {
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.65,
+        childAspectRatio: 0.56,
       ),
       itemCount: 4,
       itemBuilder: (_, __) => const PostSkeleton(),
@@ -130,7 +145,7 @@ class _PostListPageState extends State<PostListPage> {
           crossAxisCount: 2,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 0.65,
+          childAspectRatio: 0.56,
         ),
         itemCount: controller.posts.length,
         itemBuilder: (context, index) {
@@ -139,7 +154,6 @@ class _PostListPageState extends State<PostListPage> {
             post: post,
             onTap: () => controller.navigateToDetail(post),
             onLike: () => controller.toggleLike(post.id),
-            onComment: () => controller.navigateToDetail(post),
           );
         },
       ),

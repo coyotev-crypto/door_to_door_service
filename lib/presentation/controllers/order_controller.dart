@@ -19,10 +19,18 @@ class OrderController extends GetxController {
   final RxBool _isSubmitting = false.obs;
   final Rxn<ServiceItem> _service = Rxn<ServiceItem>();
   final Rxn<AddressModel> _selectedAddress = Rxn<AddressModel>();
+  final RxString _selectedDate = ''.obs;
+  final RxString _selectedTime = ''.obs;
 
   bool get isSubmitting => _isSubmitting.value;
   ServiceItem? get service => _service.value;
   AddressModel? get selectedAddress => _selectedAddress.value;
+  String get selectedDate => _selectedDate.value;
+  String get selectedTime => _selectedTime.value;
+  String get serviceTimeText {
+    if (_selectedDate.value.isEmpty) return '请选择服务时间';
+    return '${_selectedDate.value} ${_selectedTime.value.isNotEmpty ? _selectedTime.value : ''}';
+  }
 
   /// 总价 = 服务价格 + 交通费
   double get totalPrice {
@@ -56,6 +64,33 @@ class OrderController extends GetxController {
         _selectedAddress.value = args['address'] as AddressModel;
         _fillAddressInfo(args['address'] as AddressModel);
       }
+    }
+  }
+
+  /// 选择日期
+  Future<void> pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: Get.context!,
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 90)),
+    );
+    if (picked != null) {
+      _selectedDate.value =
+          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+    }
+  }
+
+  /// 选择时间
+  Future<void> pickTime() async {
+    final picked = await showTimePicker(
+      context: Get.context!,
+      initialTime: const TimeOfDay(hour: 9, minute: 0),
+    );
+    if (picked != null) {
+      _selectedTime.value =
+          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
     }
   }
 
@@ -96,6 +131,14 @@ class OrderController extends GetxController {
       ToastUtil.showError('请输入正确的手机号码');
       return;
     }
+    if (_selectedDate.value.isEmpty) {
+      ToastUtil.showError('请选择服务日期');
+      return;
+    }
+    if (_selectedTime.value.isEmpty) {
+      ToastUtil.showError('请选择服务时间');
+      return;
+    }
 
     _isSubmitting.value = true;
     try {
@@ -109,6 +152,7 @@ class OrderController extends GetxController {
         remark: remarkController.text.trim().isNotEmpty
             ? remarkController.text.trim()
             : null,
+        serviceTime: '${_selectedDate.value} ${_selectedTime.value}',
       );
       if (response.isSuccess) {
         Get.back(result: true);

@@ -161,11 +161,21 @@ class NewcomerRecommendationWidget extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          child: Icon(
-                                            Icons.person_rounded,
-                                            size: 40.sp,
-                                            color: Colors.grey[400],
-                                          ),
+                                          clipBehavior: Clip.antiAlias,
+                                          child: service.avatar != null &&
+                                                  service.avatar!.isNotEmpty
+                                              ? Image.network(
+                                                  service.avatar!,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (_, __, ___) =>
+                                                      Icon(Icons.person_rounded,
+                                                          size: 40.sp,
+                                                          color:
+                                                              Colors.grey[400]),
+                                                )
+                                              : Icon(Icons.person_rounded,
+                                                  size: 40.sp,
+                                                  color: Colors.grey[400]),
                                         ),
                                       ),
                                     ),

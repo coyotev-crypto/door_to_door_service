@@ -6,6 +6,7 @@ class UserModel {
   final String? email;
   final String? gender; // 性别：0-未知，1-男，2-女
   final String? remark; // 备注
+  final int? roleId; // 角色ID，3=服务商
   final bool? hasPaymentPassword; // 是否已设置支付密码
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -18,6 +19,7 @@ class UserModel {
     this.email,
     this.gender,
     this.remark,
+    this.roleId,
     this.hasPaymentPassword,
     this.createdAt,
     this.updatedAt,
@@ -32,6 +34,12 @@ class UserModel {
       email: json['email']?.toString(),
       gender: json['gender']?.toString(),
       remark: json['remark']?.toString(),
+      roleId: json['roleId'] is String
+          ? int.tryParse(json['roleId'])
+          : json['roleId'] as int?,
+      hasPaymentPassword: json['hasPaymentPassword'] is bool
+          ? json['hasPaymentPassword']
+          : json['hasPaymentPassword']?.toString() == 'true',
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
@@ -50,6 +58,8 @@ class UserModel {
       'email': email,
       'gender': gender,
       'remark': remark,
+      'roleId': roleId,
+      'hasPaymentPassword': hasPaymentPassword,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -63,6 +73,8 @@ class UserModel {
     String? email,
     String? gender,
     String? remark,
+    int? roleId,
+    bool? hasPaymentPassword,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -74,6 +86,8 @@ class UserModel {
       email: email ?? this.email,
       gender: gender ?? this.gender,
       remark: remark ?? this.remark,
+      roleId: roleId ?? this.roleId,
+      hasPaymentPassword: hasPaymentPassword ?? this.hasPaymentPassword,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

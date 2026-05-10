@@ -137,8 +137,10 @@ class PostDetailController extends GetxController {
       title: const Text('删除评论'),
       content: const Text('确定要删除这条评论吗？'),
       actions: [
-        TextButton(onPressed: () => Get.back(result: false), child: const Text('取消')),
-        TextButton(onPressed: () => Get.back(result: true), child: const Text('删除')),
+        TextButton(
+            onPressed: () => Get.back(result: false), child: const Text('取消')),
+        TextButton(
+            onPressed: () => Get.back(result: true), child: const Text('删除')),
       ],
     ));
     if (confirmed != true) return;

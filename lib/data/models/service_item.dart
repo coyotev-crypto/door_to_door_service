@@ -19,6 +19,9 @@ class ServiceItem {
   final double? longitude;
   final String? address;
   final double? deliveryRange;
+  final String? avatar;
+  final List<Map<String, dynamic>>? timeSlots;
+  final List<Map<String, dynamic>>? specialDateSlots;
 
   ServiceItem({
     required this.id,
@@ -40,6 +43,9 @@ class ServiceItem {
     this.longitude,
     this.address,
     this.deliveryRange,
+    this.avatar,
+    this.timeSlots,
+    this.specialDateSlots,
   });
 
   /// 获取距离的数值（用于排序）
@@ -75,6 +81,13 @@ class ServiceItem {
       longitude: (json['longitude'] as num?)?.toDouble(),
       address: json['address'] as String?,
       deliveryRange: (json['deliveryRange'] as num?)?.toDouble(),
+      avatar: json['avatar'] as String?,
+      timeSlots: (json['timeSlots'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
+      specialDateSlots: (json['specialDateSlots'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
       status: json['status'] is String
           ? int.tryParse(json['status'] as String)
           : json['status'] as int?,
@@ -102,6 +115,7 @@ class ServiceItem {
       'longitude': longitude,
       'address': address,
       'deliveryRange': deliveryRange,
+      'avatar': avatar,
       'status': status,
     };
   }
@@ -127,6 +141,7 @@ class ServiceItem {
     double? longitude,
     String? address,
     double? deliveryRange,
+    String? avatar,
   }) {
     return ServiceItem(
       id: id ?? this.id,
@@ -148,6 +163,7 @@ class ServiceItem {
       longitude: longitude ?? this.longitude,
       address: address ?? this.address,
       deliveryRange: deliveryRange ?? this.deliveryRange,
+      avatar: avatar ?? this.avatar,
     );
   }
 }

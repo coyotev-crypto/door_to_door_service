@@ -48,6 +48,10 @@ class OrderCreateScreen extends GetView<OrderController> {
           _buildSectionTitle('地址信息'),
           SizedBox(height: 12.h),
           _buildAddressSelector(context),
+          SizedBox(height: 24.h),
+          _buildSectionTitle('服务时间'),
+          SizedBox(height: 12.h),
+          _buildTimeSelector(context),
           SizedBox(height: 16.h),
           PrimaryInputField(
             label: '联系人',
@@ -233,6 +237,79 @@ class OrderCreateScreen extends GetView<OrderController> {
               style: TextStyle(fontSize: 14.sp, color: Colors.black87)),
         ],
       ),
+    );
+  }
+
+  /// 日期 + 时间选择器
+  Widget _buildTimeSelector(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => controller.pickDate(),
+            child: Container(
+              height: 48.h,
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8.r),
+                color: Colors.grey[50],
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.calendar_today_rounded,
+                      size: 18.sp, color: Colors.grey[500]),
+                  SizedBox(width: 6.w),
+                  Obx(() => Text(
+                        controller.selectedDate.isEmpty
+                            ? '选择日期'
+                            : controller.selectedDate,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: controller.selectedDate.isEmpty
+                              ? Colors.grey[500]
+                              : Colors.black87,
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => controller.pickTime(),
+            child: Container(
+              height: 48.h,
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8.r),
+                color: Colors.grey[50],
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.access_time_rounded,
+                      size: 18.sp, color: Colors.grey[500]),
+                  SizedBox(width: 6.w),
+                  Obx(() => Text(
+                        controller.selectedTime.isEmpty
+                            ? '选择时间'
+                            : controller.selectedTime,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: controller.selectedTime.isEmpty
+                              ? Colors.grey[500]
+                              : Colors.black87,
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
