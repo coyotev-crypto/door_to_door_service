@@ -5,125 +5,118 @@ import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../widgets/primary_button.dart';
 
-/// 服务商完善服务页面
+/// 服务商完善服务页面 — 温润质感风格
 class ProviderServicePage extends GetView<ProviderServiceController> {
   const ProviderServicePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFF7F5F2),
       appBar: AppBar(
         title: Text(
           controller.isEditMode ? '编辑服务' : '完善服务',
           style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.black87),
+              color: const Color(0xFF2D2A26)),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
       ),
       body: Obx(() {
         if (controller.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        return _buildForm(context);
+        return _buildForm(context, theme);
       }),
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildForm(BuildContext context, ThemeData theme) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 40.h),
       child: Form(
         key: controller.formKey,
         child: Column(
           children: [
             _buildCard([
-              _buildCardTitle(Icons.info_outline_rounded, '基本信息'),
-              SizedBox(height: 16.h),
-              _buildField('服务名称', '请输入服务名称', controller.nameController,
+              _cardHeader('基本信息', Icons.spa_rounded, const Color(0xFFB8860B)),
+              SizedBox(height: 20.h),
+              _field('服务名称', '给服务取个名字', controller.nameController,
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? '请输入服务名称' : null),
-              SizedBox(height: 14.h),
+              SizedBox(height: 16.h),
               _buildCategorySelector(context),
-              SizedBox(height: 14.h),
-              _buildField(
-                  '服务商名称', '请输入服务商名称', controller.providerNameController,
+              SizedBox(height: 16.h),
+              _field('服务商名称', '请输入您的姓名或昵称', controller.providerNameController,
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? '请输入服务商名称' : null),
             ]),
-            SizedBox(height: 12.h),
+            SizedBox(height: 14.h),
             _buildCard([
-              _buildCardTitle(Icons.location_on_outlined, '服务区域'),
-              SizedBox(height: 16.h),
+              _cardHeader(
+                  '服务区域', Icons.location_on_outlined, const Color(0xFF8B6914)),
+              SizedBox(height: 20.h),
               _buildCitySelector(context),
-              SizedBox(height: 14.h),
-              _buildField(
-                  '配送范围（KM）', '请输入配送范围（公里）', controller.deliveryRangeController,
+              SizedBox(height: 16.h),
+              _field('配送范围（KM）', '可服务的最大距离', controller.deliveryRangeController,
                   keyboardType: TextInputType.number, validator: (v) {
                 if (v == null || v.trim().isEmpty) return '请输入配送范围';
-                final range = double.tryParse(v);
-                if (range == null || range <= 0) return '请输入有效的配送范围';
+                final r = double.tryParse(v);
+                if (r == null || r <= 0) return '请输入有效的范围';
                 return null;
               }),
             ]),
-            SizedBox(height: 12.h),
+            SizedBox(height: 14.h),
             _buildCard([
-              _buildCardTitle(Icons.access_time_rounded, '可服务时间段'),
-              SizedBox(height: 12.h),
+              _cardHeader(
+                  '可服务时间', Icons.wb_twilight_rounded, const Color(0xFF9B7653)),
+              SizedBox(height: 16.h),
               _buildTimeSlotSection(context),
             ]),
-            SizedBox(height: 12.h),
+            SizedBox(height: 14.h),
             _buildCard([
-              _buildCardTitle(Icons.attach_money_rounded, '价格信息'),
+              _cardHeader(
+                  '价格方案', Icons.auto_awesome_rounded, const Color(0xFFC4956A)),
               SizedBox(height: 16.h),
-              _buildField('原价', '请输入服务价格', controller.priceController,
-                  keyboardType: TextInputType.number, validator: (v) {
-                if (v == null || v.trim().isEmpty) return '请输入服务价格';
-                final price = double.tryParse(v);
-                if (price == null || price < 0) return '请输入有效的价格';
-                return null;
-              }),
-              SizedBox(height: 14.h),
-              _buildField(
-                  '交通费/公里（选填）', '请输入每公里交通费', controller.travelFeeController,
-                  keyboardType: TextInputType.number, required: false),
+              _buildPricesEditor(context),
             ]),
-            SizedBox(height: 12.h),
+            SizedBox(height: 14.h),
             _buildCard([
-              _buildCardTitle(Icons.toggle_on_rounded, '服务状态'),
-              SizedBox(height: 12.h),
-              _buildStatusSelector(context),
+              _cardHeader(
+                  '服务状态', Icons.visibility_rounded, const Color(0xFF6B8E7B)),
+              SizedBox(height: 16.h),
+              _buildStatusToggle(context),
             ]),
-            SizedBox(height: 40.h),
+            SizedBox(height: 36.h),
             Obx(() => PrimaryButton(
                   text: controller.isEditMode ? '保存修改' : '提交服务',
                   isLoading: controller.isSubmitting,
                   onPressed: controller.submit,
                 )),
-            SizedBox(height: 32.h),
           ],
         ),
       ),
     );
   }
 
-  // ── 卡片容器 ──
+  // ═══ 卡片 ═══
   Widget _buildCard(List<Widget> children) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
+              color: const Color(0xFF2D2A26).withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -131,96 +124,97 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
     );
   }
 
-  Widget _buildCardTitle(IconData icon, String title) {
+  Widget _cardHeader(String title, IconData icon, Color accent) {
     return Row(
       children: [
-        Icon(icon, size: 18.sp, color: Colors.black54),
-        SizedBox(width: 6.w),
+        Container(
+          width: 36.w,
+          height: 36.w,
+          decoration: BoxDecoration(
+              color: accent.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(10.r)),
+          child: Icon(icon, size: 20.sp, color: accent),
+        ),
+        SizedBox(width: 12.w),
         Text(title,
             style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87)),
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF2D2A26))),
       ],
     );
   }
 
-  // ── 输入字段 ──
-  Widget _buildField(String label, String hint, TextEditingController ctrl,
-      {TextInputType? keyboardType,
-      bool required = true,
-      FormFieldValidator<String>? validator}) {
-    final baseValidator = required
-        ? (v) {
-            if (v == null || v.trim().isEmpty) return '请输入$label';
-            return null;
-          }
-        : null;
+  // ═══ 输入框 ═══
+  Widget _field(String label, String hint, TextEditingController ctrl,
+      {TextInputType? keyboardType, FormFieldValidator<String>? validator}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87)),
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF6B5E53))),
         SizedBox(height: 6.h),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: Colors.grey[200]!),
+            color: const Color(0xFFF9F7F4),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: const Color(0xFFE8E2D8)),
           ),
           child: TextFormField(
             controller: ctrl,
             keyboardType: keyboardType,
-            style: TextStyle(fontSize: 15.sp, color: Colors.black87),
+            style: TextStyle(fontSize: 15.sp, color: const Color(0xFF2D2A26)),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(fontSize: 15.sp, color: Colors.grey[400]),
+              hintStyle:
+                  TextStyle(fontSize: 15.sp, color: const Color(0xFFB8A99A)),
               border: InputBorder.none,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               isCollapsed: true,
             ),
-            validator: validator ?? baseValidator,
+            validator: validator,
           ),
         ),
       ],
     );
   }
 
-  // ── 分类选择 ──
+  // ═══ 分类选择 ═══
   Widget _buildCategorySelector(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('服务分类',
             style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87)),
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF6B5E53))),
         SizedBox(height: 6.h),
         Obx(() {
-          final items = controller.categories;
           return Container(
             height: 48.h,
-            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: Colors.grey[200]!),
+              color: const Color(0xFFF9F7F4),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: const Color(0xFFE8E2D8)),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<CategoryModel>(
                 value: controller.selectedCategory,
                 isExpanded: true,
-                hint: Text('请选择服务分类',
-                    style: TextStyle(fontSize: 15.sp, color: Colors.grey[400])),
-                icon: Icon(Icons.keyboard_arrow_down_rounded,
-                    size: 22.sp, color: Colors.grey[500]),
-                style: TextStyle(fontSize: 15.sp, color: Colors.black87),
-                items: items
+                hint: Text('选择分类',
+                    style: TextStyle(
+                        fontSize: 15.sp, color: const Color(0xFFB8A99A))),
+                icon: Icon(Icons.expand_more_rounded,
+                    size: 22.sp, color: const Color(0xFFB8A99A)),
+                style:
+                    TextStyle(fontSize: 15.sp, color: const Color(0xFF2D2A26)),
+                items: controller.categories
                     .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
                     .toList(),
                 onChanged: (v) => controller.updateCategory(v),
@@ -232,52 +226,48 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
     );
   }
 
-  // ── 城市选择 ──
+  // ═══ 城市选择 ═══
   Widget _buildCitySelector(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('意向合作城市',
             style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87)),
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF6B5E53))),
         SizedBox(height: 6.h),
         GestureDetector(
           onTap: () => controller.selectCity(),
           child: Container(
             height: 48.h,
-            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: Colors.grey[200]!),
+              color: const Color(0xFFF9F7F4),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: const Color(0xFFE8E2D8)),
             ),
             child: Row(
               children: [
                 Icon(Icons.location_on_rounded,
-                    color: Theme.of(context).primaryColor, size: 20.sp),
-                SizedBox(width: 8.w),
+                    color: const Color(0xFFC4956A), size: 20.sp),
+                SizedBox(width: 10.w),
                 Expanded(
                   child: Obx(() {
-                    final city = controller.selectedCity;
+                    final c = controller.selectedCity;
                     return Text(
-                      city != null && city.name.isNotEmpty
-                          ? city.name
-                          : '请选择意向合作城市',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: city != null && city.name.isNotEmpty
-                            ? Colors.black87
-                            : Colors.grey[400],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
+                        c != null && c.name.isNotEmpty ? c.name : '选择城市',
+                        style: TextStyle(
+                            fontSize: 15.sp,
+                            color: c != null && c.name.isNotEmpty
+                                ? const Color(0xFF2D2A26)
+                                : const Color(0xFFB8A99A)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis);
                   }),
                 ),
                 Icon(Icons.chevron_right_rounded,
-                    size: 20.sp, color: Colors.grey),
+                    size: 20.sp, color: const Color(0xFFB8A99A)),
               ],
             ),
           ),
@@ -286,52 +276,51 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
     );
   }
 
-  // ── 状态选择 ──
-  Widget _buildStatusSelector(BuildContext context) {
-    return Obx(() => Row(
-          children: [
-            _buildStatusOption(1, '上架', Icons.check_circle_outline),
-            SizedBox(width: 16.w),
-            _buildStatusOption(0, '下架', Icons.cancel_outlined),
-          ],
-        ));
+  // ═══ 状态切换 ═══
+  Widget _buildStatusToggle(BuildContext context) {
+    return Obx(() {
+      final active = controller.status == 1;
+      return Row(
+        children: [
+          Expanded(
+              child: _statusChip('上架', Icons.check_circle_outline_rounded,
+                  active, () => controller.updateStatus(1))),
+          SizedBox(width: 12.w),
+          Expanded(
+              child: _statusChip('下架', Icons.pause_circle_outline_rounded,
+                  !active, () => controller.updateStatus(0))),
+        ],
+      );
+    });
   }
 
-  Widget _buildStatusOption(int value, String label, IconData icon) {
-    final selected = controller.status == value;
+  Widget _statusChip(
+      String label, IconData icon, bool selected, VoidCallback onTap) {
+    final color = selected ? const Color(0xFF6B8E7B) : const Color(0xFFB8A99A);
+    final bg = selected
+        ? const Color(0xFF6B8E7B).withOpacity(0.08)
+        : const Color(0xFFF9F7F4);
     return GestureDetector(
-      onTap: () => controller.updateStatus(value),
+      onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(vertical: 14.h),
         decoration: BoxDecoration(
-          color: selected
-              ? Theme.of(Get.context!).primaryColor.withOpacity(0.08)
-              : Colors.grey[50],
-          borderRadius: BorderRadius.circular(10.r),
+          color: bg,
+          borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: selected
-                ? Theme.of(Get.context!).primaryColor
-                : Colors.grey[200]!,
-            width: selected ? 1.5 : 1,
-          ),
+              color:
+                  selected ? color.withOpacity(0.3) : const Color(0xFFE8E2D8)),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                size: 18.sp,
-                color: selected
-                    ? Theme.of(Get.context!).primaryColor
-                    : Colors.grey[400]),
-            SizedBox(width: 6.w),
+            Icon(icon, size: 20.sp, color: color),
+            SizedBox(width: 8.w),
             Text(label,
                 style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: selected
-                      ? Theme.of(Get.context!).primaryColor
-                      : Colors.grey[500],
-                )),
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: color)),
           ],
         ),
       ),
@@ -339,89 +328,79 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
   }
 
   // ═══════════════════════════════════════════
-  // 时间段
+  // 时间段编辑器
   // ═══════════════════════════════════════════
   Widget _buildTimeSlotSection(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel('星期时间段'),
+        _sectionLabel('星期时间段'),
         SizedBox(height: 6.h),
         _buildWeekdaySlots(context),
         SizedBox(height: 16.h),
-        _buildSectionLabel('特殊日期'),
+        _sectionLabel('特殊日期'),
         SizedBox(height: 6.h),
         _buildSpecialDateSlots(context),
       ],
     );
   }
 
-  Widget _buildSectionLabel(String text) {
-    return Text(text,
-        style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600]));
-  }
-
   Widget _buildWeekdaySlots(BuildContext context) {
     return Obx(() => Column(
           children: List.generate(7, (i) {
-            final weekday = i + 1;
-            final slots = controller.slotsForWeekday(weekday);
-            final allIndices = <int>[];
+            final w = i + 1;
+            final slots = controller.slotsForWeekday(w);
+            final indices = <int>[];
             for (var k = 0; k < controller.weekdaySlots.length; k++) {
-              if (controller.weekdaySlots[k]['weekday'] == weekday)
-                allIndices.add(k);
+              if (controller.weekdaySlots[k]['weekday'] == w) indices.add(k);
             }
             final hasSlots = slots.isNotEmpty;
             return Container(
               margin: EdgeInsets.only(bottom: 4.h),
               decoration: BoxDecoration(
                 color: hasSlots
-                    ? Theme.of(context).primaryColor.withOpacity(0.03)
-                    : Colors.grey[50],
-                borderRadius: BorderRadius.circular(8.r),
-                border: hasSlots
-                    ? Border.all(
-                        color: Theme.of(context).primaryColor.withOpacity(0.15))
-                    : null,
+                    ? const Color(0xFFF5F0E8)
+                    : const Color(0xFFF9F7F4),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               child: ExpansionTile(
-                tilePadding: EdgeInsets.symmetric(horizontal: 12.w),
+                tilePadding: EdgeInsets.symmetric(horizontal: 14.w),
                 visualDensity: VisualDensity.compact,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r)),
+                collapsedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r)),
                 title: Text(ProviderServiceController.weekdayLabels[i],
                     style: TextStyle(
-                        fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                        fontSize: 14.sp, fontWeight: FontWeight.w600)),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(slots.isEmpty ? '未设置' : '${slots.length}个时段',
+                    Text(slots.isEmpty ? '未设置' : '${slots.length}个',
                         style: TextStyle(
                             fontSize: 12.sp,
                             color: hasSlots
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey[400])),
+                                ? const Color(0xFF9B7653)
+                                : const Color(0xFFB8A99A))),
                     SizedBox(width: 4.w),
                     Icon(Icons.keyboard_arrow_down_rounded,
-                        size: 20.sp, color: Colors.grey[400]),
+                        size: 20.sp, color: const Color(0xFFB8A99A)),
                   ],
                 ),
-                childrenPadding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 10.h),
+                childrenPadding: EdgeInsets.fromLTRB(14.w, 0, 14.w, 10.h),
                 children: [
-                  ...allIndices.map((idx) {
+                  ...indices.map((idx) {
                     final s = controller.weekdaySlots[idx];
-                    return _buildTimeRow(
-                      context,
-                      start: (s['startTime'] as String).substring(0, 5),
-                      end: (s['endTime'] as String).substring(0, 5),
-                      onStart: (t) => controller.updateWeekdaySlot(
-                          idx, 'startTime', '$t:00'),
-                      onEnd: (t) =>
-                          controller.updateWeekdaySlot(idx, 'endTime', '$t:00'),
-                      onDelete: () => controller.removeWeekdaySlot(idx),
-                    );
+                    return _timeRow(context,
+                        start: (s['startTime'] as String).substring(0, 5),
+                        end: (s['endTime'] as String).substring(0, 5),
+                        onStart: (t) => controller.updateWeekdaySlot(
+                            idx, 'startTime', '$t:00'),
+                        onEnd: (t) => controller.updateWeekdaySlot(
+                            idx, 'endTime', '$t:00'),
+                        onDelete: () => controller.removeWeekdaySlot(idx));
                   }),
-                  _buildAddSlotBtn(() => controller.addWeekdaySlot(weekday)),
+                  _addBtn(() => controller.addWeekdaySlot(w)),
                 ],
               ),
             );
@@ -437,50 +416,51 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
               return Container(
                 margin: EdgeInsets.only(bottom: 4.h),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                  color: const Color(0xFFFFF6ED),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: ExpansionTile(
-                  tilePadding: EdgeInsets.symmetric(horizontal: 12.w),
+                  tilePadding: EdgeInsets.symmetric(horizontal: 14.w),
                   visualDensity: VisualDensity.compact,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r)),
+                  collapsedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r)),
                   title: Text(s['specialDate'] as String,
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w500)),
-                  childrenPadding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 10.h),
+                          fontSize: 14.sp, fontWeight: FontWeight.w600)),
+                  childrenPadding: EdgeInsets.fromLTRB(14.w, 0, 14.w, 10.h),
                   children: [
-                    _buildTimeRow(
-                      context,
-                      start: (s['startTime'] as String).substring(0, 5),
-                      end: (s['endTime'] as String).substring(0, 5),
-                      onStart: (t) => controller.updateSpecialDateSlot(
-                          e.key, 'startTime', '$t:00'),
-                      onEnd: (t) => controller.updateSpecialDateSlot(
-                          e.key, 'endTime', '$t:00'),
-                      onDelete: () => controller.removeSpecialDateSlot(e.key),
-                    ),
+                    _timeRow(context,
+                        start: (s['startTime'] as String).substring(0, 5),
+                        end: (s['endTime'] as String).substring(0, 5),
+                        onStart: (t) => controller.updateSpecialDateSlot(
+                            e.key, 'startTime', '$t:00'),
+                        onEnd: (t) => controller.updateSpecialDateSlot(
+                            e.key, 'endTime', '$t:00'),
+                        onDelete: () =>
+                            controller.removeSpecialDateSlot(e.key)),
                   ],
                 ),
               );
             }),
-            _buildAddSlotBtn(() async {
+            _addBtn(() async {
               final now = DateTime.now();
-              final picked = await showDatePicker(
+              final p = await showDatePicker(
                   context: context,
                   initialDate: now,
                   firstDate: now,
                   lastDate: now.add(const Duration(days: 365)));
-              if (picked != null) {
-                final dateStr =
-                    '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-                controller.addSpecialDateSlot(dateStr);
+              if (p != null) {
+                controller.addSpecialDateSlot(
+                    '${p.year}-${p.month.toString().padLeft(2, '0')}-${p.day.toString().padLeft(2, '0')}');
               }
             }),
           ],
         ));
   }
 
-  Widget _buildTimeRow(BuildContext context,
+  Widget _timeRow(BuildContext context,
       {required String start,
       required String end,
       required ValueChanged<String> onStart,
@@ -488,88 +468,188 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
       required VoidCallback onDelete}) {
     return Container(
       margin: EdgeInsets.only(bottom: 6.h),
-      padding: EdgeInsets.all(10.w),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
+          color: Colors.white, borderRadius: BorderRadius.circular(10.r)),
       child: Row(
         children: [
-          _buildTimeTap(context, start, onStart),
+          _timeTap(context, start, onStart),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6.w),
-            child: Text('—',
-                style: TextStyle(fontSize: 14.sp, color: Colors.grey[400])),
-          ),
-          _buildTimeTap(context, end, onEnd),
+              padding: EdgeInsets.symmetric(horizontal: 6.w),
+              child: Text('—',
+                  style: TextStyle(
+                      fontSize: 14.sp, color: const Color(0xFFB8A99A)))),
+          _timeTap(context, end, onEnd),
           const Spacer(),
           GestureDetector(
             onTap: onDelete,
             child: Container(
-              width: 28.w,
-              height: 28.w,
-              decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.08), shape: BoxShape.circle),
-              child: Icon(Icons.close, size: 14.sp, color: Colors.red[300]),
-            ),
+                width: 30.w,
+                height: 30.w,
+                decoration: BoxDecoration(
+                    color: const Color(0xFFF5E6E6), shape: BoxShape.circle),
+                child: Icon(Icons.close,
+                    size: 14.sp, color: const Color(0xFFC67B7B))),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimeTap(
-      BuildContext context, String time, ValueChanged<String> onChanged) {
+  Widget _timeTap(
+      BuildContext context, String time, ValueChanged<String> onChange) {
     return GestureDetector(
       onTap: () async {
         final parts = time.split(':');
         final t = await showTimePicker(
-          context: context,
-          initialTime:
-              TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1])),
-        );
-        if (t != null) {
-          onChanged(
+            context: context,
+            initialTime: TimeOfDay(
+                hour: int.parse(parts[0]), minute: int.parse(parts[1])));
+        if (t != null)
+          onChange(
               '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
-        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(6.r),
-        ),
+            color: const Color(0xFFF9F7F4),
+            borderRadius: BorderRadius.circular(8.r)),
         child: Text(time,
             style: TextStyle(
                 fontSize: 15.sp,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500)),
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2D2A26))),
       ),
     );
   }
 
-  Widget _buildAddSlotBtn(VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(top: 4.h),
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          border:
-              Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add_rounded, size: 16.sp, color: Colors.grey[500]),
+  Widget _addBtn(VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: EdgeInsets.only(top: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+          decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE8E2D8)),
+              borderRadius: BorderRadius.circular(10.r)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.add_rounded,
+                size: 18.sp, color: const Color(0xFF9B7653)),
             SizedBox(width: 4.w),
-            Text('添加时间段',
-                style: TextStyle(fontSize: 13.sp, color: Colors.grey[500])),
-          ],
+            Text('添加',
+                style: TextStyle(
+                    fontSize: 13.sp,
+                    color: const Color(0xFF9B7653),
+                    fontWeight: FontWeight.w500)),
+          ]),
         ),
-      ),
-    );
+      );
+
+  Widget _sectionLabel(String t) => Text(t,
+      style: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w600,
+          color: const Color(0xFFB8A99A),
+          letterSpacing: 0.5));
+
+  // ═══════════════════════════════════════════
+  // 多时长价格编辑器
+  // ═══════════════════════════════════════════
+  Widget _buildPricesEditor(BuildContext context) {
+    return Obx(() => Column(
+          children: [
+            ...controller.prices.asMap().entries.map((e) {
+              final p = e.value;
+              final dur = p['durationMinutes']?.toString() ?? '60';
+              final prc = (p['price'] as num?)?.toString() ?? '';
+              return Container(
+                margin: EdgeInsets.only(bottom: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFF9F7F4),
+                    borderRadius: BorderRadius.circular(10.r)),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48.w,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.r)),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 6.w, vertical: 10.h),
+                      child: TextFormField(
+                        initialValue: dur,
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2D2A26)),
+                        decoration: const InputDecoration(
+                            isCollapsed: true, border: InputBorder.none),
+                        onChanged: (v) => controller.updatePrice(
+                            e.key, 'durationMinutes', int.tryParse(v) ?? 60),
+                      ),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text('分钟',
+                            style: TextStyle(
+                                fontSize: 13.sp,
+                                color: const Color(0xFF9B7653),
+                                fontWeight: FontWeight.w500))),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.r)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 12.w, vertical: 10.h),
+                        child: Row(children: [
+                          Text('¥',
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFFC4956A))),
+                          SizedBox(width: 4.w),
+                          Expanded(
+                            child: TextFormField(
+                              initialValue: prc,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF2D2A26)),
+                              decoration: const InputDecoration(
+                                  isCollapsed: true,
+                                  hintText: '0',
+                                  border: InputBorder.none),
+                              onChanged: (v) => controller.updatePrice(
+                                  e.key, 'price', double.tryParse(v) ?? 0),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    GestureDetector(
+                      onTap: () => controller.removePrice(e.key),
+                      child: Container(
+                          width: 30.w,
+                          height: 30.w,
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFF5E6E6),
+                              shape: BoxShape.circle),
+                          child: Icon(Icons.close,
+                              size: 14.sp, color: const Color(0xFFC67B7B))),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            _addBtn(() => controller.addPrice()),
+          ],
+        ));
   }
 }

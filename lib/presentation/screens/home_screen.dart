@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFF7F5F2),
       body: SafeArea(
         child: SizedBox.expand(
           child: Stack(
