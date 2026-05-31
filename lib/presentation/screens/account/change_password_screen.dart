@@ -84,11 +84,11 @@ class ChangePasswordScreen extends GetView<AccountSecurityController> {
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-            colors: [AppTheme.gold.withOpacity(0.08), AppTheme.gold.withOpacity(0.03)],
+            colors: [AppTheme.gold.withValues(alpha: 0.08), AppTheme.gold.withValues(alpha: 0.03)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight),
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: AppTheme.gold.withOpacity(0.12)),
+        border: Border.all(color: AppTheme.gold.withValues(alpha: 0.12)),
       ),
       child: Row(children: [
         Icon(Icons.info_outline_rounded, size: 18.sp, color: AppTheme.gold),
@@ -175,7 +175,7 @@ class ChangePasswordScreen extends GetView<AccountSecurityController> {
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
-                color: AppTheme.gold.withOpacity(0.3),
+                color: AppTheme.gold.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4))
           ],

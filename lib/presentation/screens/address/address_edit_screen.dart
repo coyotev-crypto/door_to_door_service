@@ -281,7 +281,7 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
                   Container(
                     height: 56.h,
                     decoration: BoxDecoration(
-                      color: themeColor.withOpacity(0.1),
+                      color: themeColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Material(
@@ -520,13 +520,13 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
         gradient: LinearGradient(
           colors: [
             themeColor,
-            themeColor.withOpacity(0.8),
+            themeColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: themeColor.withOpacity(0.3),
+            color: themeColor.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

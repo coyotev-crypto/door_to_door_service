@@ -60,20 +60,18 @@ class AuthService extends GetxService {
   Future<void> _loadUserInfoFromLocal() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userJson = prefs.getString(_userKey);
+      final phoneNumber = prefs.getString('$_userKey.phoneNumber');
 
-      if (userJson != null && userJson.isNotEmpty) {
-        // 这里需要将JSON字符串转换为Map，再转换为UserModel
-        // 由于SharedPreferences只能存储基本类型，我们需要手动处理
-        // 假设我们存储的是JSON字符串
+      if (phoneNumber != null && phoneNumber.isNotEmpty) {
         final Map<String, dynamic> userData = {
           'id': prefs.getString('$_userKey.id') ?? '',
-          'phoneNumber': prefs.getString('$_userKey.phoneNumber') ?? '',
+          'phoneNumber': phoneNumber,
           'nickname': prefs.getString('$_userKey.nickname'),
           'avatar': prefs.getString('$_userKey.avatar'),
           'email': prefs.getString('$_userKey.email'),
           'gender': prefs.getString('$_userKey.gender'),
           'remark': prefs.getString('$_userKey.remark'),
+          'roleId': int.tryParse(prefs.getString('$_userKey.roleId') ?? ''),
           'hasPaymentPassword': prefs.getString('$_userKey.hasPaymentPassword'),
           'createdAt': prefs.getString('$_userKey.createdAt'),
           'updatedAt': prefs.getString('$_userKey.updatedAt'),
@@ -109,6 +107,9 @@ class AuthService extends GetxService {
       if (user.remark != null) {
         await prefs.setString('$_userKey.remark', user.remark!);
       }
+      if (user.roleId != null) {
+        await prefs.setString('$_userKey.roleId', user.roleId.toString());
+      }
       if (user.hasPaymentPassword != null) {
         await prefs.setString('$_userKey.hasPaymentPassword',
             user.hasPaymentPassword.toString());
@@ -140,6 +141,7 @@ class AuthService extends GetxService {
       await prefs.remove('$_userKey.email');
       await prefs.remove('$_userKey.gender');
       await prefs.remove('$_userKey.remark');
+      await prefs.remove('$_userKey.roleId');
       await prefs.remove('$_userKey.hasPaymentPassword');
       await prefs.remove('$_userKey.createdAt');
       await prefs.remove('$_userKey.updatedAt');
@@ -171,10 +173,10 @@ class AuthService extends GetxService {
 
       if (saved) {
         _isLoggedIn.value = true;
-        _user.value = user;
 
         // 保存用户信息到本地存储
         if (user != null) {
+          _user.value = user;
           await _saveUserInfoToLocal(user);
         }
 

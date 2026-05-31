@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.all(24.w),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20.r)),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(width: 52.w, height: 52.w, decoration: BoxDecoration(color: AppTheme.gold.withOpacity(0.08), shape: BoxShape.circle), child: Icon(Icons.logout_rounded, size: 26.sp, color: AppTheme.gold)),
+            Container(width: 52.w, height: 52.w, decoration: BoxDecoration(color: AppTheme.gold.withValues(alpha: 0.08), shape: BoxShape.circle), child: Icon(Icons.logout_rounded, size: 26.sp, color: AppTheme.gold)),
             SizedBox(height: 16.h),
             Text('退出登录', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
             SizedBox(height: 6.h),
@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
               borderRadius: BorderRadius.circular(14.r),
-              boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+              boxShadow: [BoxShadow(color: AppTheme.gold.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
             ),
             child: Center(child: _loading
                 ? SizedBox(width: 22.w, height: 22.w, child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))

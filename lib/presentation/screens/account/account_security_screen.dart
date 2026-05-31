@@ -86,12 +86,12 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppTheme.gold.withOpacity(0.08), AppTheme.gold.withOpacity(0.03)],
+          colors: [AppTheme.gold.withValues(alpha: 0.08), AppTheme.gold.withValues(alpha: 0.03)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppTheme.gold.withOpacity(0.15)),
+        border: Border.all(color: AppTheme.gold.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
@@ -99,7 +99,7 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
             width: 36.w,
             height: 36.w,
             decoration: BoxDecoration(
-              color: AppTheme.gold.withOpacity(0.12),
+              color: AppTheme.gold.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(Icons.security_rounded, size: 18.sp, color: AppTheme.gold),
@@ -153,7 +153,7 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
-              color: const Color(0xFF2D2A26).withOpacity(0.03),
+              color: const Color(0xFF2D2A26).withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2)),
         ],
@@ -186,7 +186,7 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
                     width: 42.w,
                     height: 42.w,
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.08),
+                      color: color.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Icon(icon, size: 20.sp, color: color),
@@ -240,7 +240,7 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
                 width: 56.w,
                 height: 56.w,
                 decoration: BoxDecoration(
-                  color: AppTheme.danger.withOpacity(0.08),
+                  color: AppTheme.danger.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.warning_amber_rounded,
@@ -294,13 +294,13 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
                           gradient: LinearGradient(
                             colors: [
                               AppTheme.danger,
-                              AppTheme.danger.withOpacity(0.85)
+                              AppTheme.danger.withValues(alpha: 0.85)
                             ],
                           ),
                           borderRadius: BorderRadius.circular(12.r),
                           boxShadow: [
                             BoxShadow(
-                                color: AppTheme.danger.withOpacity(0.25),
+                                color: AppTheme.danger.withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3)),
                           ],

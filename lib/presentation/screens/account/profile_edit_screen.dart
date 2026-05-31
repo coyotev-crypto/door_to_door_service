@@ -68,7 +68,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppTheme.creamBg,
-              border: Border.all(color: AppTheme.gold.withOpacity(0.2), width: 2),
+              border: Border.all(color: AppTheme.gold.withValues(alpha: 0.2), width: 2),
             ),
             clipBehavior: Clip.antiAlias,
             child: user?.avatar != null
@@ -135,7 +135,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         style: TextStyle(fontSize: 15.sp, color: enabled ? AppTheme.textPrimary : AppTheme.textMuted),
         decoration: InputDecoration(
           hintText: hint, hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-          filled: true, fillColor: enabled ? AppTheme.creamBg : AppTheme.creamBg.withOpacity(0.9),
+          filled: true, fillColor: enabled ? AppTheme.creamBg : AppTheme.creamBg.withValues(alpha: 0.9),
           contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
@@ -155,7 +155,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
           borderRadius: BorderRadius.circular(14.r),
-          boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppTheme.gold.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: Center(child: loading
             ? SizedBox(width: 22.w, height: 22.w, child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))

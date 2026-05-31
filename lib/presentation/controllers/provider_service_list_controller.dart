@@ -94,33 +94,20 @@ class ProviderServiceListController extends GetxController {
 
   /// 切换服务上架/下架状态
   Future<void> toggleStatus(ServiceItem service) async {
-    final newStatus = service.status == 1 ? 0 : 1;
+    final willPublish = service.status != 1;
     try {
-      final response = await _serviceRepository.updateService(
-        id: service.id,
-        categoryId: service.categoryId ?? 0,
-        name: service.name,
-        price: service.price,
-        providerName: service.providerName ?? '',
-        address: service.address ?? '',
-        deliveryRange: service.deliveryRange ?? 0,
-        travelFee: service.travelFee,
-        latitude: service.latitude,
-        longitude: service.longitude,
-        status: newStatus,
-      );
+      final response = willPublish
+          ? await _serviceRepository.publishService(service.id)
+          : await _serviceRepository.unpublishService(service.id);
       if (response.isSuccess) {
-        ToastUtil.showSuccess(newStatus == 1 ? '已上架' : '已下架');
-        // 本地更新列表状态，避免全量刷新
-        if (newStatus == 1) {
-          // 上架：当前服务上架，其余全部下架（互斥）
+        ToastUtil.showSuccess(willPublish ? '已上架' : '已下架');
+        if (willPublish) {
           for (var i = 0; i < _services.length; i++) {
             _services[i] = _services[i].copyWith(
               status: _services[i].id == service.id ? 1 : 0,
             );
           }
         } else {
-          // 下架：仅更新当前服务
           final index = _services.indexWhere((s) => s.id == service.id);
           if (index != -1) {
             _services[index] = _services[index].copyWith(status: 0);

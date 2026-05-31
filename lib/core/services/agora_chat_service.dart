@@ -1,8 +1,10 @@
 import 'package:agora_chat_sdk/agora_chat_sdk.dart';
+import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:get/get.dart';
 
 /// 声网消息服务
 class AgoraChatService extends GetxService {
+  static const String TAG = 'AgoraChatService';
   static AgoraChatService get to => Get.find();
 
   // 声网聊天客户端
@@ -17,36 +19,26 @@ class AgoraChatService extends GetxService {
   // 会话列表
   final RxList<ChatConversation> conversations = <ChatConversation>[].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    _initAgoraChat();
-  }
-
-  /// 初始化声网聊天
-  Future<void> _initAgoraChat() async {
+  /// 初始化声网聊天（由外部调用，传入真实 AppKey）
+  Future<void> initialize({required String appKey}) async {
     try {
-      // 设置SDK配置
       final options = ChatOptions(
-        appKey: 'your_app_key', // 替换为您的声网App Key
+        appKey: appKey,
         autoLogin: false,
       );
 
-      // 初始化SDK
       await ChatClient.getInstance.init(options);
 
-      // 获取聊天客户端实例
       chatClient = ChatClient.getInstance;
 
-      // 添加消息监听器
       ChatClient.getInstance.chatManager.addEventHandler(
         'UNIQUE_HANDLER_ID',
         ChatEventHandler(onMessagesReceived: _handleMessagesReceived),
       );
 
-      print('声网聊天初始化成功');
+      LogUtil.d('声网聊天初始化成功', tag: TAG);
     } catch (e) {
-      print('声网聊天初始化失败: $e');
+      LogUtil.d('声网聊天初始化失败: $e', tag: TAG);
     }
   }
 
@@ -55,12 +47,12 @@ class AgoraChatService extends GetxService {
     try {
       await ChatClient.getInstance.loginWithToken(userId, token);
       isConnected.value = true;
-      print('声网聊天登录成功: $userId');
+      LogUtil.d('声网聊天登录成功: $userId', tag: TAG);
 
       // 加载会话列表
       _loadConversations();
     } catch (e) {
-      print('声网聊天登录失败: $e');
+      LogUtil.d('声网聊天登录失败: $e', tag: TAG);
       isConnected.value = false;
       rethrow;
     }
@@ -73,9 +65,9 @@ class AgoraChatService extends GetxService {
       isConnected.value = false;
       conversations.clear();
       unreadCount.value = 0;
-      print('声网聊天登出成功');
+      LogUtil.d('声网聊天登出成功', tag: TAG);
     } catch (e) {
-      print('声网聊天登出失败: $e');
+      LogUtil.d('声网聊天登出失败: $e', tag: TAG);
       rethrow;
     }
   }
@@ -89,9 +81,9 @@ class AgoraChatService extends GetxService {
       );
 
       await ChatClient.getInstance.chatManager.sendMessage(msg);
-      print('发送文本消息成功: $content');
+      LogUtil.d('发送文本消息成功: $content', tag: TAG);
     } catch (e) {
-      print('发送文本消息失败: $e');
+      LogUtil.d('发送文本消息失败: $e', tag: TAG);
       rethrow;
     }
   }
@@ -108,16 +100,16 @@ class AgoraChatService extends GetxService {
       }
       unreadCount.value = totalUnread;
 
-      print('加载会话列表成功: ${conversations.length}');
+      LogUtil.d('加载会话列表成功: ${conversations.length}', tag: TAG);
     } catch (e) {
-      print('加载会话列表失败: $e');
+      LogUtil.d('加载会话列表失败: $e', tag: TAG);
     }
   }
 
   /// 处理收到的新消息
   void _handleMessagesReceived(List<ChatMessage> messages) {
     for (var message in messages) {
-      print('收到新消息: ${message.body}');
+      LogUtil.d('收到新消息: ${message.body}', tag: TAG);
 
       // 更新未读数量
       unreadCount.value++;
@@ -167,7 +159,7 @@ class AgoraChatService extends GetxService {
       await ChatClient.getInstance.chatManager.sendConversationReadAck(conversationId);
       _loadConversations();
     } catch (e) {
-      print('标记会话为已读失败: $e');
+      LogUtil.d('标记会话为已读失败: $e', tag: TAG);
     }
   }
 
@@ -179,7 +171,7 @@ class AgoraChatService extends GetxService {
       conversations.refresh();
       _updateUnreadCount();
     } catch (e) {
-      print('删除会话失败: $e');
+      LogUtil.d('删除会话失败: $e', tag: TAG);
     }
   }
 }

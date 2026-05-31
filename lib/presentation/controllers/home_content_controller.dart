@@ -135,6 +135,8 @@ class HomeContentController extends GetxController {
         ));
         // 添加后端返回的分类
         _categories.addAll(response.list!);
+        // 通知 GetBuilder 重建分类栏
+        update(['category']);
       }
     } catch (e) {
       print('加载服务分类失败: $e');

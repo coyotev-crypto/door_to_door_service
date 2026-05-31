@@ -36,7 +36,7 @@ class ProfileFunctionItemWidget extends StatelessWidget {
                     width: 38.w,
                     height: 38.w,
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.08),
+                      color: color.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Icon(icon, size: 20.sp, color: color),

@@ -36,7 +36,7 @@ class ServiceCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                     boxShadow: [
                       BoxShadow(
-                          color: AppTheme.gold.withOpacity(0.15),
+                          color: AppTheme.gold.withValues(alpha: 0.15),
                           blurRadius: 8,
                           offset: const Offset(0, 3)),
                     ]),
@@ -172,7 +172,7 @@ class ServiceCardWidget extends StatelessWidget {
                               boxShadow: [
                                 BoxShadow(
                                     color: AppTheme.gold
-                                        .withOpacity(0.25),
+                                        .withValues(alpha: 0.25),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2))
                               ],

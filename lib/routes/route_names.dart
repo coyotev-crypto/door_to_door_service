@@ -22,7 +22,8 @@ class RouteNames {
   // 订单相关
   static const String orderCreate = '/order/create';
   static const String orderPayment = '/order/payment';
-  static const String orderList = '/order/list';
+  static const String customerOrderList = '/order/list';
+  static const String providerOrderList = '/order/provider-list';
 
   // 社区相关
   static const String postList = '/community';

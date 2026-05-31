@@ -270,7 +270,7 @@ class _ChatDetailWidgetState extends State<ChatDetailWidget> {
           width: 60.w,
           height: 3.h,
           decoration: BoxDecoration(
-            color: isSelf ? Colors.white.withOpacity(0.5) : Colors.grey[400],
+            color: isSelf ? Colors.white.withValues(alpha: 0.5) : Colors.grey[400],
             borderRadius: BorderRadius.circular(2.r),
           ),
         ),
@@ -289,7 +289,7 @@ class _ChatDetailWidgetState extends State<ChatDetailWidget> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),

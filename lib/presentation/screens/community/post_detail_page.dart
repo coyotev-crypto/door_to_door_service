@@ -57,7 +57,7 @@ class PostDetailPage extends GetView<PostDetailController> {
                 width: 36.w,
                 height: 36.w,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.35),
+                  color: Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.arrow_back_rounded,
@@ -71,7 +71,7 @@ class PostDetailPage extends GetView<PostDetailController> {
                 width: 36.w,
                 height: 36.w,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.35),
+                  color: Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                 ),
                 child:
@@ -277,9 +277,9 @@ class PostDetailPage extends GetView<PostDetailController> {
       margin: EdgeInsets.only(top: 12.h),
       padding: depth > 0 ? EdgeInsets.only(left: 12.w) : EdgeInsets.zero,
       decoration: depth > 0
-          ? BoxDecoration(
+          ? const BoxDecoration(
               border:
-                  Border(left: BorderSide(color: const Color(0xFFE8E2D8), width: 2)),
+                  Border(left: BorderSide(color: Color(0xFFE8E2D8), width: 2)),
             )
           : null,
       child: Padding(
@@ -396,7 +396,7 @@ class PostDetailPage extends GetView<PostDetailController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 6,
             offset: const Offset(0, -2),
           ),
@@ -412,7 +412,7 @@ class PostDetailPage extends GetView<PostDetailController> {
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   margin: EdgeInsets.only(right: 4.w),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Row(
@@ -443,7 +443,7 @@ class PostDetailPage extends GetView<PostDetailController> {
                       TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.r),
-                    borderSide: BorderSide(color: const Color(0xFFE8E2D8)),
+                    borderSide: const BorderSide(color: Color(0xFFE8E2D8)),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -636,7 +636,7 @@ class _ImageGalleryState extends State<_ImageGallery> {
                     decoration: BoxDecoration(
                       color: _currentIndex == i
                           ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+                          : Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(3.w),
                     ),
                   ),

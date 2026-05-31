@@ -21,7 +21,7 @@ class ProfileHeaderWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(14.r),
             boxShadow: [
               BoxShadow(
-                  color: const Color(0xFF2D2A26).withOpacity(0.03),
+                  color: const Color(0xFF2D2A26).withValues(alpha: 0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 2))
             ]),
@@ -40,10 +40,10 @@ class ProfileHeaderWidget extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: AppTheme.creamBg,
                       border:
-                          Border.all(color: AppTheme.gold.withOpacity(0.25), width: 2),
+                          Border.all(color: AppTheme.gold.withValues(alpha: 0.25), width: 2),
                       boxShadow: [
                         BoxShadow(
-                            color: AppTheme.gold.withOpacity(0.08),
+                            color: AppTheme.gold.withValues(alpha: 0.08),
                             blurRadius: 10,
                             offset: const Offset(0, 3)),
                       ],
@@ -78,8 +78,8 @@ class ProfileHeaderWidget extends StatelessWidget {
                       ]),
                       SizedBox(height: 4.h),
                       if (user?.phoneNumber != null &&
-                          user!.phoneNumber!.isNotEmpty)
-                        Text(user.phoneNumber!,
+                          user!.phoneNumber.isNotEmpty)
+                        Text(user.phoneNumber,
                             style:
                                 TextStyle(fontSize: 13.sp, color: AppTheme.textSecondary)),
                       SizedBox(height: 4.h),
@@ -101,7 +101,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                     width: 34.w,
                     height: 34.w,
                     decoration: BoxDecoration(
-                      color: AppTheme.gold.withOpacity(0.08),
+                      color: AppTheme.gold.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Icon(Icons.edit_rounded, size: 16.sp, color: AppTheme.gold),
@@ -147,7 +147,7 @@ class ProfileHeaderWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(3.w),
       decoration:
-          BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+          BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
       child: Icon(icon, size: 14.sp, color: color),
     );
   }

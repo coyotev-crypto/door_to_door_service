@@ -19,6 +19,11 @@ class OrderModel {
   final String? createTime;
   final String? updateTime;
 
+  // 退款相关
+  final int refundStatus; // 0-无退款,1-申请中,2-已批准,3-已拒绝,4-已退款
+  final String? refundReason;
+  final double? refundAmount;
+
   OrderModel({
     this.id = 0,
     this.orderNo,
@@ -38,6 +43,9 @@ class OrderModel {
     this.status = 0,
     this.createTime,
     this.updateTime,
+    this.refundStatus = 0,
+    this.refundReason,
+    this.refundAmount,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -64,6 +72,9 @@ class OrderModel {
       status: _parseStatus(json['status']),
       createTime: json['createTime'] as String?,
       updateTime: json['updateTime'] as String?,
+      refundStatus: json['refundStatus'] as int? ?? 0,
+      refundReason: json['refundReason'] as String?,
+      refundAmount: (json['refundAmount'] as num?)?.toDouble(),
     );
   }
 
@@ -102,6 +113,9 @@ class OrderModel {
       'status': status,
       'createTime': createTime,
       'updateTime': updateTime,
+      'refundStatus': refundStatus,
+      'refundReason': refundReason,
+      'refundAmount': refundAmount,
     };
   }
 

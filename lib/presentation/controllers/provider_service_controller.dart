@@ -421,8 +421,12 @@ class ProviderServiceController extends GetxController {
         prices: _prices.toList(),
       );
       if (response.isSuccess) {
-        Get.back(result: true);
         ToastUtil.showSuccess('服务创建成功');
+        // 等待 SnackBar 展示后再导航，避免 OverlayState 被销毁时
+        // SnackBar 动画回调触发 _lifecycleState.defunct 断言
+        await Future.delayed(const Duration(milliseconds: 800));
+        Get.closeAllSnackbars();
+        Get.back(result: true);
       }
     } catch (e) {
       LogUtil.e('创建服务失败: $e', tag: _tag);
@@ -452,8 +456,12 @@ class ProviderServiceController extends GetxController {
         prices: _prices.toList(),
       );
       if (response.isSuccess) {
-        Get.back(result: true);
         ToastUtil.showSuccess('服务更新成功');
+        // 等待 SnackBar 展示后再导航，避免 OverlayState 被销毁时
+        // SnackBar 动画回调触发 _lifecycleState.defunct 断言
+        await Future.delayed(const Duration(milliseconds: 800));
+        Get.closeAllSnackbars();
+        Get.back(result: true);
       }
     } catch (e) {
       LogUtil.e('更新服务失败: $e', tag: _tag);

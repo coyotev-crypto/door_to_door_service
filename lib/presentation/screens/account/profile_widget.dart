@@ -1,7 +1,9 @@
+import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
+import '../../../core/services/auth_service.dart';
 import '../../controllers/profile_controller.dart';
 import '../../widgets/profile_header_widget.dart';
 import '../../widgets/profile_function_item_widget.dart';
@@ -27,14 +29,17 @@ class ProfileWidget extends StatelessWidget {
               _fnItem(Icons.favorite_rounded, '我的收藏',
                   () => ctrl.navigateToFavorites()),
             ]),
-            SizedBox(height: 14.h),
-            _menuCard([
-              _sectionTitle('服务商入驻'),
-              _fnItem(Icons.description_rounded, '资质材料',
-                  () => ctrl.navigateToProviderQualification()),
-              _fnItem(Icons.room_service_rounded, '完善服务',
-                  () => ctrl.navigateToProviderService()),
-            ]),
+            if (AuthService.instance.userRx.value?.roleId ==
+                AppConfig.MERCHANT_USER_TYPE) ...[
+              SizedBox(height: 14.h),
+              _menuCard([
+                _sectionTitle('服务商入驻'),
+                _fnItem(Icons.description_rounded, '资质材料',
+                    () => ctrl.navigateToProviderQualification()),
+                _fnItem(Icons.room_service_rounded, '完善服务',
+                    () => ctrl.navigateToProviderService()),
+              ]),
+            ],
             SizedBox(height: 20.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -46,7 +51,7 @@ class ProfileWidget extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14.r),
                       border:
-                          Border.all(color: AppTheme.danger.withOpacity(0.2))),
+                          Border.all(color: AppTheme.danger.withValues(alpha: 0.2))),
                   child: Center(
                       child: Text('退出登录',
                           style: TextStyle(
@@ -70,7 +75,7 @@ class ProfileWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
-                color: const Color(0xFF2D2A26).withOpacity(0.03),
+                color: const Color(0xFF2D2A26).withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 2))
           ]),
@@ -150,7 +155,7 @@ class ProfileWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
-                color: const Color(0xFF2D2A26).withOpacity(0.03),
+                color: const Color(0xFF2D2A26).withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 2))
           ]),

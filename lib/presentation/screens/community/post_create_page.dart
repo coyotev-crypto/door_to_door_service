@@ -84,7 +84,7 @@ class PostCreatePage extends GetView<PostCreateController> {
                         width: 22.w,
                         height: 22.w,
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.45),
+                          color: Colors.black.withValues(alpha: 0.45),
                           shape: BoxShape.circle,
                         ),
                         child:

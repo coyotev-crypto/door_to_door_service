@@ -1,6 +1,7 @@
 import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import '../../core/utils/screen_adapter.dart';
 import '../widgets/category_filter_bar_widget.dart';
@@ -55,7 +56,7 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                    color: AppTheme.textPrimary.withOpacity(0.04),
+                    color: AppTheme.textPrimary.withValues(alpha: 0.04),
                     blurRadius: 8,
                     offset: const Offset(0, 2))
               ],
@@ -88,8 +89,7 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
               onRefresh: _onRefresh,
               onLoad: _onLoad,
               child: CustomScrollView(
-                cacheExtent: 800,
-                slivers: [
+                scrollCacheExtent: const ScrollCacheExtent.pixels(800), slivers: [
                   // 新人推荐
                   if (controller.newcomerServices.isNotEmpty)
                     SliverToBoxAdapter(

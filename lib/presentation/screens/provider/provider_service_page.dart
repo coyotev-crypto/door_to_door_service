@@ -85,13 +85,6 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
               SizedBox(height: 16.h),
               _buildPricesEditor(context),
             ]),
-            SizedBox(height: 14.h),
-            _buildCard([
-              _cardHeader(
-                  '服务状态', Icons.visibility_rounded, const Color(0xFF6B8E7B)),
-              SizedBox(height: 16.h),
-              _buildStatusToggle(context),
-            ]),
             SizedBox(height: 36.h),
             Obx(() => PrimaryButton(
                   text: controller.isEditMode ? '保存修改' : '提交服务',
@@ -114,7 +107,7 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-              color: const Color(0xFF2D2A26).withOpacity(0.04),
+              color: const Color(0xFF2D2A26).withValues(alpha: 0.04),
               blurRadius: 12,
               offset: const Offset(0, 3)),
         ],
@@ -131,7 +124,7 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
           width: 36.w,
           height: 36.w,
           decoration: BoxDecoration(
-              color: accent.withOpacity(0.10),
+              color: accent.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(10.r)),
           child: Icon(icon, size: 20.sp, color: accent),
         ),
@@ -273,57 +266,6 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
           ),
         ),
       ],
-    );
-  }
-
-  // ═══ 状态切换 ═══
-  Widget _buildStatusToggle(BuildContext context) {
-    return Obx(() {
-      final active = controller.status == 1;
-      return Row(
-        children: [
-          Expanded(
-              child: _statusChip('上架', Icons.check_circle_outline_rounded,
-                  active, () => controller.updateStatus(1))),
-          SizedBox(width: 12.w),
-          Expanded(
-              child: _statusChip('下架', Icons.pause_circle_outline_rounded,
-                  !active, () => controller.updateStatus(0))),
-        ],
-      );
-    });
-  }
-
-  Widget _statusChip(
-      String label, IconData icon, bool selected, VoidCallback onTap) {
-    final color = selected ? const Color(0xFF6B8E7B) : const Color(0xFFB8A99A);
-    final bg = selected
-        ? const Color(0xFF6B8E7B).withOpacity(0.08)
-        : const Color(0xFFF9F7F4);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 14.h),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-              color:
-                  selected ? color.withOpacity(0.3) : const Color(0xFFE8E2D8)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20.sp, color: color),
-            SizedBox(width: 8.w),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: color)),
-          ],
-        ),
-      ),
     );
   }
 
@@ -486,8 +428,8 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
             child: Container(
                 width: 30.w,
                 height: 30.w,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFF5E6E6), shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                    color: Color(0xFFF5E6E6), shape: BoxShape.circle),
                 child: Icon(Icons.close,
                     size: 14.sp, color: const Color(0xFFC67B7B))),
           ),
@@ -505,9 +447,10 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
             context: context,
             initialTime: TimeOfDay(
                 hour: int.parse(parts[0]), minute: int.parse(parts[1])));
-        if (t != null)
+        if (t != null) {
           onChange(
               '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
@@ -638,9 +581,8 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
                       child: Container(
                           width: 30.w,
                           height: 30.w,
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFF5E6E6),
-                              shape: BoxShape.circle),
+                          decoration: const BoxDecoration(
+                              color: Color(0xFFF5E6E6), shape: BoxShape.circle),
                           child: Icon(Icons.close,
                               size: 14.sp, color: const Color(0xFFC67B7B))),
                     ),

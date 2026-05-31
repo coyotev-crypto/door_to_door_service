@@ -23,7 +23,7 @@ class HomeBottomNavWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: AppTheme.textPrimary.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -3)),
+          BoxShadow(color: AppTheme.textPrimary.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, -3)),
         ],
       ),
       child: SafeArea(
@@ -53,7 +53,7 @@ class HomeBottomNavWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.all(selected ? 6.w : 4.w),
               decoration: selected
-                  ? BoxDecoration(color: AppTheme.gold.withOpacity(0.10), borderRadius: BorderRadius.circular(10.r))
+                  ? BoxDecoration(color: AppTheme.gold.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(10.r))
                   : null,
               child: Icon(icon, size: 24.sp, color: color),
             ),

@@ -84,7 +84,7 @@ class CommonDropdownSelector<T> extends StatelessWidget {
             boxShadow: enabled && selectedValue != null
                 ? [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

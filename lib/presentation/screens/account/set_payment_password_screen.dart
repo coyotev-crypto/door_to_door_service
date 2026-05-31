@@ -50,7 +50,7 @@ class SetPaymentPasswordScreen extends GetView<AccountSecurityController> {
                   child: Container(
                     height: 52.h, width: 110.w,
                     decoration: BoxDecoration(
-                      gradient: active ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
+                      gradient: active ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : const LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Center(child: Text(active ? '获取验证码' : '${cd}s', style: TextStyle(fontSize: 13.sp, color: active ? Colors.white : AppTheme.textMuted, fontWeight: FontWeight.w600))),
@@ -70,8 +70,8 @@ class SetPaymentPasswordScreen extends GetView<AccountSecurityController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [AppTheme.gold.withOpacity(0.08), AppTheme.gold.withOpacity(0.03)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-        borderRadius: BorderRadius.circular(10.r), border: Border.all(color: AppTheme.gold.withOpacity(0.12)),
+        gradient: LinearGradient(colors: [AppTheme.gold.withValues(alpha: 0.08), AppTheme.gold.withValues(alpha: 0.03)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(10.r), border: Border.all(color: AppTheme.gold.withValues(alpha: 0.12)),
       ),
       child: Row(children: [
         Icon(Icons.info_outline_rounded, size: 18.sp, color: AppTheme.gold),
@@ -135,7 +135,7 @@ class SetPaymentPasswordScreen extends GetView<AccountSecurityController> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]),
           borderRadius: BorderRadius.circular(14.r),
-          boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppTheme.gold.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: Center(child: loading
             ? SizedBox(width: 22.w, height: 22.w, child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))

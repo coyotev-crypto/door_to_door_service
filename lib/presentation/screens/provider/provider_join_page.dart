@@ -45,7 +45,7 @@ class ProviderJoinPage extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Theme.of(Get.context!).primaryColor,
-            Theme.of(Get.context!).primaryColor.withOpacity(0.8),
+            Theme.of(Get.context!).primaryColor.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -68,7 +68,7 @@ class ProviderJoinPage extends StatelessWidget {
             '加入我们，开启您的服务事业',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],

@@ -29,6 +29,9 @@ class UserRepository {
             email: user['email']?.toString(),
             gender: user['sex']?.toString(),
             remark: user['remark']?.toString(),
+            roleId: user['roleId'] is int
+                ? user['roleId']
+                : int.tryParse(user['roleId']?.toString() ?? ''),
             createdAt: user['createdAt'] != null
                 ? DateTime.tryParse(user['createdAt'])
                 : null,
@@ -85,6 +88,8 @@ class UserRepository {
         email: email ?? currentUser.email,
         gender: gender ?? currentUser.gender,
         remark: remark ?? currentUser.remark,
+        roleId: currentUser.roleId,
+        hasPaymentPassword: currentUser.hasPaymentPassword,
         createdAt: currentUser.createdAt,
         updatedAt: currentUser.updatedAt,
       );

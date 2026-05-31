@@ -30,8 +30,8 @@ class PostCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: theme.brightness == Brightness.light
-                  ? Colors.black.withOpacity(0.04)
-                  : Colors.white.withOpacity(0.04),
+                  ? Colors.black.withValues(alpha: 0.04)
+                  : Colors.white.withValues(alpha: 0.04),
               blurRadius: 2,
               offset: const Offset(0, 1),
             ),
@@ -77,7 +77,7 @@ class PostCard extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.45),
+                color: Colors.black.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(14.r),
               ),
               child: Row(

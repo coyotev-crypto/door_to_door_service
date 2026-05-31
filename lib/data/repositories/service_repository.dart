@@ -248,4 +248,20 @@ class ServiceRepository {
       dataParser: (data) => ServiceItem.fromJson(data as Map<String, dynamic>),
     );
   }
+
+  /// 上架服务
+  Future<BaseResponse<dynamic>> publishService(int id) async {
+    final path =
+        ApiEndpoints.publishService.replaceAll('{id}', id.toString());
+    final response = await _dioClient.put(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 下架服务
+  Future<BaseResponse<dynamic>> unpublishService(int id) async {
+    final path =
+        ApiEndpoints.unpublishService.replaceAll('{id}', id.toString());
+    final response = await _dioClient.put(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
 }

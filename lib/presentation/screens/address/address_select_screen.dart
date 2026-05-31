@@ -281,7 +281,7 @@ class AddressSelectScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(Get.context!).primaryColor.withOpacity(0.1),
+            color: Theme.of(Get.context!).primaryColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -297,9 +297,9 @@ class AddressSelectScreen extends StatelessWidget {
               height: 40.w,
               decoration: BoxDecoration(
                 color: isCurrentLocation
-                    ? Theme.of(Get.context!).primaryColor.withOpacity(0.1)
+                    ? Theme.of(Get.context!).primaryColor.withValues(alpha: 0.1)
                     : (isDefault
-                        ? Theme.of(Get.context!).primaryColor.withOpacity(0.15)
+                        ? Theme.of(Get.context!).primaryColor.withValues(alpha: 0.15)
                         : Colors.grey[100]),
                 borderRadius: BorderRadius.circular(10.r),
               ),
@@ -344,7 +344,7 @@ class AddressSelectScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Theme.of(Get.context!)
                                 .primaryColor
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Text(
@@ -407,13 +407,13 @@ class AddressSelectScreen extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Theme.of(Get.context!).primaryColor,
-            Theme.of(Get.context!).primaryColor.withOpacity(0.8),
+            Theme.of(Get.context!).primaryColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(Get.context!).primaryColor.withOpacity(0.3),
+            color: Theme.of(Get.context!).primaryColor.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

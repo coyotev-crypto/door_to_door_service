@@ -49,8 +49,8 @@ class LoginScreen extends GetWidget<LoginController> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.gold.withOpacity(0.12),
-                    AppTheme.gold.withOpacity(0.04),
+                    AppTheme.gold.withValues(alpha: 0.12),
+                    AppTheme.gold.withValues(alpha: 0.04),
                     Colors.transparent,
                   ],
                 ),
@@ -68,8 +68,8 @@ class LoginScreen extends GetWidget<LoginController> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.amber.withOpacity(0.10),
-                    AppTheme.amber.withOpacity(0.03),
+                    AppTheme.amber.withValues(alpha: 0.10),
+                    AppTheme.amber.withValues(alpha: 0.03),
                     Colors.transparent,
                   ],
                 ),
@@ -93,7 +93,7 @@ class LoginScreen extends GetWidget<LoginController> {
                   borderRadius: BorderRadius.circular(26.r),
                   boxShadow: [
                     BoxShadow(
-                        color: AppTheme.gold.withOpacity(0.35),
+                        color: AppTheme.gold.withValues(alpha: 0.35),
                         blurRadius: 28,
                         offset: const Offset(0, 10)),
                   ],
@@ -133,7 +133,7 @@ class LoginScreen extends GetWidget<LoginController> {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-              color: AppTheme.textPrimary.withOpacity(0.04),
+              color: AppTheme.textPrimary.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 4)),
         ],
@@ -272,7 +272,7 @@ class LoginScreen extends GetWidget<LoginController> {
         decoration: BoxDecoration(
           gradient: active
               ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber])
-              : LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
+              : const LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Center(
@@ -380,7 +380,7 @@ class LoginScreen extends GetWidget<LoginController> {
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
-                  color: AppTheme.gold.withOpacity(0.3),
+                  color: AppTheme.gold.withValues(alpha: 0.3),
                   blurRadius: 14,
                   offset: const Offset(0, 6)),
             ],
@@ -513,7 +513,7 @@ class LoginScreen extends GetWidget<LoginController> {
                             gradient: active
                                 ? const LinearGradient(
                                     colors: [AppTheme.gold, AppTheme.amber])
-                                : LinearGradient(
+                                : const LinearGradient(
                                     colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -613,7 +613,7 @@ class LoginScreen extends GetWidget<LoginController> {
                         borderRadius: BorderRadius.circular(16.r),
                         boxShadow: [
                           BoxShadow(
-                              color: AppTheme.gold.withOpacity(0.3),
+                              color: AppTheme.gold.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4)),
                         ],

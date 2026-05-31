@@ -22,6 +22,8 @@ class ServiceItem {
   final List<Map<String, dynamic>>? timeSlots;
   final List<Map<String, dynamic>>? specialDateSlots;
   final List<Map<String, dynamic>>? prices;
+  final int? auditStatus; // 审核状态: 0=待审核, 1=通过, 2=驳回
+  final String? auditRemark; // 审核驳回原因
 
   ServiceItem({
     required this.id,
@@ -46,6 +48,8 @@ class ServiceItem {
     this.timeSlots,
     this.specialDateSlots,
     this.prices,
+    this.auditStatus,
+    this.auditRemark,
   });
 
   /// 默认展示时长（分钟），从 prices 第一项取
@@ -77,6 +81,19 @@ class ServiceItem {
       return (first['price'] as num?)?.toDouble() ?? 0.0;
     }
     return 0.0;
+  }
+
+  static int? _parseAuditStatus(dynamic v) {
+    if (v is int) return v;
+    if (v is String) {
+      return switch (v) {
+        'pending' => 0,
+        'approved' => 1,
+        'rejected' => 2,
+        _ => int.tryParse(v),
+      };
+    }
+    return null;
   }
 
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
@@ -113,6 +130,8 @@ class ServiceItem {
       status: json['status'] is String
           ? int.tryParse(json['status'] as String)
           : json['status'] as int?,
+      auditStatus: _parseAuditStatus(json['auditStatus']),
+      auditRemark: json['auditRemark'] as String?,
     );
   }
 
@@ -138,6 +157,8 @@ class ServiceItem {
       'deliveryRange': deliveryRange,
       'avatar': avatar,
       'status': status,
+      'auditStatus': auditStatus,
+      'auditRemark': auditRemark,
     };
   }
 
@@ -162,6 +183,8 @@ class ServiceItem {
     String? address,
     double? deliveryRange,
     String? avatar,
+    int? auditStatus,
+    String? auditRemark,
   }) {
     return ServiceItem(
       id: id ?? this.id,
@@ -183,6 +206,25 @@ class ServiceItem {
       address: address ?? this.address,
       deliveryRange: deliveryRange ?? this.deliveryRange,
       avatar: avatar ?? this.avatar,
+      auditStatus: auditStatus ?? this.auditStatus,
+      auditRemark: auditRemark ?? this.auditRemark,
     );
+  }
+
+  /// 是否审核驳回
+  bool get isAuditRejected => auditStatus == 2;
+
+  /// 审核状态文本
+  String get auditStatusText {
+    switch (auditStatus) {
+      case 0:
+        return '待审核';
+      case 1:
+        return '已通过';
+      case 2:
+        return '已驳回';
+      default:
+        return '';
+    }
   }
 }

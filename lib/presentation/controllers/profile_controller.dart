@@ -290,7 +290,7 @@ class ProfileController extends GetxController {
 
   /// 跳转到订单列表页
   void navigateToOrderList(int initialTabIndex) {
-    Get.toNamed(RouteNames.orderList, arguments: initialTabIndex);
+    Get.toNamed(RouteNames.customerOrderList, arguments: initialTabIndex);
   }
 
   /// 跳转到地址管理页

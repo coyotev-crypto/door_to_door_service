@@ -28,7 +28,7 @@ class SectionHeaderWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                colors: [accentColor, accentColor.withOpacity(0)],
+                colors: [accentColor, accentColor.withValues(alpha: 0)],
               ),
               borderRadius: BorderRadius.circular(1.r),
             ),
@@ -43,7 +43,7 @@ class SectionHeaderWidget extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 1.h),
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
               decoration: BoxDecoration(
-                border: Border.all(color: accentColor.withOpacity(0.3)),
+                border: Border.all(color: accentColor.withValues(alpha: 0.3)),
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Text(badge!, style: TextStyle(fontSize: 9.sp, color: accentColor,

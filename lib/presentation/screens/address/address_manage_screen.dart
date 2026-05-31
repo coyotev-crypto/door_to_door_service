@@ -113,13 +113,13 @@ class AddressManageScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: address.isDefault
-              ? themeColor.withOpacity(0.3)
+              ? themeColor.withValues(alpha: 0.3)
               : Colors.grey[200]!,
           width: address.isDefault ? 1.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: themeColor.withOpacity(0.1),
+            color: themeColor.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -161,7 +161,7 @@ class AddressManageScreen extends StatelessWidget {
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: themeColor.withOpacity(0.1),
+                        color: themeColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Text(
@@ -315,13 +315,13 @@ class AddressManageScreen extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Theme.of(Get.context!).primaryColor,
-            Theme.of(Get.context!).primaryColor.withOpacity(0.8),
+            Theme.of(Get.context!).primaryColor.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(Get.context!).primaryColor.withOpacity(0.3),
+            color: Theme.of(Get.context!).primaryColor.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

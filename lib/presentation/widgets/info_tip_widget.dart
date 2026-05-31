@@ -23,7 +23,7 @@ class InfoTipWidget extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color:
-            backgroundColor ?? AppTheme.servicePrimaryColor.withOpacity(0.08),
+            backgroundColor ?? AppTheme.servicePrimaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(

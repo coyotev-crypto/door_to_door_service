@@ -4,6 +4,9 @@ class ApiEndpoints {
   // 私有构造函数，防止实例化
   ApiEndpoints._();
 
+  // ========== 支付相关 ==========
+  static const String payment = '/payment?orderNo=';
+
   // ========== 认证相关 ==========
 
   /// 发送短信验证码
@@ -43,14 +46,38 @@ class ApiEndpoints {
   /// 创建订单
   static const String createOrder = '/order';
 
-  /// 获取订单列表
+  /// 获取订单列表（用户）
   static const String getOrderList = '/order/list';
 
   /// 获取订单详情
   static const String getOrderDetail = '/order/detail';
 
   /// 取消订单
-  static const String cancelOrder = '/order/cancel';
+  static const String cancelOrder = '/order/{id}/cancel';
+
+  /// 申请退款
+  static const String requestRefund = '/order/{id}/refund';
+
+  /// 服务商订单列表
+  static const String getProviderOrders = '/order/provider/list';
+
+  /// 服务商订单详情
+  static const String getProviderOrderDetail = '/order/provider/{id}';
+
+  /// 服务商接单
+  static const String acceptOrder = '/order/provider/{id}/accept';
+
+  /// 服务商拒单
+  static const String rejectOrder = '/order/provider/{id}/reject';
+
+  /// 服务商出发
+  static const String enRouteOrder = '/order/provider/{id}/en-route';
+
+  /// 开始服务
+  static const String startService = '/order/provider/{id}/start';
+
+  /// 完成服务
+  static const String completeService = '/order/provider/{id}/complete';
 
   // ========== 服务相关 ==========
 
@@ -72,8 +99,9 @@ class ApiEndpoints {
   /// 获取我的服务列表
   static const String getMyServices = '/service/my';
 
+  static const String publishService = '/service/{id}/publish';
+  static const String unpublishService = '/service/{id}/unpublish';
   static const String toggleFavoriteService = '/service/favorite';
-
   static const String deleteFavoriteService = '/service/favorite/{id}';
 
   /// 获取收藏列表

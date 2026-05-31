@@ -1,3 +1,6 @@
+import 'package:door_to_door_service/core/services/agora_chat_service.dart';
+import 'package:door_to_door_service/core/services/auth_service.dart';
+import 'package:door_to_door_service/core/services/location_service.dart';
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_list_controller.dart';
@@ -12,6 +15,7 @@ import 'package:door_to_door_service/presentation/controllers/favorite_controlle
 import 'package:door_to_door_service/presentation/controllers/post_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/post_create_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/post_detail_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/sms_code_controller.dart';
 import 'package:get/get.dart';
 import 'route_names.dart';
 import '../presentation/screens/splash_screen.dart';
@@ -20,7 +24,8 @@ import '../presentation/screens/community/post_list_page.dart';
 import '../presentation/screens/community/post_create_page.dart';
 import '../presentation/screens/community/post_detail_page.dart';
 import '../presentation/screens/order/order_create_screen.dart';
-import '../presentation/screens/order/order_list_page.dart';
+import '../presentation/screens/order/customer_order_list_page.dart';
+import '../presentation/screens/order/provider_order_list_page.dart';
 import '../presentation/screens/order/payment_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/account/profile_edit_screen.dart';
@@ -53,7 +58,6 @@ import '../presentation/controllers/more_recommendations_controller.dart';
 import '../presentation/controllers/search_controller.dart';
 import '../presentation/controllers/address_controller.dart';
 import '../presentation/controllers/account_security_controller.dart';
-import '../core/services/agora_chat_service.dart';
 
 class AppPages {
   static const String initial = RouteNames.splash;
@@ -62,16 +66,21 @@ class AppPages {
     GetPage(
       name: RouteNames.splash,
       page: () => const SplashScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => AuthService.instance)),
     ),
     GetPage(
       name: RouteNames.login,
       page: () => const LoginScreen(),
-      binding: BindingsBuilder(() => Get.lazyPut(() => LoginController())),
+      binding: BindingsBuilder(() => [
+            Get.lazyPut(() => LoginController())
+          ]),
     ),
     GetPage(
       name: RouteNames.home,
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() => [
+            Get.lazyPut(() => AgoraChatService()),
+            Get.lazyPut(() => LocationService()),
             Get.lazyPut(() => HomeController()),
             Get.lazyPut(() => MessageController()),
             Get.lazyPut(() => ServiceController()),
@@ -79,7 +88,6 @@ class AppPages {
             Get.lazyPut(() => HomeContentController()),
             Get.lazyPut(() => PostListController()),
             Get.lazyPut(() => OrderListController()),
-            Get.put(() => AgoraChatService()),
           ]),
     ),
     GetPage(
@@ -148,39 +156,38 @@ class AppPages {
     GetPage(
       name: RouteNames.orderCreate,
       page: () => const OrderCreateScreen(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => OrderController())),
+      binding: BindingsBuilder(() => Get.lazyPut(() => OrderController())),
     ),
     GetPage(
       name: RouteNames.orderPayment,
       page: () => const PaymentScreen(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => PaymentController())),
+      binding: BindingsBuilder(() => Get.lazyPut(() => PaymentController())),
     ),
     GetPage(
-      name: RouteNames.orderList,
-      page: () => const OrderListPage(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => OrderListController())),
+      name: RouteNames.customerOrderList,
+      page: () => const CustomerOrderListPage(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => OrderListController())),
+    ),
+    GetPage(
+      name: RouteNames.providerOrderList,
+      page: () => const ProviderOrderListPage(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => OrderListController())),
     ),
     // 社区相关路由
     GetPage(
       name: RouteNames.postList,
       page: () => const PostListPage(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => PostListController())),
+      binding: BindingsBuilder(() => Get.lazyPut(() => PostListController())),
     ),
     GetPage(
       name: RouteNames.postCreate,
       page: () => const PostCreatePage(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => PostCreateController())),
+      binding: BindingsBuilder(() => Get.lazyPut(() => PostCreateController())),
     ),
     GetPage(
       name: RouteNames.postDetail,
       page: () => const PostDetailPage(),
-      binding:
-          BindingsBuilder(() => Get.lazyPut(() => PostDetailController())),
+      binding: BindingsBuilder(() => Get.lazyPut(() => PostDetailController())),
     ),
     // 入驻相关路由
     GetPage(
@@ -191,7 +198,8 @@ class AppPages {
     GetPage(
       name: RouteNames.providerQualification,
       page: () => const ProviderQualificationPage(),
-      binding: BindingsBuilder(() => Get.lazyPut(() => ProviderQualificationController())),
+      binding: BindingsBuilder(
+          () => Get.lazyPut(() => ProviderQualificationController())),
     ),
     GetPage(
       name: RouteNames.providerService,

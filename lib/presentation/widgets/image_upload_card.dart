@@ -94,7 +94,7 @@ class ImageUploadCard extends StatelessWidget {
               boxShadow: hasImage
                   ? [
                       BoxShadow(
-                        color: primaryColor.withOpacity(0.1),
+                        color: primaryColor.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -153,7 +153,7 @@ class ImageUploadCard extends StatelessWidget {
             margin: EdgeInsets.all(6.w),
             padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.55),
+              color: Colors.black.withValues(alpha: 0.55),
               borderRadius: BorderRadius.circular(6.r),
             ),
             child: Text(

@@ -31,7 +31,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     setState(() { _canSend = false; _cd = 60; });
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return t.cancel();
-      setState(() { if (_cd > 0) _cd--; else { _canSend = true; t.cancel(); } });
+      setState(() { if (_cd > 0) {
+        _cd--;
+      } else { _canSend = true; t.cancel(); } });
     });
     ToastUtil.showSuccess('验证码已发送');
   }
@@ -78,7 +80,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                 child: Container(
                   height: 52.h, width: 110.w,
                   decoration: BoxDecoration(
-                    gradient: _canSend ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
+                    gradient: _canSend ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : const LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Center(child: Text(_canSend ? '获取验证码' : '${_cd}s',
@@ -103,12 +105,12 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppTheme.danger.withOpacity(0.04), borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppTheme.danger.withOpacity(0.15)),
+        color: AppTheme.danger.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppTheme.danger.withValues(alpha: 0.15)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(width: 36.w, height: 36.w, decoration: BoxDecoration(color: AppTheme.danger.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)), child: Icon(Icons.warning_amber_rounded, size: 18.sp, color: AppTheme.danger)),
+          Container(width: 36.w, height: 36.w, decoration: BoxDecoration(color: AppTheme.danger.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)), child: Icon(Icons.warning_amber_rounded, size: 18.sp, color: AppTheme.danger)),
           SizedBox(width: 10.w),
           Text('重要提示', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w700, color: AppTheme.danger)),
         ]),
@@ -139,9 +141,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       child: Container(
         height: 52.h,
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [AppTheme.danger, AppTheme.danger.withOpacity(0.85)]),
+          gradient: LinearGradient(colors: [AppTheme.danger, AppTheme.danger.withValues(alpha: 0.85)]),
           borderRadius: BorderRadius.circular(14.r),
-          boxShadow: [BoxShadow(color: AppTheme.danger.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: AppTheme.danger.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: Center(child: _loading
             ? SizedBox(width: 22.w, height: 22.w, child: const CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))

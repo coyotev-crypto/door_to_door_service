@@ -159,7 +159,7 @@ class OrderController extends GetxController {
   String _buildStartTime() {
     final date = _selectedDate.value; // "2026-05-11"
     final time = _selectedTime.value; // "09:00"
-    return '${date}T${time}:00+08:00';
+    return '${date}T$time:00+08:00';
   }
 
   /// 验证并提交订单

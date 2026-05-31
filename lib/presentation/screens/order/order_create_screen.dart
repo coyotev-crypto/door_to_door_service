@@ -84,7 +84,7 @@ class OrderCreateScreen extends GetView<OrderController> {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-              color: AppTheme.gold.withOpacity(0.1),
+              color: AppTheme.gold.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 6)),
         ],
@@ -97,10 +97,10 @@ class OrderCreateScreen extends GetView<OrderController> {
             height: 72.w,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.gold.withOpacity(0.3), width: 2),
+              border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3), width: 2),
               boxShadow: [
                 BoxShadow(
-                    color: AppTheme.gold.withOpacity(0.15),
+                    color: AppTheme.gold.withValues(alpha: 0.15),
                     blurRadius: 12,
                     offset: const Offset(0, 4)),
               ],
@@ -174,7 +174,7 @@ class OrderCreateScreen extends GetView<OrderController> {
     return Container(
       color: AppTheme.creamFill,
       child: Icon(Icons.spa_rounded,
-          size: 32.sp, color: AppTheme.gold.withOpacity(0.4)),
+          size: 32.sp, color: AppTheme.gold.withValues(alpha: 0.4)),
     );
   }
 
@@ -212,7 +212,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                           horizontal: 16.w, vertical: 10.h),
                       decoration: BoxDecoration(
                         color: selected
-                            ? AppTheme.gold.withOpacity(0.1)
+                            ? AppTheme.gold.withValues(alpha: 0.1)
                             : AppTheme.creamBg,
                         borderRadius: BorderRadius.circular(10.r),
                         border: Border.all(
@@ -300,7 +300,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                     width: 40.w,
                     height: 40.w,
                     decoration: BoxDecoration(
-                      color: AppTheme.gold.withOpacity(0.08),
+                      color: AppTheme.gold.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: const Icon(Icons.location_on_rounded,
@@ -319,7 +319,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                         SizedBox(height: 2.h),
                         Text(
                           hasAddress
-                              ? address!.name
+                              ? address.name
                               : '点击选择您的服务地址',
                           style: TextStyle(
                               fontSize: 14.sp,
@@ -429,7 +429,7 @@ class OrderCreateScreen extends GetView<OrderController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
-            color: hasValue ? AppTheme.gold.withOpacity(0.3) : AppTheme.warmBorder,
+            color: hasValue ? AppTheme.gold.withValues(alpha: 0.3) : AppTheme.warmBorder,
           ),
         ),
         child: Column(
@@ -441,7 +441,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                   width: 32.w,
                   height: 32.w,
                   decoration: BoxDecoration(
-                    color: AppTheme.gold.withOpacity(0.08),
+                    color: AppTheme.gold.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(icon, size: 16.sp, color: AppTheme.gold),
@@ -641,7 +641,7 @@ class OrderCreateScreen extends GetView<OrderController> {
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
-                  color: AppTheme.gold.withOpacity(0.35),
+                  color: AppTheme.gold.withValues(alpha: 0.35),
                   blurRadius: 16,
                   offset: const Offset(0, 6)),
             ],

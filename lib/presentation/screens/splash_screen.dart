@@ -20,6 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
+    await AuthService.instance.initialize();
     // 检查登录状态
     final isLoggedIn = AuthService.instance.isLoggedIn;
 

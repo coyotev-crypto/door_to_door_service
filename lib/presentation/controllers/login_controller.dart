@@ -120,13 +120,17 @@ class LoginController extends GetxController {
         throw Exception(result.message ?? '登录失败');
       }
 
-      // 保存Token并更新登录状态
-      await _authService.login(
+      // 先保存Token，再获取用户信息（getUserInfo需要认证头）
+      final loggedIn = await _authService.login(
         token: result.token!,
         expireSeconds: result.expire,
       );
 
-      // 登录后立即获取用户信息并持久化
+      if (!loggedIn) {
+        throw Exception('登录状态保存失败');
+      }
+
+      // Token已保存，现在获取用户信息并持久化
       try {
         final userRepository = UserRepository();
         final userInfo = await userRepository.getUserInfo();

@@ -164,7 +164,7 @@ class ForgotPasswordScreen extends GetWidget<LoginController> {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   elevation: 0,
-                  shadowColor: AppTheme.servicePrimaryColor.withOpacity(0.3),
+                  shadowColor: AppTheme.servicePrimaryColor.withValues(alpha: 0.3),
                 ),
                 child: controller.forgotIsLoading.value
                     ? SizedBox(

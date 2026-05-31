@@ -88,10 +88,94 @@ class OrderRepository {
 
   /// 取消订单
   Future<BaseResponse<dynamic>> cancelOrder(int orderId) async {
-    final response = await _dioClient.post(
-      ApiEndpoints.cancelOrder,
-      data: {'id': orderId},
+    final path =
+        ApiEndpoints.cancelOrder.replaceAll('{id}', orderId.toString());
+    final response = await _dioClient.post(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 申请退款
+  Future<BaseResponse<dynamic>> requestRefund(
+      int orderId, String reason) async {
+    final path =
+        ApiEndpoints.requestRefund.replaceAll('{id}', orderId.toString());
+    final response = await _dioClient.post(path, data: {'reason': reason});
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  // ═══ 服务商订单接口 ═══
+
+  /// 服务商获取订单列表
+  Future<BaseResponse<List<OrderModel>>> getProviderOrders({
+    String? status,
+    int pageIndex = 1,
+    int pageSize = 10,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'pageIndex': pageIndex,
+      'pageSize': pageSize,
+    };
+    if (status != null) queryParams['status'] = status;
+    final response = await _dioClient.get(
+      ApiEndpoints.getProviderOrders,
+      queryParameters: queryParams,
     );
+    return BaseResponse<List<OrderModel>>.fromJson(
+      response.data,
+      dataParser: (data) {
+        if (data is List) {
+          return data
+              .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+        final map = data as Map<String, dynamic>;
+        if (map['list'] is List) {
+          return (map['list'] as List)
+              .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+        return <OrderModel>[];
+      },
+    );
+  }
+
+  /// 服务商接单
+  Future<BaseResponse<dynamic>> acceptOrder(int id) async {
+    final path =
+        ApiEndpoints.acceptOrder.replaceAll('{id}', id.toString());
+    final response = await _dioClient.post(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 服务商拒单
+  Future<BaseResponse<dynamic>> rejectOrder(int id) async {
+    final path =
+        ApiEndpoints.rejectOrder.replaceAll('{id}', id.toString());
+    final response = await _dioClient.post(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 服务商出发
+  Future<BaseResponse<dynamic>> enRouteOrder(int id) async {
+    final path =
+        ApiEndpoints.enRouteOrder.replaceAll('{id}', id.toString());
+    final response = await _dioClient.post(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 开始服务
+  Future<BaseResponse<dynamic>> startService(int id) async {
+    final path =
+        ApiEndpoints.startService.replaceAll('{id}', id.toString());
+    final response = await _dioClient.post(path);
+    return BaseResponse<dynamic>.fromJson(response.data);
+  }
+
+  /// 完成服务
+  Future<BaseResponse<dynamic>> completeService(int id) async {
+    final path =
+        ApiEndpoints.completeService.replaceAll('{id}', id.toString());
+    final response = await _dioClient.post(path);
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 }

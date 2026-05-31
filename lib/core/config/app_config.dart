@@ -8,6 +8,8 @@ class AppConfig {
   /// 开发环境: http://localhost:8080
   /// 生产环境: 请修改为实际的生产环境地址
   static const String baseUrl = 'http://192.168.1.7:8000';
+  // 前端地址，用于构建一些需要前端URL的接口，如支付回调等
+  static const String webUrl = "http://192.168.1.7:9528";
   static const String baseApiUrl = '$baseUrl/api/v1';
 
   /// 连接超时时间（秒）
@@ -32,4 +34,7 @@ class AppConfig {
   static const String FORGOT_PASSWORD_CODE = '3'; // 忘记密码验证码
   static const String SET_PAYMENT_PASSWORD_CODE = '5'; // 设置支付密码验证码
   static const String CHANGE_PHONE_CODE = '6'; // 修改手机号验证码
+
+  static const int USER_TYPE = 2; //普通用户
+  static const int MERCHANT_USER_TYPE = 3; //商家用户
 }

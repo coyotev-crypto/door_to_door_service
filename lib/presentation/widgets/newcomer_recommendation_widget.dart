@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/models/service_item.dart';
 import '../../core/themes/app_theme.dart';
@@ -67,8 +68,7 @@ class NewcomerRecommendationWidget extends StatelessWidget {
           SizedBox(
             height: 210.h,
             child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              cacheExtent: 5 * 172.w,
+              scrollCacheExtent: ScrollCacheExtent.pixels(5 * 172.w), scrollDirection: Axis.horizontal,
               itemCount: services.length,
               itemBuilder: (context, index) => _buildCard(context, services[index]),
             ),
@@ -88,7 +88,7 @@ class NewcomerRecommendationWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.r),
-            boxShadow: [BoxShadow(color: AppTheme.gold.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, 6))],
+            boxShadow: [BoxShadow(color: AppTheme.gold.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, 6))],
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -113,7 +113,7 @@ class NewcomerRecommendationWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
-                            boxShadow: [BoxShadow(color: AppTheme.textPrimary.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 3))],
+                            boxShadow: [BoxShadow(color: AppTheme.textPrimary.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 3))],
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: service.avatar != null && service.avatar!.isNotEmpty

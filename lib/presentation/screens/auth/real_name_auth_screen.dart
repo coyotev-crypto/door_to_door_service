@@ -64,7 +64,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
                   width: double.infinity,
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
-                    color: AppTheme.servicePrimaryColor.withOpacity(0.08),
+                    color: AppTheme.servicePrimaryColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
@@ -134,7 +134,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
                       backgroundColor: AppTheme.servicePrimaryColor,
                       foregroundColor: Colors.white,
                       disabledBackgroundColor:
-                          AppTheme.servicePrimaryColor.withOpacity(0.5),
+                          AppTheme.servicePrimaryColor.withValues(alpha: 0.5),
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.r),
@@ -234,7 +234,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: hasImage
-                ? AppTheme.servicePrimaryColor.withOpacity(0.6)
+                ? AppTheme.servicePrimaryColor.withValues(alpha: 0.6)
                 : Colors.grey[300]!,
           ),
           image: hasImage
@@ -251,7 +251,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
                   margin: EdgeInsets.all(6.w),
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.55),
+                    color: Colors.black.withValues(alpha: 0.55),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                   child: Text(
