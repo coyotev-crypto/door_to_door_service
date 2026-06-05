@@ -6,6 +6,5 @@ import 'presentation/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.lazyPut(() => SmsCodeController());
   runApp(const MyApp());
 }

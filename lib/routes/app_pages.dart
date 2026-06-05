@@ -72,6 +72,7 @@ class AppPages {
       name: RouteNames.login,
       page: () => const LoginScreen(),
       binding: BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => LoginController())
           ]),
     ),
@@ -219,37 +220,55 @@ class AppPages {
       name: RouteNames.accountSecurity,
       page: () => const AccountSecurityScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
     GetPage(
       name: RouteNames.changePassword,
       page: () => const ChangePasswordScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
     GetPage(
       name: RouteNames.setPaymentPassword,
       page: () => const SetPaymentPasswordScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
     GetPage(
       name: RouteNames.changePhone,
       page: () => const ChangePhoneScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
     GetPage(
       name: RouteNames.loginDevices,
       page: () => const LoginDevicesScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
     GetPage(
       name: RouteNames.deleteAccount,
       page: () => const DeleteAccountScreen(),
       binding:
-          BindingsBuilder(() => Get.lazyPut(() => AccountSecurityController())),
+          BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
     ),
   ];
 }

@@ -338,31 +338,6 @@ class LocationService extends GetxService {
     }
   }
 
-  /// 模拟定位（调试用）
-  void enableMockLocation({
-    double latitude = 39.908823,
-    double longitude = 116.397470,
-    String province = '北京市',
-    String city = '北京市',
-    String district = '东城区',
-    String address = '北京市东城区天安门广场',
-  }) {
-    final mock = BaiduLocation(
-      latitude: latitude,
-      longitude: longitude,
-      province: province,
-      city: city,
-      district: district,
-      address: address,
-    );
-    _currentLocation.value = mock;
-    _saveLocation(mock);
-    _updateCityFromLocation(mock);
-    if (isDebug) {
-      LogUtil.d('已启用模拟定位: $city', tag: _tag);
-    }
-  }
-
   @override
   void onClose() {
     _locationPlugin.stopLocation();

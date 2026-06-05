@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import '../../core/services/location_service.dart';
+import '../../data/models/address_model.dart';
 import '../../data/models/category_model.dart';
 import '../../data/models/service_item.dart';
 import '../../data/repositories/category_repository.dart';
@@ -33,6 +35,9 @@ class HomeContentController extends GetxController {
 
   // 初始化状态
   final RxBool _isInitialized = false.obs;
+
+  // 手动选择的城市（地址选择页面返回）
+  final Rx<AddressModel?> _selectedCity = Rx<AddressModel?>(null);
 
   /// 获取选中的分类索引
   int get selectedCategoryIndex => _selectedCategoryIndex.value;
@@ -78,6 +83,23 @@ class HomeContentController extends GetxController {
 
   /// 获取错误信息
   String? get errorMessage => _serviceController.errorMessage;
+
+  /// 获取手动选择的城市
+  AddressModel? get selectedCity => _selectedCity.value;
+
+  /// 当前展示的城市名称（优先手动选择，其次 GPS 定位）
+  String get currentCityName {
+    if (_selectedCity.value != null) {
+      return _selectedCity.value!.city.isNotEmpty
+          ? _selectedCity.value!.city
+          : _selectedCity.value!.shortName;
+    }
+    // 回退到 GPS 定位城市
+    final locationService = Get.find<LocationService>();
+    final lc = locationService.currentCity;
+    if (lc != null && lc.isNotEmpty) return lc;
+    return '北京';
+  }
 
   @override
   void onInit() {
@@ -152,6 +174,20 @@ class HomeContentController extends GetxController {
     loadServices();
     // 更新分类UI
     update(['category']);
+  }
+
+  /// 手动选择城市后的回调
+  /// [address] 用户选择的地址，包含经纬度和城市信息
+  Future<void> onCitySelected(AddressModel address) async {
+    _selectedCity.value = address;
+    // 将经纬度设置到 ServiceController，用于服务列表按距离查询
+    await _serviceController.setUserLocation(
+      latitude: address.latitude,
+      longitude: address.longitude,
+      refresh: false,
+    );
+    // 用新的经纬度重新加载服务列表
+    await loadServices();
   }
 
   /// 加载服务列表

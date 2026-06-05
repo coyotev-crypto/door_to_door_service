@@ -2,33 +2,34 @@ import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/utils/screen_adapter.dart';
-import '../../core/services/location_service.dart';
+import '../../data/models/address_model.dart';
 import '../../core/themes/app_theme.dart';
+import '../controllers/home_content_controller.dart';
 
 /// 首页搜索栏 — 温润质感风格
-class HomeSearchBarWidget extends StatefulWidget {
+class HomeSearchBarWidget extends StatelessWidget {
   final VoidCallback? onSearchTap;
 
   const HomeSearchBarWidget({super.key, this.onSearchTap});
 
   @override
-  State<HomeSearchBarWidget> createState() => _HomeSearchBarWidgetState();
-}
-
-class _HomeSearchBarWidgetState extends State<HomeSearchBarWidget> {
-  final LocationService _locationService = Get.find<LocationService>();
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<HomeContentController>();
+
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 10.h),
       child: Row(
         children: [
           // 城市选择
           GestureDetector(
-            onTap: () => Get.toNamed(RouteNames.addressSelect),
+            onTap: () async {
+              final result = await Get.toNamed(RouteNames.addressSelect);
+              if (result is AddressModel) {
+                await controller.onCitySelected(result);
+              }
+            },
             child: Obx(() {
-              final city = _locationService.currentCity ?? '北京';
+              final city = controller.currentCityName;
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -46,7 +47,7 @@ class _HomeSearchBarWidgetState extends State<HomeSearchBarWidget> {
           // 搜索框
           Expanded(
             child: GestureDetector(
-              onTap: widget.onSearchTap,
+              onTap: onSearchTap,
               child: Container(
                 height: 40.h,
                 padding: EdgeInsets.symmetric(horizontal: 14.w),
