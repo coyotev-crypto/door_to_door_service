@@ -210,6 +210,8 @@ class OrderController extends GetxController {
         final orderId = data is Map ? (data['orderId'] as int?) : null;
         final orderNo =
             data is Map ? (data['orderNo'] as String?) : null;
+        // 先关闭 loading 再关闭页面，避免 loading dialog 的 context 失效
+        LoadingUtil.dismiss();
         Get.back();
         if (orderId != null && orderNo != null) {
           Get.toNamed(
@@ -224,6 +226,11 @@ class OrderController extends GetxController {
           );
         }
         ToastUtil.showSuccess('下单成功');
+      } else {
+        // 服务器返回失败时，显示错误消息
+        ToastUtil.showError(
+          response.message.isNotEmpty ? response.message : '下单失败，请稍后重试',
+        );
       }
     } catch (e) {
       LogUtil.e('下单失败: $e', tag: _tag);
