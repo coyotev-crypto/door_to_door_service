@@ -1,6 +1,8 @@
 import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:door_to_door_service/core/network/api_endpoints.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/utils/toast_util.dart';
 import '../../routes/route_names.dart';
 
@@ -11,6 +13,7 @@ class PaymentController extends GetxController {
   late final int orderId;
   late final String orderNo;
   late final String paymentUrl;
+  late final WebViewController webViewController;
 
   @override
   void onInit() {
@@ -19,6 +22,20 @@ class PaymentController extends GetxController {
     orderId = args['orderId'] as int;
     orderNo = args['orderNo'] as String;
     paymentUrl = '${AppConfig.webUrl}${ApiEndpoints.payment}$orderNo';
+
+    // WebViewController 只创建一次，避免 rebuild 时重建
+    webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (_) => isLoading.value = false,
+          onNavigationRequest: (request) =>
+              onPageChanged(request.url)
+                  ? NavigationDecision.navigate
+                  : NavigationDecision.prevent,
+        ),
+      )
+      ..loadRequest(Uri.parse(paymentUrl));
   }
 
   /// WebView URL 变化回调，用于检测支付结果

@@ -31,20 +31,7 @@ class PaymentScreen extends GetView<PaymentController> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(
-            controller: WebViewController()
-              ..setJavaScriptMode(JavaScriptMode.unrestricted)
-              ..setNavigationDelegate(
-                NavigationDelegate(
-                  onPageFinished: (_) => controller.isLoading.value = false,
-                  onNavigationRequest: (request) =>
-                      controller.onPageChanged(request.url)
-                          ? NavigationDecision.navigate
-                          : NavigationDecision.prevent,
-                ),
-              )
-              ..loadRequest(Uri.parse(controller.paymentUrl)),
-          ),
+          WebViewWidget(controller: controller.webViewController),
           Obx(() => controller.isLoading.value
               ? const Center(
                   child: CircularProgressIndicator(
