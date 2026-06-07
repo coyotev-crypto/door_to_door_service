@@ -2,6 +2,7 @@ import 'package:door_to_door_service/core/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../../../core/utils/log_util.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/payment_controller.dart';
 
@@ -11,6 +12,7 @@ class PaymentScreen extends GetView<PaymentController> {
 
   @override
   Widget build(BuildContext context) {
+    LogUtil.d('PaymentScreen.build() called, isLoading=${controller.isLoading.value}', tag: 'PAYMENT');
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
@@ -33,9 +35,14 @@ class PaymentScreen extends GetView<PaymentController> {
         children: [
           WebViewWidget(controller: controller.webViewController),
           Obx(() => controller.isLoading.value
-              ? const Center(
-                  child: CircularProgressIndicator(
-                      color: AppTheme.gold, strokeWidth: 2.5))
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.white,
+                  child: const Center(
+                      child: CircularProgressIndicator(
+                          color: AppTheme.gold, strokeWidth: 2.5)),
+                )
               : const SizedBox.shrink()),
         ],
       ),

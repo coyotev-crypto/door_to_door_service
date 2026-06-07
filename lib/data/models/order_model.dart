@@ -5,9 +5,9 @@ class OrderModel {
   final int serviceId;
   final int? durationMinutes;
   final String? serviceName;
-  final double? servicePrice;
-  final double? travelFee;
-  final double? totalPrice;
+  final String? servicePrice;
+  final String? travelFee;
+  final String? totalPrice;
   final String? addressName;
   final double? latitude;
   final double? longitude;
@@ -22,7 +22,7 @@ class OrderModel {
   // 退款相关
   final int refundStatus; // 0-无退款,1-申请中,2-已批准,3-已拒绝,4-已退款
   final String? refundReason;
-  final double? refundAmount;
+  final String? refundAmount;
 
   OrderModel({
     this.id = 0,
@@ -48,6 +48,29 @@ class OrderModel {
     this.refundAmount,
   });
 
+  /// 解析 decimal 字符串为 double
+  static double? _parseDecimal(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    if (v is String) {
+      final parsed = double.tryParse(v);
+      return parsed;
+    }
+    return null;
+  }
+
+  /// 总价数值（用于计算和比较）
+  double? get totalPriceValue => _parseDecimal(totalPrice);
+
+  /// 出行费数值
+  double? get travelFeeValue => _parseDecimal(travelFee);
+
+  /// 服务价格数值
+  double? get servicePriceValue => _parseDecimal(servicePrice);
+
+  /// 退款金额数值
+  double? get refundAmountValue => _parseDecimal(refundAmount);
+
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'] is String ? int.parse(json['id']) : (json['id'] as int? ?? 0),
@@ -57,11 +80,9 @@ class OrderModel {
           : (json['serviceId'] as int? ?? 0),
       durationMinutes: json['durationMinutes'] as int?,
       serviceName: json['serviceName'] as String?,
-      servicePrice: (json['servicePrice'] as num?)?.toDouble(),
-      travelFee: (json['travelFee'] as num?)?.toDouble() ??
-          (json['deliveryFee'] as num?)?.toDouble(),
-      totalPrice: (json['totalPrice'] as num?)?.toDouble() ??
-          (json['totalAmount'] as num?)?.toDouble(),
+      servicePrice: json['servicePrice']?.toString(),
+      travelFee: json['travelFee']?.toString() ?? json['deliveryFee']?.toString(),
+      totalPrice: json['totalPrice']?.toString() ?? json['totalAmount']?.toString(),
       addressName: json['addressName'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
@@ -74,7 +95,7 @@ class OrderModel {
       updateTime: json['updateTime'] as String?,
       refundStatus: json['refundStatus'] as int? ?? 0,
       refundReason: json['refundReason'] as String?,
-      refundAmount: (json['refundAmount'] as num?)?.toDouble(),
+      refundAmount: json['refundAmount']?.toString(),
     );
   }
 

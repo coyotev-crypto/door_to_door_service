@@ -14,7 +14,7 @@ class CustomerOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = order.totalPrice ?? order.servicePrice ?? 0;
+    final price = order.totalPrice ?? order.servicePrice ?? '0';
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
@@ -65,7 +65,7 @@ class CustomerOrderCard extends StatelessWidget {
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.gold)),
-            Text(price.toStringAsFixed(0),
+            Text(price,
                 style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.w800,
@@ -82,7 +82,7 @@ class CustomerOrderCard extends StatelessWidget {
                   Get.toNamed(RouteNames.orderPayment, arguments: {
                     'orderId': order.id,
                     'orderNo': order.orderNo ?? '${order.id}',
-                    'amount': (order.totalPrice ?? 0).toDouble(),
+                    'amount': order.totalPrice ?? '0',
                     'serviceName': order.serviceName ?? '',
                     'durationMinutes': order.durationMinutes ?? 60,
                   });

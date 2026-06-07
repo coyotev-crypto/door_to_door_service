@@ -31,18 +31,18 @@ class OrderController extends GetxController {
   String get selectedTime => _selectedTime.value;
   int get selectedDurationMinutes => _selectedDurationMinutes.value;
 
-  /// 当前所选时长的价格
+  /// 当前所选时长的价格（double，用于数值计算）
   double get selectedPrice {
     final s = _service.value;
     if (s == null) return 0;
     if (s.prices != null && s.prices!.isNotEmpty) {
       for (final p in s.prices!) {
         if ((p['durationMinutes'] as int?) == _selectedDurationMinutes.value) {
-          return (p['price'] as num?)?.toDouble() ?? s.price;
+          return _parseDecimal(p['price']) ?? s.priceValue;
         }
       }
     }
-    return s.price;
+    return s.priceValue;
   }
 
   String get serviceTimeText {
@@ -50,10 +50,11 @@ class OrderController extends GetxController {
     return '${_selectedDate.value} ${_selectedTime.value.isNotEmpty ? _selectedTime.value : ''}';
   }
 
-  /// 总价 = 所选时长的价格 + 交通费
-  double get totalPrice {
-    if (_service.value == null) return 0;
-    return selectedPrice + (_service.value!.travelFee ?? 0);
+  /// 总价 = 所选时长的价格 + 交通费（String，用于 API 传输）
+  String get totalPrice {
+    if (_service.value == null) return '0';
+    final total = selectedPrice + (_service.value!.travelFeeValue ?? 0);
+    return total.toString();
   }
 
   /// 可选的时长列表
@@ -62,7 +63,15 @@ class OrderController extends GetxController {
     if (s?.prices != null && s!.prices!.isNotEmpty) {
       return s.prices!;
     }
-    return [{'durationMinutes': 60, 'price': s?.price ?? 0}];
+    return [{'durationMinutes': 60, 'price': s?.price ?? '0'}];
+  }
+
+  /// 解析 decimal 值为 double
+  static double? _parseDecimal(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v);
+    return null;
   }
 
   @override

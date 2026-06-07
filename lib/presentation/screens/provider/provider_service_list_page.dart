@@ -185,7 +185,7 @@ class _ServiceCard extends StatelessWidget {
                                 color: AppTheme.textMuted)),
                       SizedBox(height: 6.h),
                       Row(children: [
-                        Text('¥${service.price.toStringAsFixed(0)}',
+                        Text('¥${service.price}',
                             style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w800,

@@ -24,7 +24,7 @@ class ProviderOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = order.totalPrice ?? order.servicePrice ?? 0;
+    final price = order.totalPrice ?? order.servicePrice ?? '0';
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
@@ -100,7 +100,7 @@ class ProviderOrderCard extends StatelessWidget {
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.gold)),
-            Text(price.toStringAsFixed(0),
+            Text(price,
                 style: TextStyle(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.w800,

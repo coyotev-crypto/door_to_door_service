@@ -9,7 +9,7 @@ class AppConfig {
   /// 生产环境: 请修改为实际的生产环境地址
   static const String baseUrl = 'http://192.168.1.7:8000';
   // 前端地址，用于构建一些需要前端URL的接口，如支付回调等
-  static const String webUrl = "http://192.168.1.7:9528";
+  static const String webUrl = "http://192.168.1.7:8080";
   static const String baseApiUrl = '$baseUrl/api/v1';
 
   /// 连接超时时间（秒）

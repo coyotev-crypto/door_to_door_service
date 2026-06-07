@@ -167,7 +167,7 @@ class NewcomerRecommendationWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 6.h),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text('¥${service.price.toStringAsFixed(0)}',
+                        Text('¥${service.price}',
                             style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800, color: AppTheme.gold)),
                         SizedBox(width: 3.w),
                         Text('/${service.defaultDurationMinutes}分钟',

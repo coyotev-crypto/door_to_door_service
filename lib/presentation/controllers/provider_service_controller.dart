@@ -248,7 +248,10 @@ class ProviderServiceController extends GetxController {
   /// 从 prices 取第一个价格作为 base price（API 兼容）
   double get _basePrice {
     if (_prices.isEmpty) return 0;
-    return (_prices.first['price'] as num?)?.toDouble() ?? 0;
+    final p = _prices.first['price'];
+    if (p is num) return p.toDouble();
+    if (p is String) return double.tryParse(p) ?? 0;
+    return 0;
   }
 
   @override
@@ -311,8 +314,8 @@ class ProviderServiceController extends GetxController {
   /// 填充表单数据
   void _populateForm(ServiceItem service) {
     nameController.text = service.name;
-    priceController.text = service.price.toString();
-    travelFeeController.text = service.travelFee?.toString() ?? '';
+    priceController.text = service.price;
+    travelFeeController.text = service.travelFee ?? '';
     providerNameController.text = service.providerName ?? '';
     _status.value = service.status ?? 1;
     deliveryRangeController.text = service.deliveryRange?.toString() ?? '';

@@ -3,7 +3,7 @@ class ServiceItem {
   final int id;
   final String name;
   final double rating;
-  final double price;
+  final String price;
   final int? categoryId;
   final String? categoryName;
   final int? status;
@@ -12,7 +12,7 @@ class ServiceItem {
   final String? distance;
   final bool? isFavorite;
   final int? orderCount;
-  final double? travelFee;
+  final String? travelFee;
   final int? favoriteCount;
   final double? latitude;
   final double? longitude;
@@ -55,10 +55,20 @@ class ServiceItem {
   /// 默认展示时长（分钟），从 prices 第一项取
   int get defaultDurationMinutes {
     if (prices != null && prices!.isNotEmpty) {
-      return (prices!.first['durationMinutes'] as num?)?.toInt() ?? 60;
+      final d = prices!.first['durationMinutes'];
+      if (d is int) return d;
+      if (d is String) return int.tryParse(d) ?? 60;
+      return 60;
     }
     return 60;
   }
+
+  /// 价格作为 double（用于数值计算）
+  double get priceValue => _parseDecimal(price);
+
+  /// 出行费作为 double（用于数值计算）
+  double? get travelFeeValue =>
+      travelFee != null ? _parseDecimalNullable(travelFee!) : null;
 
   /// 获取距离的数值（用于排序）
   double get distanceValue {
@@ -70,17 +80,38 @@ class ServiceItem {
     }
   }
 
-  /// 从JSON创建实例
-  /// 从 prices 数组中取第一个价格作为默认展示价格
-  static double _priceFromJson(Map<String, dynamic> json) {
-    final topPrice = (json['price'] as num?)?.toDouble();
-    if (topPrice != null && topPrice > 0) return topPrice;
+  /// 解析 decimal 字符串为 double
+  static double _parseDecimal(dynamic v) {
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v) ?? 0.0;
+    return 0.0;
+  }
+
+  static double? _parseDecimalNullable(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    if (v is String) {
+      final parsed = double.tryParse(v);
+      return parsed;
+    }
+    return null;
+  }
+
+  /// 从JSON解析价格（优先取顶层 price 字段，其次取 prices[0].price）
+  static String _priceFromJson(Map<String, dynamic> json) {
+    final topPrice = json['price'];
+    if (topPrice != null) {
+      final s = topPrice.toString();
+      final p = double.tryParse(s);
+      if (p != null && p > 0) return s;
+    }
     final prices = json['prices'] as List<dynamic>?;
     if (prices != null && prices.isNotEmpty) {
       final first = prices.first as Map<String, dynamic>;
-      return (first['price'] as num?)?.toDouble() ?? 0.0;
+      final p = first['price'];
+      if (p != null) return p.toString();
     }
-    return 0.0;
+    return '0';
   }
 
   static int? _parseAuditStatus(dynamic v) {
@@ -111,7 +142,7 @@ class ServiceItem {
       distance: json['distance'] as String?,
       isFavorite: json['isFavorite'] as bool?,
       orderCount: json['orderCount'] as int?,
-      travelFee: (json['travelFee'] as num?)?.toDouble(),
+      travelFee: json['travelFee']?.toString(),
       favoriteCount: json['favoriteCount'] as int?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
@@ -167,7 +198,7 @@ class ServiceItem {
     int? id,
     String? name,
     double? rating,
-    double? price,
+    String? price,
     int? categoryId,
     String? categoryName,
     bool? isNew,
@@ -175,7 +206,7 @@ class ServiceItem {
     String? distance,
     bool? isFavorite,
     int? orderCount,
-    double? travelFee,
+    String? travelFee,
     int? favoriteCount,
     int? status,
     double? latitude,

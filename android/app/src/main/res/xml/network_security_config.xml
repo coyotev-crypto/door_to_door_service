@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许指定域名的明文 HTTP 流量（支付页面 WebView 需要） -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">192.168.1.7</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">2586967bi2.wicp.vip</domain>
+    </domain-config>
+</network-security-config>

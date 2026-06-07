@@ -139,7 +139,7 @@ class ServiceCardWidget extends StatelessWidget {
                     // 价格 + 下单按钮
                     Row(
                       children: [
-                        Text('¥${service.price.toStringAsFixed(0)}',
+                        Text('¥${service.price}',
                             style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.w800,
@@ -149,10 +149,10 @@ class ServiceCardWidget extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 11.sp,
                                 color: AppTheme.textMuted)),
-                        if (service.travelFee != null &&
-                            service.travelFee! > 0) ...[
+                        if (service.travelFeeValue != null &&
+                            service.travelFeeValue! > 0) ...[
                           SizedBox(width: 6.w),
-                          Text('出行¥${service.travelFee!.toStringAsFixed(0)}',
+                          Text('出行¥${service.travelFee!}',
                               style: TextStyle(
                                   fontSize: 10.sp,
                                   color: AppTheme.textMuted)),

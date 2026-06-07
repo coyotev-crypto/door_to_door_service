@@ -202,7 +202,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                 runSpacing: 10.h,
                 children: durations.map((p) {
                   final mins = (p['durationMinutes'] as int?) ?? 60;
-                  final price = (p['price'] as num?)?.toDouble() ?? 0;
+                  final price = double.tryParse(p['price']?.toString() ?? '') ?? 0;
                   final selected =
                       mins == controller.selectedDurationMinutes;
                   return GestureDetector(
@@ -244,10 +244,10 @@ class OrderCreateScreen extends GetView<OrderController> {
                   );
                 }).toList(),
               )),
-          if (service.travelFee != null && service.travelFee! > 0) ...[
+          if (service.travelFeeValue != null && service.travelFeeValue! > 0) ...[
             SizedBox(height: 14.h),
             _divider(),
-            _infoRow('出行费', '¥${service.travelFee!.toStringAsFixed(0)}/公里'),
+            _infoRow('出行费', '¥${service.travelFee!}/公里'),
           ],
         ],
       ),
@@ -551,8 +551,8 @@ class OrderCreateScreen extends GetView<OrderController> {
             ),
             SizedBox(height: 18.h),
             _priceLine('服务费用 ($mins 分钟)', price),
-            if (service.travelFee != null && service.travelFee! > 0)
-              _priceLine('出行费用', service.travelFee!),
+            if (service.travelFeeValue != null && service.travelFeeValue! > 0)
+              _priceLine('出行费用', service.travelFeeValue!),
             SizedBox(height: 12.h),
             Container(height: 1, color: AppTheme.warmBorder),
             SizedBox(height: 14.h),
@@ -573,7 +573,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.gold)),
-                    Text(total.toStringAsFixed(0),
+                    Text(total,
                         style: TextStyle(
                             fontSize: 30.sp,
                             fontWeight: FontWeight.w800,
