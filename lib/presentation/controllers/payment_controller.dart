@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:door_to_door_service/core/network/api_endpoints.dart';
 import 'package:door_to_door_service/core/services/token_service.dart';
@@ -50,7 +52,9 @@ class PaymentController extends GetxController {
       ..addJavaScriptChannel('FlutterConsole',
           onMessageReceived: (JavaScriptMessage msg) {
         LogUtil.d('[JS Console] ${msg.message}', tag: 'PAYMENT');
-      });
+      })
+      ..addJavaScriptChannel('PaymentBridge',
+          onMessageReceived: _onPaymentCallback);
     isWebViewReady.value = true;
 
     // 异步：获取 token → 设置 cookie → 加载页面
@@ -70,6 +74,8 @@ class PaymentController extends GetxController {
         if (!_pageFinished) {
           _pageFinished = true;
           isLoading.value = false;
+          // 页面首次加载完成 → 注入支付回调接口给前端使用
+          _injectPaymentCallback();
         }
       },
       onWebResourceError: (error) {
@@ -88,19 +94,14 @@ class PaymentController extends GetxController {
         final url = request.url;
         LogUtil.d('onNavigationRequest: $url', tag: 'PAYMENT');
 
-        if (url.contains('/payment/success')) {
-          ToastUtil.showSuccess('支付成功');
-          Get.until(
-            (route) => route.settings.name == RouteNames.home,
-          );
-          return NavigationDecision.prevent;
+        // 拦截支付宝/微信 App URL Scheme
+        if (url.startsWith('alipay://') ||
+            url.startsWith('alipays://') ||
+            url.startsWith('weixin://')) {
+          LogUtil.d('Payment app scheme detected: $url', tag: 'PAYMENT');
+          return NavigationDecision.navigate;
         }
-        if (url.contains('/payment/fail') ||
-            url.contains('/payment/cancel')) {
-          ToastUtil.showError('支付失败，请重试');
-          Get.back();
-          return NavigationDecision.prevent;
-        }
+
         return NavigationDecision.navigate;
       },
     );
@@ -169,5 +170,54 @@ class PaymentController extends GetxController {
       return;
     }
     ToastUtil.showError('页面加载失败: $description');
+  }
+
+  // ═══ JS 回调注入 ═══
+
+  /// 页面加载完成后，向 WebView 注入 window.onPaymentResult 回调函数
+  /// 前端通过调用 window.onPaymentResult(status, data) 来通知 Flutter 支付结果
+  Future<void> _injectPaymentCallback() async {
+    const js = '''
+      window.onPaymentResult = function(status, data) {
+        var payload = JSON.stringify({
+          status: status || 'success',
+          orderNo: (data && data.orderNo) || '',
+          msg: (data && data.msg) || ''
+        });
+        PaymentBridge.postMessage(payload);
+      };
+    ''';
+    try {
+      await webViewController.runJavaScript(js);
+      LogUtil.d('window.onPaymentResult callback injected', tag: 'PAYMENT');
+    } catch (e) {
+      LogUtil.e('Failed to inject onPaymentResult: $e', tag: 'PAYMENT');
+    }
+  }
+
+  /// 接收 PaymentBridge 通道消息，处理支付结果
+  void _onPaymentCallback(JavaScriptMessage msg) {
+    LogUtil.d('[PaymentBridge] received: ${msg.message}', tag: 'PAYMENT');
+    try {
+      final data = jsonDecode(msg.message) as Map<String, dynamic>;
+      final status = data['status'] as String? ?? 'success';
+      final orderNo = data['orderNo'] as String?;
+      LogUtil.d('Payment result: status=$status, orderNo=$orderNo', tag: 'PAYMENT');
+
+      if (status == 'fail') {
+        final errMsg = data['msg'] as String?;
+        if (errMsg != null && errMsg.isNotEmpty) {
+          ToastUtil.showError(errMsg);
+        }
+        Get.back();
+      } else {
+        if (orderNo != null && orderNo.isNotEmpty) {
+          ToastUtil.showSuccess('支付成功');
+        }
+        Get.back();
+      }
+    } catch (e) {
+      LogUtil.e('Failed to parse PaymentBridge data: $e', tag: 'PAYMENT');
+    }
   }
 }
