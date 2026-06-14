@@ -41,6 +41,7 @@ class OrderRepository {
   /// 获取订单列表
   Future<BaseResponse<List<OrderModel>>> getOrderList({
     String? status,
+    String? statuses,
     int pageIndex = 1,
     int pageSize = 10,
   }) async {
@@ -50,6 +51,9 @@ class OrderRepository {
     };
     if (status != null) {
       queryParams['status'] = status;
+    }
+    if (statuses != null) {
+      queryParams['statuses'] = statuses;
     }
     final response = await _dioClient.get(
       ApiEndpoints.getOrderList,
@@ -108,6 +112,7 @@ class OrderRepository {
   /// 服务商获取订单列表
   Future<BaseResponse<List<OrderModel>>> getProviderOrders({
     String? status,
+    String? statuses,
     int pageIndex = 1,
     int pageSize = 10,
   }) async {
@@ -116,6 +121,7 @@ class OrderRepository {
       'pageSize': pageSize,
     };
     if (status != null) queryParams['status'] = status;
+    if (statuses != null) queryParams['statuses'] = statuses;
     final response = await _dioClient.get(
       ApiEndpoints.getProviderOrders,
       queryParameters: queryParams,

@@ -116,21 +116,22 @@ class ProviderOrderCard extends StatelessWidget {
   List<Widget> _buildActions(int status) {
     switch (status) {
       case 0:
+      case 1:
         return [
           _actionBtn('拒单', AppTheme.danger, AppTheme.danger.withValues(alpha: 0.85),
               onReject),
           SizedBox(width: 10.w),
           _actionBtn('接单', AppTheme.gold, AppTheme.amber, onAccept),
         ];
-      case 1:
+      case 2:
         return [
           _actionBtn('出发', AppTheme.gold, AppTheme.amber, onEnRoute),
         ];
-      case 2:
+      case 3:
         return [
           _actionBtn('开始服务', AppTheme.gold, AppTheme.amber, onStart),
         ];
-      case 3:
+      case 4:
         return [
           _actionBtn('完成服务', AppTheme.sage, const Color(0xFF5A7D6A),
               onComplete),
@@ -157,9 +158,12 @@ class ProviderOrderCard extends StatelessWidget {
   static Widget _statusBadge(int s) {
     final (c, l) = switch (s) {
       0 => (const Color(0xFFE8A838), '待接单'),
-      2 => (AppTheme.sage, '进行中'),
-      3 => (AppTheme.textMuted, '已完成'),
-      4 => (AppTheme.danger, '已取消'),
+      1 => (const Color(0xFF7BA5C2), '待接单'),
+      2 => (const Color(0xFF5A8DB5), '已接单'),
+      3 => (const Color(0xFF6B9EBF), '待上门'),
+      4 => (AppTheme.sage, '服务中'),
+      5 => (AppTheme.textMuted, '已完成'),
+      6 => (AppTheme.danger, '已取消'),
       _ => (AppTheme.textMuted, ''),
     };
     return Container(

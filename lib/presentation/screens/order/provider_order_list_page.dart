@@ -37,7 +37,7 @@ class ProviderOrderListPage extends GetView<OrderListController> {
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
       child: Obx(() {
-        const tabs = ['全部', '待接单', '进行中', '已完成'];
+        final tabs = controller.tabs;
         final selected = controller.selectedTab.value;
         return Row(
           children: List.generate(tabs.length, (i) {
@@ -82,46 +82,45 @@ class ProviderOrderListPage extends GetView<OrderListController> {
             child: CircularProgressIndicator(
                 color: AppTheme.gold, strokeWidth: 2.5));
       }
-      if (controller.orders.isEmpty) {
-        return Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 72.w,
-              height: 72.w,
-              decoration: BoxDecoration(
-                color: AppTheme.gold.withValues(alpha: 0.06),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.receipt_long_rounded,
-                  size: 32.sp, color: AppTheme.textMuted),
-            ),
-            SizedBox(height: 16.h),
-            Text('暂无订单',
-                style: TextStyle(fontSize: 15.sp, color: AppTheme.textMuted)),
-          ]),
-        );
-      }
       return EasyRefresh(
         controller: controller.refreshController,
         onRefresh: () => controller.onRefresh(),
-        onLoad: () => controller.onLoadMore(),
-        child: ListView.builder(
-          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 40.h),
-          itemCount: controller.orders.length,
-          itemBuilder: (_, i) => ProviderOrderCard(
-            order: controller.orders[i],
-            onAccept: () =>
-                controller.acceptOrder(controller.orders[i].id),
-            onReject: () =>
-                controller.rejectOrder(controller.orders[i].id),
-            onEnRoute: () =>
-                controller.enRouteOrder(controller.orders[i].id),
-            onStart: () =>
-                controller.startService(controller.orders[i].id),
-            onComplete: () =>
-                controller.completeService(controller.orders[i].id),
-          ),
-        ),
+        onLoad: controller.orders.isNotEmpty ? () => controller.onLoadMore() : null,
+        child: controller.orders.isEmpty
+            ? Center(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 72.w,
+                    height: 72.w,
+                    decoration: BoxDecoration(
+                      color: AppTheme.gold.withValues(alpha: 0.06),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.receipt_long_rounded,
+                        size: 32.sp, color: AppTheme.textMuted),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text('暂无订单',
+                      style: TextStyle(fontSize: 15.sp, color: AppTheme.textMuted)),
+                ]),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 40.h),
+                itemCount: controller.orders.length,
+                itemBuilder: (_, i) => ProviderOrderCard(
+                  order: controller.orders[i],
+                  onAccept: () =>
+                      controller.acceptOrder(controller.orders[i].id),
+                  onReject: () =>
+                      controller.rejectOrder(controller.orders[i].id),
+                  onEnRoute: () =>
+                      controller.enRouteOrder(controller.orders[i].id),
+                  onStart: () =>
+                      controller.startService(controller.orders[i].id),
+                  onComplete: () =>
+                      controller.completeService(controller.orders[i].id),
+                ),
+              ),
       );
     });
   }

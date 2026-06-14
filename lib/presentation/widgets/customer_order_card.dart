@@ -73,38 +73,40 @@ class CustomerOrderCard extends StatelessWidget {
                     height: 1)),
           ]),
         ]),
-        if (order.status == 0 && order.refundStatus == 0) ...[
+        // 待支付 → 去支付
+        if (order.status == 0) ...[
           SizedBox(height: 12.h),
-          Row(children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Get.toNamed(RouteNames.orderPayment, arguments: {
-                    'orderId': order.id,
-                    'orderNo': order.orderNo ?? '${order.id}',
-                    'amount': order.totalPrice ?? '0',
-                    'serviceName': order.serviceName ?? '',
-                    'durationMinutes': order.durationMinutes ?? 60,
-                  });
-                },
-                child: Container(
-                  height: 40.h,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                        colors: [AppTheme.gold, AppTheme.amber]),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Center(
-                    child: Text('去支付',
-                        style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
-                  ),
-                ),
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(RouteNames.orderPayment, arguments: {
+                'orderId': order.id,
+                'orderNo': order.orderNo ?? '${order.id}',
+                'amount': order.totalPrice ?? '0',
+                'serviceName': order.serviceName ?? '',
+                'durationMinutes': order.durationMinutes ?? 60,
+              });
+            },
+            child: Container(
+              height: 40.h,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                    colors: [AppTheme.gold, AppTheme.amber]),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Center(
+                child: Text('去支付',
+                    style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
               ),
             ),
-            SizedBox(width: 10.w),
+          ),
+        ],
+        // 已支付但未完成 → 申请退款
+        if (order.status >= 1 && order.status <= 4 && order.refundStatus == 0) ...[
+          SizedBox(height: 12.h),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             GestureDetector(
               onTap: () => _showRefundDialog(context),
               child: Container(
@@ -136,10 +138,12 @@ class CustomerOrderCard extends StatelessWidget {
   static Widget _statusBadge(int s) {
     final (c, l) = switch (s) {
       0 => (const Color(0xFFE8A838), '待支付'),
-      1 => (const Color(0xFF7BA5C2), '待服务'),
-      2 => (AppTheme.sage, '进行中'),
-      3 => (AppTheme.textMuted, '已完成'),
-      4 => (AppTheme.danger, '已取消'),
+      1 => (const Color(0xFF7BA5C2), '待接单'),
+      2 => (const Color(0xFF5A8DB5), '已接单'),
+      3 => (const Color(0xFF6B9EBF), '待上门'),
+      4 => (AppTheme.sage, '服务中'),
+      5 => (AppTheme.textMuted, '已完成'),
+      6 => (AppTheme.danger, '已取消'),
       _ => (AppTheme.textMuted, ''),
     };
     return Container(

@@ -28,28 +28,51 @@ class OrderListController extends GetxController {
   }
 
   static final _providerTabs = ['全部', '待接单', '进行中', '已完成'];
-  static final _customerTabs = ['全部', '待支付', '进行中', '已完成'];
+  static final _customerTabs = ['全部', '待支付', '待服务', '服务中', '已完成'];
 
   List<String> get tabs => isProvider ? _providerTabs : _customerTabs;
 
-  String? get _filterStatus {
-    switch (selectedTab.value) {
-      case 1:
-        return 'pending';
-      case 2:
-        return 'in_progress';
-      case 3:
-        return 'completed';
-      default:
-        return null;
+  /// Tab → 对应状态列表（null = 全部）
+  /// 待支付: pending
+  /// 待服务: paid + accepted + en_route（已支付/已接单/已出发，等待服务开始）
+  /// 服务中: in_progress
+  /// 已完成: completed
+  List<String>? get _filterStatuses {
+    final t = selectedTab.value;
+    if (isProvider) {
+      switch (t) {
+        case 1: return ['pending'];
+        case 2: return ['in_progress'];
+        case 3: return ['completed'];
+        default: return null;
+      }
     }
+    switch (t) {
+      case 1: return ['pending'];
+      case 2: return ['paid', 'accepted', 'en_route'];
+      case 3: return ['in_progress'];
+      case 4: return ['completed'];
+      default: return null;
+    }
+  }
+
+  /// 获取 API 调用的 status 参数（单个状态）
+  String? get _filterStatus {
+    final list = _filterStatuses;
+    return list != null && list.length == 1 ? list.first : null;
+  }
+
+  /// 获取 API 调用的 statuses 参数（多状态，逗号分隔）
+  String? get _filterStatusesParam {
+    final list = _filterStatuses;
+    return list != null && list.length > 1 ? list.join(',') : null;
   }
 
   @override
   void onInit() {
     super.onInit();
     final args = Get.arguments;
-    if (args is int) selectedTab.value = args.clamp(0, 3);
+    if (args is int) selectedTab.value = args.clamp(0, 4);
     onRefresh();
   }
 
@@ -66,9 +89,13 @@ class OrderListController extends GetxController {
     try {
       final response = isProvider
           ? await _repository.getProviderOrders(
-              status: _filterStatus, pageIndex: 1, pageSize: pageSize)
+              status: _filterStatus,
+              statuses: _filterStatusesParam,
+              pageIndex: 1, pageSize: pageSize)
           : await _repository.getOrderList(
-              status: _filterStatus, pageIndex: 1, pageSize: pageSize);
+              status: _filterStatus,
+              statuses: _filterStatusesParam,
+              pageIndex: 1, pageSize: pageSize);
       if (response.isSuccess && response.data != null) {
         orders.value = response.data!;
         _noMore = response.data!.length < pageSize;
@@ -91,10 +118,12 @@ class OrderListController extends GetxController {
       final response = isProvider
           ? await _repository.getProviderOrders(
               status: _filterStatus,
+              statuses: _filterStatusesParam,
               pageIndex: currentPage.value,
               pageSize: pageSize)
           : await _repository.getOrderList(
               status: _filterStatus,
+              statuses: _filterStatusesParam,
               pageIndex: currentPage.value,
               pageSize: pageSize);
       if (response.isSuccess && response.data != null) {

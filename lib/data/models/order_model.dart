@@ -15,7 +15,7 @@ class OrderModel {
   final String? contactPhone;
   final String? serviceTime;
   final String? remark;
-  final int status; // 0-待支付,1-待服务,2-进行中,3-已完成,4-已取消
+  final int status; // 0-待支付,1-待接单,2-已接单,3-待上门,4-服务中,5-已完成,6-已取消
   final String? createTime;
   final String? updateTime;
 
@@ -104,10 +104,12 @@ class OrderModel {
     if (status is String) {
       return switch (status) {
         'pending' => 0,
-        'confirmed' => 1,
-        'in_progress' => 2,
-        'completed' => 3,
-        'cancelled' => 4,
+        'paid' => 1,
+        'accepted' => 2,
+        'en_route' => 3,
+        'in_progress' => 4,
+        'completed' => 5,
+        'cancelled' => 6,
         _ => int.tryParse(status) ?? 0,
       };
     }
@@ -145,12 +147,16 @@ class OrderModel {
       case 0:
         return '待支付';
       case 1:
-        return '待服务';
+        return '待接单';
       case 2:
-        return '进行中';
+        return '已接单';
       case 3:
-        return '已完成';
+        return '待上门';
       case 4:
+        return '服务中';
+      case 5:
+        return '已完成';
+      case 6:
         return '已取消';
       default:
         return '未知';
