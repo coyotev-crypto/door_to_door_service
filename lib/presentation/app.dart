@@ -8,6 +8,9 @@ import '../core/utils/screen_adapter.dart';
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<OverlayState> overlayKey = GlobalKey<OverlayState>();
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -23,6 +26,17 @@ class MyApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           initialRoute: AppPages.initial,
           getPages: AppPages.routes,
+          navigatorKey: navigatorKey,
+          builder: (context, child) {
+            return Overlay(
+              key: overlayKey,
+              initialEntries: [
+                OverlayEntry(
+                  builder: (context) => child ?? const SizedBox.shrink(),
+                ),
+              ],
+            );
+          },
         );
       },
     );

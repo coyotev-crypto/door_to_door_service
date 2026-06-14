@@ -1,20 +1,24 @@
 import 'package:door_to_door_service/core/themes/app_theme.dart';
+import 'package:door_to_door_service/presentation/app.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class LoadingUtil {
   static bool _isShowing = false;
-  static BuildContext? _dialogContext;
+  static OverlayEntry? _overlayEntry;
 
   static void show({String? message}) {
     if (_isShowing) return;
+    final overlayState = MyApp.overlayKey.currentState;
+    if (overlayState == null) return;
     _isShowing = true;
-    Get.dialog(
-      Builder(
-        builder: (ctx) {
-          _dialogContext = ctx;
-          return PopScope(
-            canPop: false,
+
+    final entry = OverlayEntry(
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: PopScope(
+          canPop: false,
+          child: Container(
+            color: Colors.black26,
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -47,24 +51,22 @@ class LoadingUtil {
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
-      barrierDismissible: false,
-      barrierColor: Colors.black26,
     );
+
+    _overlayEntry = entry;
+    overlayState.insert(entry);
   }
 
   static void dismiss() {
     if (!_isShowing) return;
     _isShowing = false;
-    final ctx = _dialogContext;
-    _dialogContext = null;
-    if (ctx != null && ctx.mounted) {
-      final route = ModalRoute.of(ctx);
-      if (route != null) {
-        Navigator.of(ctx).removeRoute(route);
-      }
+    final entry = _overlayEntry;
+    _overlayEntry = null;
+    if (entry != null && entry.mounted) {
+      entry.remove();
     }
   }
 }
