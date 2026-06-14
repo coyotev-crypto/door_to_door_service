@@ -91,10 +91,13 @@ class OrderRepository {
   }
 
   /// 取消订单
-  Future<BaseResponse<dynamic>> cancelOrder(int orderId) async {
+  Future<BaseResponse<dynamic>> cancelOrder(int orderId, String reason) async {
     final path =
         ApiEndpoints.cancelOrder.replaceAll('{id}', orderId.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': orderId,
+      'reason': reason,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 
@@ -103,7 +106,10 @@ class OrderRepository {
       int orderId, String reason) async {
     final path =
         ApiEndpoints.requestRefund.replaceAll('{id}', orderId.toString());
-    final response = await _dioClient.post(path, data: {'reason': reason});
+    final response = await _dioClient.post(path, data: {
+      'orderId': orderId,
+      'reason': reason,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 

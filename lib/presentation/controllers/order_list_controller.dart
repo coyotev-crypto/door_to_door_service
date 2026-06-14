@@ -170,19 +170,32 @@ class OrderListController extends GetxController {
   Future<void> completeService(int id) =>
       _providerAction(() => _repository.completeService(id), '服务已完成', '操作失败');
 
-  Future<void> cancelOrder(int id) =>
-      _providerAction(() => _repository.cancelOrder(id), '已取消', '取消失败');
+  Future<void> cancelOrder(int id, String reason) =>
+      _providerAction(() => _repository.cancelOrder(id, reason), '已取消', '取消失败');
 
   // ═══ 用户操作 ═══
 
-  Future<void> requestRefund(int orderId, String reason) async {
+  Future<bool> cancelUserOrder(int orderId, String reason) async {
+    LoadingUtil.show();
+    try {
+      await _repository.cancelOrder(orderId, reason);
+      onRefresh();
+      return true;
+    } catch (e) {
+      return false;
+    } finally {
+      LoadingUtil.dismiss();
+    }
+  }
+
+  Future<bool> requestRefund(int orderId, String reason) async {
     LoadingUtil.show();
     try {
       await _repository.requestRefund(orderId, reason);
-      ToastUtil.showSuccess('退款申请已提交，请等待审核');
       onRefresh();
+      return true;
     } catch (e) {
-      ToastUtil.showError('提交失败：$e');
+      return false;
     } finally {
       LoadingUtil.dismiss();
     }

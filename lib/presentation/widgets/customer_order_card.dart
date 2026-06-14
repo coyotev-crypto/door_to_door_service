@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
-import '../../../core/utils/toast_util.dart';
 import '../../../data/models/order_model.dart';
-import '../controllers/order_list_controller.dart';
 import '../../../routes/route_names.dart';
+import 'order_reason_dialog.dart';
 
 /// 用户订单卡片（我的订单）
 class CustomerOrderCard extends StatelessWidget {
@@ -73,35 +72,59 @@ class CustomerOrderCard extends StatelessWidget {
                     height: 1)),
           ]),
         ]),
-        // 待支付 → 去支付
+        // 待支付 → 取消订单 + 去支付
         if (order.status == 0) ...[
           SizedBox(height: 12.h),
-          GestureDetector(
-            onTap: () {
-              Get.toNamed(RouteNames.orderPayment, arguments: {
-                'orderId': order.id,
-                'orderNo': order.orderNo ?? '${order.id}',
-                'amount': order.totalPrice ?? '0',
-                'serviceName': order.serviceName ?? '',
-                'durationMinutes': order.durationMinutes ?? 60,
-              });
-            },
-            child: Container(
-              height: 40.h,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                    colors: [AppTheme.gold, AppTheme.amber]),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Center(
-                child: Text('去支付',
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
+          Row(children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _showCancelDialog(context),
+                child: Container(
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppTheme.danger, width: 1.5),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Center(
+                    child: Text('取消订单',
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.danger)),
+                  ),
+                ),
               ),
             ),
-          ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Get.toNamed(RouteNames.orderPayment, arguments: {
+                    'orderId': order.id,
+                    'orderNo': order.orderNo ?? '${order.id}',
+                    'amount': order.totalPrice ?? '0',
+                    'serviceName': order.serviceName ?? '',
+                    'durationMinutes': order.durationMinutes ?? 60,
+                  });
+                },
+                child: Container(
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                        colors: [AppTheme.gold, AppTheme.amber]),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Center(
+                    child: Text('去支付',
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                  ),
+                ),
+              ),
+            ),
+          ]),
         ],
         // 已支付但未完成 → 申请退款
         if (order.status >= 1 && order.status <= 4 && order.refundStatus == 0) ...[
@@ -157,93 +180,12 @@ class CustomerOrderCard extends StatelessWidget {
     );
   }
 
-  void _showRefundDialog(BuildContext context) {
-    final reasonCtl = TextEditingController();
-    final selectedReason = ''.obs;
+  void _showCancelDialog(BuildContext context) {
+    OrderReasonDialog.showCancel(order.id);
+  }
 
-    Get.defaultDialog(
-      title: '申请退款',
-      titleStyle: TextStyle(
-          fontSize: 17.sp,
-          fontWeight: FontWeight.w700,
-          color: AppTheme.textPrimary),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('请选择退款原因',
-              style:
-                  TextStyle(fontSize: 13.sp, color: AppTheme.textSecondary)),
-          SizedBox(height: 12.h),
-          ...['不需要此服务', '误操作 / 重复下单', '价格不合理', '其他原因'].map((reason) {
-            return Obx(() {
-              final active = selectedReason.value == reason;
-              return GestureDetector(
-                onTap: () {
-                  selectedReason.value = reason;
-                  reasonCtl.text = reason;
-                },
-                child: Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom: 8.h),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                  decoration: BoxDecoration(
-                    color: active
-                        ? AppTheme.gold.withValues(alpha: 0.08)
-                        : Colors.white,
-                    border: Border.all(
-                      color:
-                          active ? AppTheme.gold : AppTheme.warmBorder,
-                    ),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Text(reason,
-                      style: TextStyle(
-                          fontSize: 13.sp,
-                          color: active
-                              ? AppTheme.gold
-                              : AppTheme.textSecondary)),
-                ),
-              );
-            });
-          }),
-          SizedBox(height: 8.h),
-          TextField(
-            controller: reasonCtl,
-            maxLines: 2,
-            style: TextStyle(fontSize: 13.sp, color: AppTheme.textPrimary),
-            decoration: InputDecoration(
-              hintText: '补充说明（选填）',
-              hintStyle: TextStyle(
-                  fontSize: 12.sp, color: AppTheme.textMuted),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: AppTheme.warmBorder),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: AppTheme.warmBorder),
-              ),
-            ),
-          ),
-        ],
-      ),
-      textConfirm: '提交申请',
-      textCancel: '取消',
-      confirmTextColor: Colors.white,
-      buttonColor: AppTheme.gold,
-      onConfirm: () {
-        if (reasonCtl.text.isEmpty) {
-          ToastUtil.showError('请选择或填写退款原因');
-          return;
-        }
-        Get.find<OrderListController>()
-            .requestRefund(order.id, reasonCtl.text);
-        Get.back();
-      },
-    );
+  void _showRefundDialog(BuildContext context) {
+    OrderReasonDialog.showRefund(order.id);
   }
 
   Widget _buildRefundStatusBanner() {
