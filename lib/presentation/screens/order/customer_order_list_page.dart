@@ -77,7 +77,7 @@ class CustomerOrderListPage extends GetView<OrderListController> {
 
   Widget _buildOrderList() {
     return Obx(() {
-      if (controller.isLoading.value && controller.orders.isEmpty) {
+      if (controller.orders.isEmpty) {
         return const Center(
             child: CircularProgressIndicator(
                 color: AppTheme.gold, strokeWidth: 2.5));

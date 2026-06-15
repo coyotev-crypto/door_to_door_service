@@ -1,16 +1,22 @@
+import 'dart:io' show Platform;
+
 /// API配置类
 /// 统一管理API相关配置
 class AppConfig {
   // 私有构造函数，防止实例化
   AppConfig._();
 
+  /// 宿主机地址
+  /// Android 模拟器需用 10.0.2.2 访问宿主机，真机/其他平台用实际 IP
+  static String get _host => Platform.isAndroid ? '10.0.2.2' : '192.168.1.7';
+
   /// API基础URL
   /// 开发环境: http://localhost:8080
   /// 生产环境: 请修改为实际的生产环境地址
-  static const String baseUrl = 'http://192.168.1.7:8000';
+  static String get baseUrl => 'http://$_host:8000';
   // 前端地址，用于构建一些需要前端URL的接口，如支付回调等
-  static const String webUrl = "http://192.168.1.7:8080";
-  static const String baseApiUrl = '$baseUrl/api/v1';
+  static String get webUrl => 'http://$_host:8080';
+  static String get baseApiUrl => '$baseUrl/api/v1';
 
   /// 连接超时时间（秒）
   static const int connectTimeout = 30;

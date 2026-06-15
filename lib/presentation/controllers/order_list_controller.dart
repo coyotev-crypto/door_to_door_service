@@ -14,7 +14,6 @@ class OrderListController extends GetxController {
       controlFinishRefresh: true, controlFinishLoad: true);
 
   final RxList<OrderModel> orders = <OrderModel>[].obs;
-  final RxBool isLoading = false.obs;
   final RxInt selectedTab = 0.obs;
   final RxInt currentPage = 1.obs;
 
@@ -85,7 +84,6 @@ class OrderListController extends GetxController {
   Future<void> onRefresh() async {
     currentPage.value = 1;
     _noMore = false;
-    isLoading.value = true;
     try {
       final response = isProvider
           ? await _repository.getProviderOrders(
@@ -103,7 +101,6 @@ class OrderListController extends GetxController {
     } catch (e) {
       ToastUtil.showError('加载订单失败');
     } finally {
-      isLoading.value = false;
       refreshController.finishRefresh();
     }
   }
@@ -179,9 +176,11 @@ class OrderListController extends GetxController {
     LoadingUtil.show();
     try {
       await _repository.cancelOrder(orderId, reason);
+      ToastUtil.showSuccess('取消成功');
       onRefresh();
       return true;
     } catch (e) {
+      ToastUtil.showError('取消失败: $e');
       return false;
     } finally {
       LoadingUtil.dismiss();
@@ -192,9 +191,11 @@ class OrderListController extends GetxController {
     LoadingUtil.show();
     try {
       await _repository.requestRefund(orderId, reason);
+      ToastUtil.showSuccess('申请退款成功');
       onRefresh();
       return true;
     } catch (e) {
+      ToastUtil.showError('申请退款失败: $e');
       return false;
     } finally {
       LoadingUtil.dismiss();
