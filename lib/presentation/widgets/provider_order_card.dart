@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../data/models/order_model.dart';
+import 'primary_button.dart';
+import 'order_status_badge.dart';
 
 /// 服务商订单卡片（接单列表）
 class ProviderOrderCard extends StatelessWidget {
@@ -67,7 +69,7 @@ class ProviderOrderCard extends StatelessWidget {
                             color: AppTheme.textSecondary)),
                 ]),
           ),
-          _statusBadge(order.status),
+          OrderStatusBadge(status: order.status, isProvider: true),
         ]),
         SizedBox(height: 12.h),
         Container(
@@ -118,23 +120,51 @@ class ProviderOrderCard extends StatelessWidget {
       case 0:
       case 1:
         return [
-          _actionBtn('拒单', AppTheme.danger, AppTheme.danger.withValues(alpha: 0.85),
-              onReject),
+          Expanded(
+            child: PrimaryButton(
+              text: '拒单',
+              gradientColors: const [AppTheme.danger, AppTheme.danger],
+              onPressed: onReject,
+            ),
+          ),
           SizedBox(width: 10.w),
-          _actionBtn('接单', AppTheme.gold, AppTheme.amber, onAccept),
+          Expanded(
+            child: PrimaryButton(
+              text: '接单',
+              gradientColors: const [AppTheme.gold, AppTheme.amber],
+              onPressed: onAccept,
+            ),
+          ),
         ];
       case 2:
         return [
-          _actionBtn('出发', AppTheme.gold, AppTheme.amber, onEnRoute),
+          Expanded(
+            child: PrimaryButton(
+              text: '出发',
+              gradientColors: const [AppTheme.gold, AppTheme.amber],
+              onPressed: onEnRoute,
+            ),
+          ),
         ];
       case 3:
         return [
-          _actionBtn('开始服务', AppTheme.gold, AppTheme.amber, onStart),
+          Expanded(
+            child: PrimaryButton(
+              text: '开始服务',
+              gradientColors: const [AppTheme.gold, AppTheme.amber],
+              onPressed: onStart,
+            ),
+          ),
         ];
       case 4:
         return [
-          _actionBtn('完成服务', AppTheme.sage, const Color(0xFF5A7D6A),
-              onComplete),
+          Expanded(
+            child: PrimaryButton(
+              text: '完成服务',
+              gradientColors: const [AppTheme.sage, Color(0xFF5A7D6A)],
+              onPressed: onComplete,
+            ),
+          ),
         ];
       default:
         return const [];
@@ -153,52 +183,5 @@ class ProviderOrderCard extends StatelessWidget {
             style: TextStyle(fontSize: 13.sp, color: color)),
       ),
     ]);
-  }
-
-  static Widget _statusBadge(int s) {
-    final (c, l) = switch (s) {
-      0 => (const Color(0xFFE8A838), '待接单'),
-      1 => (const Color(0xFF7BA5C2), '待接单'),
-      2 => (const Color(0xFF5A8DB5), '已接单'),
-      3 => (const Color(0xFF6B9EBF), '待上门'),
-      4 => (AppTheme.sage, '服务中'),
-      5 => (AppTheme.textMuted, '已完成'),
-      6 => (AppTheme.danger, '已取消'),
-      _ => (AppTheme.textMuted, ''),
-    };
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-          color: c.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6.r)),
-      child: Text(l,
-          style: TextStyle(
-              fontSize: 12.sp, color: c, fontWeight: FontWeight.w600)),
-    );
-  }
-
-  static Widget _actionBtn(
-      String label, Color c1, Color c2, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [c1, c2]),
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-                color: c1.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3)),
-          ],
-        ),
-        child: Text(label,
-            style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w700,
-                color: Colors.white)),
-      ),
-    );
   }
 }

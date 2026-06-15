@@ -10,6 +10,7 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   final double? width;
+  final List<Color>? gradientColors;
 
   const PrimaryButton({
     super.key,
@@ -18,6 +19,7 @@ class PrimaryButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
+    this.gradientColors,
   });
 
   @override
@@ -28,7 +30,7 @@ class PrimaryButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
+            colors: gradientColors ?? [
               Theme.of(context).primaryColor,
               Theme.of(context).primaryColor.withValues(alpha: 0.8),
             ],
@@ -36,7 +38,7 @@ class PrimaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+              color: (gradientColors?.first ?? Theme.of(context).primaryColor).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
