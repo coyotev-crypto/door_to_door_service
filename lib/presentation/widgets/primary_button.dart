@@ -10,7 +10,9 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   final double? width;
+  final double? height;
   final List<Color>? gradientColors;
+  final bool compact;
 
   const PrimaryButton({
     super.key,
@@ -19,14 +21,16 @@ class PrimaryButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.width,
+    this.height,
     this.gradientColors,
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: 56.h,
+      height: height ?? (compact ? 36.h : 56.h),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -35,7 +39,7 @@ class PrimaryButton extends StatelessWidget {
               Theme.of(context).primaryColor.withValues(alpha: 0.8),
             ],
           ),
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(compact ? 10.r : 12.r),
           boxShadow: [
             BoxShadow(
               color: (gradientColors?.first ?? Theme.of(context).primaryColor).withValues(alpha: 0.3),
@@ -50,7 +54,7 @@ class PrimaryButton extends StatelessWidget {
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(compact ? 10.r : 12.r),
             ),
           ),
           child: isLoading
@@ -73,7 +77,7 @@ class PrimaryButton extends StatelessWidget {
                     Text(
                       text,
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: compact ? 13.sp : 16.sp,
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),

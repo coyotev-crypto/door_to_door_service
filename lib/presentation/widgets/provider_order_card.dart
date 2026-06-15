@@ -120,17 +120,22 @@ class ProviderOrderCard extends StatelessWidget {
       case 0:
       case 1:
         return [
+          SizedBox(width: 40.w),
           Expanded(
+            flex: 2,
             child: PrimaryButton(
               text: '拒单',
+              compact: true,
               gradientColors: const [AppTheme.danger, AppTheme.danger],
               onPressed: onReject,
             ),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 8.w),
           Expanded(
+            flex: 2,
             child: PrimaryButton(
               text: '接单',
+              compact: true,
               gradientColors: const [AppTheme.gold, AppTheme.amber],
               onPressed: onAccept,
             ),
@@ -138,9 +143,11 @@ class ProviderOrderCard extends StatelessWidget {
         ];
       case 2:
         return [
-          Expanded(
+          SizedBox(
+            width: 80.w,
             child: PrimaryButton(
               text: '出发',
+              compact: true,
               gradientColors: const [AppTheme.gold, AppTheme.amber],
               onPressed: onEnRoute,
             ),
@@ -148,9 +155,11 @@ class ProviderOrderCard extends StatelessWidget {
         ];
       case 3:
         return [
-          Expanded(
+          SizedBox(
+            width: 120.w,
             child: PrimaryButton(
               text: '开始服务',
+              compact: true,
               gradientColors: const [AppTheme.gold, AppTheme.amber],
               onPressed: onStart,
             ),
@@ -158,9 +167,11 @@ class ProviderOrderCard extends StatelessWidget {
         ];
       case 4:
         return [
-          Expanded(
+          SizedBox(
+            width: 120.w,
             child: PrimaryButton(
               text: '完成服务',
+              compact: true,
               gradientColors: const [AppTheme.sage, Color(0xFF5A7D6A)],
               onPressed: onComplete,
             ),
