@@ -155,15 +155,20 @@ class OrderRepository {
   Future<BaseResponse<dynamic>> acceptOrder(int id) async {
     final path =
         ApiEndpoints.acceptOrder.replaceAll('{id}', id.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': id,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 
   /// 服务商拒单
-  Future<BaseResponse<dynamic>> rejectOrder(int id) async {
+  Future<BaseResponse<dynamic>> rejectOrder(int id, String remark) async {
     final path =
         ApiEndpoints.rejectOrder.replaceAll('{id}', id.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': id,
+      'remark': remark,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 
@@ -171,7 +176,9 @@ class OrderRepository {
   Future<BaseResponse<dynamic>> enRouteOrder(int id) async {
     final path =
         ApiEndpoints.enRouteOrder.replaceAll('{id}', id.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': id,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 
@@ -179,7 +186,9 @@ class OrderRepository {
   Future<BaseResponse<dynamic>> startService(int id) async {
     final path =
         ApiEndpoints.startService.replaceAll('{id}', id.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': id,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 
@@ -187,7 +196,9 @@ class OrderRepository {
   Future<BaseResponse<dynamic>> completeService(int id) async {
     final path =
         ApiEndpoints.completeService.replaceAll('{id}', id.toString());
-    final response = await _dioClient.post(path);
+    final response = await _dioClient.post(path, data: {
+      'orderId': id,
+    });
     return BaseResponse<dynamic>.fromJson(response.data);
   }
 }

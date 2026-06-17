@@ -7,6 +7,7 @@ import '../../../core/services/auth_service.dart';
 import '../../controllers/profile_controller.dart';
 import '../../widgets/profile_header_widget.dart';
 import '../../widgets/profile_function_item_widget.dart';
+import '../../widgets/order_stat_widget.dart';
 
 /// 个人中心页面 — 温润质感
 class ProfileWidget extends StatelessWidget {
@@ -100,49 +101,15 @@ class ProfileWidget extends StatelessWidget {
         ]),
         SizedBox(height: 18.h),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          _orderStat(Icons.payment_rounded, '待付款', ctrl.pendingPaymentCount,
-              () => ctrl.navigateToOrderList(1)),
-          _orderStat(Icons.local_shipping_rounded, '待发货', ctrl.pendingServiceCount,
-              () => ctrl.navigateToOrderList(2)),
-          _orderStat(Icons.play_circle_rounded, '待收货', ctrl.inProgressCount,
-              () => ctrl.navigateToOrderList(3)),
-          _orderStat(Icons.star_border_rounded, '待评价', ctrl.completedCount,
-              () => ctrl.navigateToOrderList(4)),
+          OrderStatWidget(icon: Icons.payment_rounded, label: '待付款', count: ctrl.pendingPaymentCount,
+              onTap: () => ctrl.navigateToOrderList(1)),
+          OrderStatWidget(icon: Icons.local_shipping_rounded, label: '待发货', count: ctrl.pendingServiceCount,
+              onTap: () => ctrl.navigateToOrderList(2)),
+          OrderStatWidget(icon: Icons.play_circle_rounded, label: '待收货', count: ctrl.inProgressCount,
+              onTap: () => ctrl.navigateToOrderList(3)),
+          OrderStatWidget(icon: Icons.star_border_rounded, label: '待评价', count: ctrl.completedCount,
+              onTap: () => ctrl.navigateToOrderList(4)),
         ]),
-      ]),
-    );
-  }
-
-  Widget _orderStat(
-      IconData icon, String label, int count, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(children: [
-        Stack(children: [
-          Icon(icon, size: 26.sp, color: AppTheme.textSecondary),
-          if (count > 0)
-            Positioned(
-                right: -4,
-                top: -4,
-                child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-                    decoration: BoxDecoration(
-                        color: AppTheme.danger,
-                        borderRadius: BorderRadius.circular(10.r)),
-                    constraints:
-                        BoxConstraints(minWidth: 16.w, minHeight: 16.h),
-                    child: Text(count > 99 ? '99+' : '$count',
-                        style: TextStyle(
-                            fontSize: 10.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center))),
-        ]),
-        SizedBox(height: 8.h),
-        Text(label,
-            style: TextStyle(fontSize: 12.sp, color: AppTheme.textMuted)),
       ]),
     );
   }

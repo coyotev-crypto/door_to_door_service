@@ -6,7 +6,7 @@ import '../../../core/utils/toast_util.dart';
 import '../controllers/order_list_controller.dart';
 
 /// 订单原因选择弹窗类型
-enum OrderReasonType { cancel, refund }
+enum OrderReasonType { cancel, refund, reject }
 
 /// 通用订单原因选择底部弹窗（取消订单 / 申请退款）
 class OrderReasonDialog extends StatefulWidget {
@@ -37,6 +37,15 @@ class OrderReasonDialog extends StatefulWidget {
     );
   }
 
+  /// 显示拒单弹窗
+  static Future<void> showReject(int orderId) {
+    return Get.bottomSheet(
+      OrderReasonDialog(orderId: orderId, type: OrderReasonType.reject),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+    );
+  }
+
   @override
   State<OrderReasonDialog> createState() => _OrderReasonDialogState();
 }
@@ -56,20 +65,47 @@ class _OrderReasonDialogState extends State<OrderReasonDialog> {
     '其他原因',
   ];
 
+  static const _rejectReasons = [
+    '当前时间冲突',
+    '服务区域不匹配',
+    '无法提供该服务',
+    '其他原因',
+  ];
+
   List<String> get _reasons =>
-      widget.type == OrderReasonType.cancel ? _cancelReasons : _refundReasons;
+      switch (widget.type) {
+        OrderReasonType.cancel => _cancelReasons,
+        OrderReasonType.refund => _refundReasons,
+        OrderReasonType.reject => _rejectReasons,
+      };
 
   bool get _isCancel => widget.type == OrderReasonType.cancel;
+  bool get _isReject => widget.type == OrderReasonType.reject;
 
-  String get _title => _isCancel ? '取消订单' : '申请退款';
-  String get _subtitle =>
-      _isCancel ? '请选择取消原因，我们会根据原因优化服务体验' : '请选择退款原因，我们会尽快处理您的申请';
-  String get _submitText => _isCancel ? '确认取消' : '提交申请';
-  String get _cancelText => '再想想';
-  String get _emptyHint => _isCancel ? '请选择或填写取消原因' : '请选择或填写退款原因';
+  String get _title => switch (widget.type) {
+    OrderReasonType.cancel => '取消订单',
+    OrderReasonType.refund => '申请退款',
+    OrderReasonType.reject => '拒单',
+  };
+  String get _subtitle => switch (widget.type) {
+    OrderReasonType.cancel => '请选择取消原因，我们会根据原因优化服务体验',
+    OrderReasonType.refund => '请选择退款原因，我们会尽快处理您的申请',
+    OrderReasonType.reject => '请选择拒单原因，以便我们安排其他服务商',
+  };
+  String get _submitText => switch (widget.type) {
+    OrderReasonType.cancel => '确认取消',
+    OrderReasonType.refund => '提交申请',
+    OrderReasonType.reject => '确认拒单',
+  };
+  String get _cancelText => _isReject ? '返回' : '再想想';
+  String get _emptyHint => switch (widget.type) {
+    OrderReasonType.cancel => '请选择或填写取消原因',
+    OrderReasonType.refund => '请选择或填写退款原因',
+    OrderReasonType.reject => '请选择或填写拒单原因',
+  };
 
-  Color get _accentColor => _isCancel ? AppTheme.danger : AppTheme.gold;
-  Gradient get _submitGradient => _isCancel
+  Color get _accentColor => (_isCancel || _isReject) ? AppTheme.danger : AppTheme.gold;
+  Gradient get _submitGradient => (_isCancel || _isReject)
       ? const LinearGradient(colors: [AppTheme.danger, Color(0xFFC0392B)])
       : const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]);
 
@@ -248,6 +284,8 @@ class _OrderReasonDialogState extends State<OrderReasonDialog> {
     if (_isCancel) {
       success =
           await controller.cancelUserOrder(widget.orderId, _reasonCtl.text);
+    } else if (_isReject) {
+      success = await controller.rejectOrder(widget.orderId, _reasonCtl.text);
     } else {
       success = await controller.requestRefund(widget.orderId, _reasonCtl.text);
     }

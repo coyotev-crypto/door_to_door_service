@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
+import '../../../core/utils/toast_util.dart';
 import '../../controllers/account_security_controller.dart';
 import '../../../data/models/login_device_model.dart';
 
@@ -41,7 +42,7 @@ class LoginDevicesScreen extends GetView<AccountSecurityController> {
 
   void _showRemoveDialog(BuildContext context, LoginDeviceModel device) {
     if (device.isCurrentDevice) {
-      Get.snackbar('提示', '无法移除当前设备', snackPosition: SnackPosition.BOTTOM);
+      ToastUtil.showMessage('无法移除当前设备');
       return;
     }
     showDialog(

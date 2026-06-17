@@ -4,6 +4,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/order_list_controller.dart';
+import '../../widgets/order_reason_dialog.dart';
 import '../../widgets/provider_order_card.dart';
 
 /// 服务商接单列表
@@ -77,33 +78,31 @@ class ProviderOrderListPage extends GetView<OrderListController> {
 
   Widget _buildOrderList() {
     return Obx(() {
-      if (controller.orders.isEmpty) {
-        return const Center(
-            child: CircularProgressIndicator(
-                color: AppTheme.gold, strokeWidth: 2.5));
-      }
       return EasyRefresh(
         controller: controller.refreshController,
         onRefresh: () => controller.onRefresh(),
         onLoad: controller.orders.isNotEmpty ? () => controller.onLoadMore() : null,
         child: controller.orders.isEmpty
-            ? Center(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                    width: 72.w,
-                    height: 72.w,
-                    decoration: BoxDecoration(
-                      color: AppTheme.gold.withValues(alpha: 0.06),
-                      shape: BoxShape.circle,
+            ? ListView(children: [
+                SizedBox(height: 120.h),
+                Center(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    Container(
+                      width: 72.w,
+                      height: 72.w,
+                      decoration: BoxDecoration(
+                        color: AppTheme.gold.withValues(alpha: 0.06),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.receipt_long_rounded,
+                          size: 32.sp, color: AppTheme.textMuted),
                     ),
-                    child: Icon(Icons.receipt_long_rounded,
-                        size: 32.sp, color: AppTheme.textMuted),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text('暂无订单',
-                      style: TextStyle(fontSize: 15.sp, color: AppTheme.textMuted)),
-                ]),
-              )
+                    SizedBox(height: 16.h),
+                    Text('暂无订单',
+                        style: TextStyle(fontSize: 15.sp, color: AppTheme.textMuted)),
+                  ]),
+                ),
+              ])
             : ListView.builder(
                 padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 40.h),
                 itemCount: controller.orders.length,
@@ -112,7 +111,7 @@ class ProviderOrderListPage extends GetView<OrderListController> {
                   onAccept: () =>
                       controller.acceptOrder(controller.orders[i].id),
                   onReject: () =>
-                      controller.rejectOrder(controller.orders[i].id),
+                      OrderReasonDialog.showReject(controller.orders[i].id),
                   onEnRoute: () =>
                       controller.enRouteOrder(controller.orders[i].id),
                   onStart: () =>

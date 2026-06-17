@@ -155,8 +155,20 @@ class OrderListController extends GetxController {
   Future<void> acceptOrder(int id) =>
       _providerAction(() => _repository.acceptOrder(id), '已接单', '接单失败');
 
-  Future<void> rejectOrder(int id) =>
-      _providerAction(() => _repository.rejectOrder(id), '已拒单', '拒单失败');
+  Future<bool> rejectOrder(int id, String remark) async {
+    LoadingUtil.show();
+    try {
+      await _repository.rejectOrder(id, remark);
+      ToastUtil.showSuccess('已拒单');
+      onRefresh();
+      return true;
+    } catch (e) {
+      ToastUtil.showError('拒单失败: $e');
+      return false;
+    } finally {
+      LoadingUtil.dismiss();
+    }
+  }
 
   Future<void> enRouteOrder(int id) =>
       _providerAction(() => _repository.enRouteOrder(id), '已出发', '操作失败');
