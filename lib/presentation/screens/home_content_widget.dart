@@ -127,7 +127,9 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
                             children: [
                               ServiceCardWidget(
                                 service: service,
-                                onTap: () {/* TODO */},
+                                onTap: () => Get.toNamed(
+                                    RouteNames.orderCreate,
+                                    arguments: service),
                                 onOrderTap: () => Get.toNamed(
                                     RouteNames.orderCreate,
                                     arguments: service),

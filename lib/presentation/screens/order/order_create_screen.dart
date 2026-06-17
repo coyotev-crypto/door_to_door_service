@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../widgets/section_header_widget.dart';
+import '../../widgets/user_avatar_widget.dart';
 
 /// 下单页面 — 温润质感·臻享预约
 class OrderCreateScreen extends GetView<OrderController> {
@@ -34,8 +35,8 @@ class OrderCreateScreen extends GetView<OrderController> {
         final service = controller.service;
         if (service == null) {
           return const Center(
-              child:
-                  Text('服务信息加载失败', style: TextStyle(color: AppTheme.textMuted)));
+              child: Text('服务信息加载失败',
+                  style: TextStyle(color: AppTheme.textMuted)));
         }
         return _buildForm(context, service);
       }),
@@ -92,26 +93,10 @@ class OrderCreateScreen extends GetView<OrderController> {
       child: Row(
         children: [
           // 头像
-          Container(
-            width: 72.w,
-            height: 72.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3), width: 2),
-              boxShadow: [
-                BoxShadow(
-                    color: AppTheme.gold.withValues(alpha: 0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4)),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: service.avatar != null && service.avatar!.isNotEmpty
-                ? Image.network(service.avatar!,
-                    fit: BoxFit.cover,
-                    cacheWidth: 256,
-                    errorBuilder: (_, __, ___) => _avatarPlaceholder())
-                : _avatarPlaceholder(),
+          UserAvatarWidget(
+            avatarUrl: service.avatar,
+            username: service.providerName ?? service.name,
+            size: 72.w,
           ),
           SizedBox(width: 16.w),
           // 信息
@@ -170,14 +155,6 @@ class OrderCreateScreen extends GetView<OrderController> {
     );
   }
 
-  Widget _avatarPlaceholder() {
-    return Container(
-      color: AppTheme.creamFill,
-      child: Icon(Icons.spa_rounded,
-          size: 32.sp, color: AppTheme.gold.withValues(alpha: 0.4)),
-    );
-  }
-
   /// 服务详情卡片 — 含时长选择
   Widget _buildInfoCard(ServiceItem service) {
     final durations = controller.availableDurations;
@@ -202,9 +179,9 @@ class OrderCreateScreen extends GetView<OrderController> {
                 runSpacing: 10.h,
                 children: durations.map((p) {
                   final mins = (p['durationMinutes'] as int?) ?? 60;
-                  final price = double.tryParse(p['price']?.toString() ?? '') ?? 0;
-                  final selected =
-                      mins == controller.selectedDurationMinutes;
+                  final price =
+                      double.tryParse(p['price']?.toString() ?? '') ?? 0;
+                  final selected = mins == controller.selectedDurationMinutes;
                   return GestureDetector(
                     onTap: () => controller.selectDuration(mins),
                     child: Container(
@@ -216,9 +193,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                             : AppTheme.creamBg,
                         borderRadius: BorderRadius.circular(10.r),
                         border: Border.all(
-                          color: selected
-                              ? AppTheme.gold
-                              : AppTheme.warmBorder,
+                          color: selected ? AppTheme.gold : AppTheme.warmBorder,
                           width: selected ? 1.5 : 1,
                         ),
                       ),
@@ -244,7 +219,8 @@ class OrderCreateScreen extends GetView<OrderController> {
                   );
                 }).toList(),
               )),
-          if (service.travelFeeValue != null && service.travelFeeValue! > 0) ...[
+          if (service.travelFeeValue != null &&
+              service.travelFeeValue! > 0) ...[
             SizedBox(height: 14.h),
             _divider(),
             _infoRow('出行费', '¥${service.travelFee!}/公里'),
@@ -318,9 +294,7 @@ class OrderCreateScreen extends GetView<OrderController> {
                                 color: AppTheme.textPrimary)),
                         SizedBox(height: 2.h),
                         Text(
-                          hasAddress
-                              ? address.name
-                              : '点击选择您的服务地址',
+                          hasAddress ? address.name : '点击选择您的服务地址',
                           style: TextStyle(
                               fontSize: 14.sp,
                               color: hasAddress
@@ -372,7 +346,8 @@ class OrderCreateScreen extends GetView<OrderController> {
     final hasValue = value != '未填写';
     return Row(
       children: [
-        Icon(icon, size: 16.sp, color: hasValue ? AppTheme.gold : AppTheme.textMuted),
+        Icon(icon,
+            size: 16.sp, color: hasValue ? AppTheme.gold : AppTheme.textMuted),
         SizedBox(width: 10.w),
         Text('$label  ',
             style: TextStyle(
@@ -390,26 +365,16 @@ class OrderCreateScreen extends GetView<OrderController> {
 
   /// 日期 + 时间选择器
   Widget _buildTimeSelector(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: _timePickerCard(
-          icon: Icons.calendar_today_rounded,
-          label: '服务日期',
-          value: controller.selectedDate,
-          placeholder: '选择日期',
-          onTap: () => controller.pickDate(),
-        )),
-        SizedBox(width: 12.w),
-        Expanded(
-            child: _timePickerCard(
-          icon: Icons.access_time_rounded,
-          label: '服务时间',
-          value: controller.selectedTime,
-          placeholder: '选择时间',
-          onTap: () => controller.pickTime(),
-        )),
-      ],
+    return Obx(
+      () => _timePickerCard(
+        icon: Icons.event_available_rounded,
+        label: '服务时间',
+        value: controller.selectedDate.isNotEmpty
+            ? controller.serviceTimeText
+            : '',
+        placeholder: '选择服务日期和时间',
+        onTap: () => controller.selectServiceDateTime(context),
+      ),
     );
   }
 
@@ -429,7 +394,9 @@ class OrderCreateScreen extends GetView<OrderController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
-            color: hasValue ? AppTheme.gold.withValues(alpha: 0.3) : AppTheme.warmBorder,
+            color: hasValue
+                ? AppTheme.gold.withValues(alpha: 0.3)
+                : AppTheme.warmBorder,
           ),
         ),
         child: Column(
@@ -498,8 +465,8 @@ class OrderCreateScreen extends GetView<OrderController> {
               fillColor: AppTheme.creamBg,
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-              prefixIcon:
-                  Icon(Icons.edit_note_rounded, size: 18.sp, color: AppTheme.gold),
+              prefixIcon: Icon(Icons.edit_note_rounded,
+                  size: 18.sp, color: AppTheme.gold),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.r),
                 borderSide: BorderSide.none,
@@ -617,7 +584,8 @@ class OrderCreateScreen extends GetView<OrderController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(
             dashCount,
-            (_) => Container(width: dashWidth, height: 1, color: AppTheme.warmBorder),
+            (_) => Container(
+                width: dashWidth, height: 1, color: AppTheme.warmBorder),
           ),
         );
       },

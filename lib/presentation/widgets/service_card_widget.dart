@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/models/service_item.dart';
 import '../../core/themes/app_theme.dart';
+import 'user_avatar_widget.dart';
 
 /// 服务卡片 — 温润质感风格
 class ServiceCardWidget extends StatelessWidget {
@@ -29,26 +30,10 @@ class ServiceCardWidget extends StatelessWidget {
           child: Row(
             children: [
               // 头像图片
-              Container(
-                width: 84.w,
-                height: 84.w,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                          color: AppTheme.gold.withValues(alpha: 0.15),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3)),
-                    ]),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: service.avatar != null && service.avatar!.isNotEmpty
-                      ? Image.network(service.avatar!,
-                          fit: BoxFit.cover,
-                          cacheWidth: 256,
-                          errorBuilder: (_, __, ___) => _placeholder())
-                      : _placeholder(),
-                ),
+              UserAvatarWidget(
+                avatarUrl: service.avatar,
+                username: service.providerName ?? service.name,
+                size: 84.w,
               ),
               SizedBox(width: 14.w),
               // 信息区
@@ -110,16 +95,14 @@ class ServiceCardWidget extends StatelessWidget {
                         SizedBox(width: 10.w),
                         Text('${service.orderCount}单',
                             style: TextStyle(
-                                fontSize: 11.sp,
-                                color: AppTheme.textMuted)),
+                                fontSize: 11.sp, color: AppTheme.textMuted)),
                         SizedBox(width: 10.w),
                         Icon(Icons.favorite_rounded,
                             size: 11.sp, color: AppTheme.rose),
                         SizedBox(width: 2.w),
                         Text('${service.favoriteCount ?? 0}',
                             style: TextStyle(
-                                fontSize: 11.sp,
-                                color: AppTheme.textMuted)),
+                                fontSize: 11.sp, color: AppTheme.textMuted)),
                         const Spacer(),
                         GestureDetector(
                           onTap: onFavoriteTap,
@@ -147,15 +130,13 @@ class ServiceCardWidget extends StatelessWidget {
                         SizedBox(width: 4.w),
                         Text('/${service.defaultDurationMinutes}分钟',
                             style: TextStyle(
-                                fontSize: 11.sp,
-                                color: AppTheme.textMuted)),
+                                fontSize: 11.sp, color: AppTheme.textMuted)),
                         if (service.travelFeeValue != null &&
                             service.travelFeeValue! > 0) ...[
                           SizedBox(width: 6.w),
                           Text('出行¥${service.travelFee!}',
                               style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: AppTheme.textMuted)),
+                                  fontSize: 10.sp, color: AppTheme.textMuted)),
                         ],
                         const Spacer(),
                         GestureDetector(
@@ -164,15 +145,13 @@ class ServiceCardWidget extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 16.w, vertical: 7.h),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [
-                                AppTheme.gold,
-                                AppTheme.amber
-                              ]),
+                              gradient: const LinearGradient(
+                                  colors: [AppTheme.gold, AppTheme.amber]),
                               borderRadius: BorderRadius.circular(16.r),
                               boxShadow: [
                                 BoxShadow(
-                                    color: AppTheme.gold
-                                        .withValues(alpha: 0.25),
+                                    color:
+                                        AppTheme.gold.withValues(alpha: 0.25),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2))
                               ],
@@ -193,15 +172,6 @@ class ServiceCardWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _placeholder() {
-    return Container(
-      color: AppTheme.creamFill,
-      child: Center(
-          child: Icon(Icons.spa_rounded,
-              size: 36.sp, color: const Color(0xFFD0C8BF))),
     );
   }
 }

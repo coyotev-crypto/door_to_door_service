@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../core/utils/screen_adapter.dart';
 import '../../core/themes/app_theme.dart';
 import '../controllers/profile_controller.dart';
+import 'user_avatar_widget.dart';
 
 /// 个人中心头部 — 温润质感
 class ProfileHeaderWidget extends StatelessWidget {
@@ -33,28 +34,10 @@ class ProfileHeaderWidget extends StatelessWidget {
                 // 头像
                 GestureDetector(
                   onTap: () => controller.navigateToProfileEdit(),
-                  child: Container(
-                    width: 64.w,
-                    height: 64.w,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppTheme.creamBg,
-                      border:
-                          Border.all(color: AppTheme.gold.withValues(alpha: 0.25), width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                            color: AppTheme.gold.withValues(alpha: 0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3)),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: user?.avatar != null
-                        ? Image.network(user!.avatar!,
-                            fit: BoxFit.cover,
-                            cacheWidth: 256,
-                            errorBuilder: (_, __, ___) => _avatarPlaceholder())
-                        : _avatarPlaceholder(),
+                  child: UserAvatarWidget(
+                    avatarUrl: user?.avatar,
+                    username: user?.nickname,
+                    size: 64.w,
                   ),
                 ),
                 SizedBox(width: 16.w),
@@ -80,8 +63,9 @@ class ProfileHeaderWidget extends StatelessWidget {
                       if (user?.phoneNumber != null &&
                           user!.phoneNumber.isNotEmpty)
                         Text(user.phoneNumber,
-                            style:
-                                TextStyle(fontSize: 13.sp, color: AppTheme.textSecondary)),
+                            style: TextStyle(
+                                fontSize: 13.sp,
+                                color: AppTheme.textSecondary)),
                       SizedBox(height: 4.h),
                       Text(
                         user?.remark?.trim().isNotEmpty == true
@@ -89,7 +73,8 @@ class ProfileHeaderWidget extends StatelessWidget {
                             : '这个人很神秘，什么都没留下',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.sp, color: AppTheme.textMuted),
+                        style: TextStyle(
+                            fontSize: 12.sp, color: AppTheme.textMuted),
                       ),
                     ],
                   ),
@@ -104,7 +89,8 @@ class ProfileHeaderWidget extends StatelessWidget {
                       color: AppTheme.gold.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    child: Icon(Icons.edit_rounded, size: 16.sp, color: AppTheme.gold),
+                    child: Icon(Icons.edit_rounded,
+                        size: 16.sp, color: AppTheme.gold),
                   ),
                 ),
               ],
@@ -126,9 +112,6 @@ class ProfileHeaderWidget extends StatelessWidget {
     });
   }
 
-  Widget _avatarPlaceholder() =>
-      Icon(Icons.person_rounded, size: 32.sp, color: AppTheme.textMuted);
-
   Widget _genderBadge(String? gender) {
     IconData icon;
     Color color;
@@ -146,8 +129,8 @@ class ProfileHeaderWidget extends StatelessWidget {
     }
     return Container(
       padding: EdgeInsets.all(3.w),
-      decoration:
-          BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+      decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
       child: Icon(icon, size: 14.sp, color: color),
     );
   }
@@ -168,7 +151,9 @@ class ProfileHeaderWidget extends StatelessWidget {
           SizedBox(width: 6.w),
           Text(label,
               style: TextStyle(
-                  fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary)),
         ]),
       ),
     );

@@ -6,6 +6,7 @@ import '../../core/utils/log_util.dart';
 import '../../data/models/address_model.dart';
 import '../../data/models/service_item.dart';
 import '../../data/repositories/order_repository.dart';
+import '../widgets/date_time_picker_sheet.dart';
 import '../../routes/route_names.dart';
 
 /// 下单控制器
@@ -63,7 +64,9 @@ class OrderController extends GetxController {
     if (s?.prices != null && s!.prices!.isNotEmpty) {
       return s.prices!;
     }
-    return [{'durationMinutes': 60, 'price': s?.price ?? '0'}];
+    return [
+      {'durationMinutes': 60, 'price': s?.price ?? '0'}
+    ];
   }
 
   /// 解析 decimal 值为 double
@@ -119,27 +122,21 @@ class OrderController extends GetxController {
   }
 
   /// 选择日期
-  Future<void> pickDate() async {
+  Future<void> selectServiceDateTime(BuildContext context) async {
     final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: Get.context!,
-      initialDate: now,
+    final initialDate = _selectedDate.value.isNotEmpty &&
+            _selectedTime.value.isNotEmpty
+        ? DateTime.tryParse('${_selectedDate.value} ${_selectedTime.value}:00')
+        : null;
+    final picked = await showDateTimePickerSheet(
+      context: context,
+      initialDate: initialDate ?? now,
       firstDate: now,
       lastDate: now.add(const Duration(days: 90)),
     );
     if (picked != null) {
       _selectedDate.value =
           '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-    }
-  }
-
-  /// 选择时间
-  Future<void> pickTime() async {
-    final picked = await showTimePicker(
-      context: Get.context!,
-      initialTime: const TimeOfDay(hour: 9, minute: 0),
-    );
-    if (picked != null) {
       _selectedTime.value =
           '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
     }
@@ -185,7 +182,8 @@ class OrderController extends GetxController {
       ToastUtil.showError('请输入联系电话');
       return;
     }
-    if (!RegExp(r'^1[3-9]\d{9}$').hasMatch(contactPhoneController.text.trim())) {
+    if (!RegExp(r'^1[3-9]\d{9}$')
+        .hasMatch(contactPhoneController.text.trim())) {
       ToastUtil.showError('请输入正确的手机号码');
       return;
     }
@@ -217,8 +215,7 @@ class OrderController extends GetxController {
       if (response.isSuccess) {
         final data = response.data;
         final orderId = data is Map ? (data['orderId'] as int?) : null;
-        final orderNo =
-            data is Map ? (data['orderNo'] as String?) : null;
+        final orderNo = data is Map ? (data['orderNo'] as String?) : null;
         // 先关闭 loading 再关闭页面，避免 loading dialog 的 context 失效
         LoadingUtil.dismiss();
         Get.back();
