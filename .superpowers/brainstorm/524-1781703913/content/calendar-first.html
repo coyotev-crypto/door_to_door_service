@@ -1,0 +1,151 @@
+<h2>📅 Calendar-First Date & Time Picker</h2>
+<p class="subtitle">Spa-booking inspired — beautiful calendar grid with elegant time slot chips</p>
+
+<h3>Design Concept</h3>
+<p>Opens as a modal bottom sheet. The calendar is the hero — a beautifully styled month grid with gold accents. Tap a date, and time slot chips animate in below. Feels like booking a luxury spa appointment.</p>
+
+<h3>Full Picker Mockup</h3>
+
+<div class="mockup">
+  <div class="mockup-header">Service Time Picker — Modal Sheet</div>
+  <div class="mockup-body" style="background: #F7F5F2; padding: 0; font-family: system-ui, sans-serif;">
+
+    <!-- Handle bar -->
+    <div style="text-align: center; padding: 12px 0 4px;">
+      <div style="width: 40px; height: 4px; background: #D4C8B8; border-radius: 2px; margin: 0 auto;"></div>
+    </div>
+
+    <!-- Header -->
+    <div style="padding: 8px 24px 20px; text-align: center;">
+      <div style="font-size: 13px; color: #B8860B; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">选择服务时间</div>
+      <div style="font-size: 22px; font-weight: 800; color: #2D2A26;">Select Service Time</div>
+    </div>
+
+    <!-- Selected date preview -->
+    <div style="margin: 0 20px 16px; background: linear-gradient(135deg, #C4956A, #B8860B); border-radius: 16px; padding: 14px 20px; color: white; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="font-size: 11px; opacity: 0.85; margin-bottom: 2px;">SELECTED</div>
+        <div style="font-size: 20px; font-weight: 700;">6月17日 星期二</div>
+      </div>
+      <div style="font-size: 32px; font-weight: 800; opacity: 0.9;">09:00</div>
+    </div>
+
+    <!-- Calendar card -->
+    <div style="background: white; margin: 0 20px 16px; border-radius: 20px; padding: 20px; box-shadow: 0 2px 12px rgba(197,149,106,0.08);">
+
+      <!-- Month nav -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: #F7F5F2; display: flex; align-items: center; justify-content: center; color: #C4956A; font-size: 16px;">‹</div>
+        <div style="font-size: 17px; font-weight: 700; color: #2D2A26;">2026年 6月</div>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: #F7F5F2; display: flex; align-items: center; justify-content: center; color: #C4956A; font-size: 16px;">›</div>
+      </div>
+
+      <!-- Weekday headers -->
+      <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 8px; text-align: center;">
+        <div style="font-size: 11px; color: #B8A99A; font-weight: 600; padding: 4px;">一</div>
+        <div style="font-size: 11px; color: #B8A99A; font-weight: 600; padding: 4px;">二</div>
+        <div style="font-size: 11px; color: #B8A99A; font-weight: 600; padding: 4px;">三</div>
+        <div style="font-size: 11px; color: #B8A99A; font-weight: 600; padding: 4px;">四</div>
+        <div style="font-size: 11px; color: #B8A99A; font-weight: 600; padding: 4px;">五</div>
+        <div style="font-size: 11px; color: #D4736A; font-weight: 600; padding: 4px;">六</div>
+        <div style="font-size: 11px; color: #D4736A; font-weight: 600; padding: 4px;">日</div>
+      </div>
+
+      <!-- Days grid (June 2026 starts on Monday) -->
+      <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;">
+        <!-- June 1 = Monday = col 1 -->
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">1</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">2</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">3</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">4</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">5</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">6</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">7</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">8</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">9</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">10</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">11</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">12</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">13</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">14</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">15</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">16</div>
+        <!-- Selected: June 17 -->
+        <div style="background: linear-gradient(135deg, #C4956A, #B8860B); padding: 8px 0; border-radius: 50%; font-size: 14px; color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(196,149,106,0.5);">17</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">18</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">19</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">20</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">21</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">22</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">23</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">24</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">25</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">26</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">27</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #D4736A;">28</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">29</div>
+        <div style="padding: 8px 0; border-radius: 50%; font-size: 14px; color: #2D2A26;">30</div>
+        <div style="grid-column: 1 / -1;"><!-- empty row for 5th row placeholder --></div>
+      </div>
+
+      <!-- Today button -->
+      <div style="text-align: center; margin-top: 12px;">
+        <span style="display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid #E8E2D8; font-size: 12px; color: #C4956A; font-weight: 600; cursor: pointer;">今天</span>
+      </div>
+    </div>
+
+    <!-- Time slots section -->
+    <div style="margin: 0 20px 16px;">
+      <div style="font-size: 13px; font-weight: 700; color: #2D2A26; margin-bottom: 12px;">选择时间</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">08:00</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">08:30</div>
+        <!-- Selected time -->
+        <div style="padding: 10px 16px; border-radius: 10px; background: linear-gradient(135deg, #C4956A, #B8860B); border: 1.5px solid #C4956A; font-size: 14px; font-weight: 700; color: white; box-shadow: 0 2px 8px rgba(196,149,106,0.4);">09:00</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">09:30</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">10:00</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">10:30</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: #F7F5F2; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #B8A99A;">11:00</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: #F7F5F2; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #B8A99A;">11:30</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: #F7F5F2; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #B8A99A;">12:00</div>
+        <div style="padding: 10px 16px; border-radius: 10px; background: white; border: 1px solid #E8E2D8; font-size: 14px; font-weight: 600; color: #2D2A26;">12:30</div>
+      </div>
+      <div style="font-size: 11px; color: #B8A99A; margin-top: 8px; text-align: right;">灰色 = 已约满 · 每 30 分钟</div>
+    </div>
+
+    <!-- Confirm button -->
+    <div style="margin: 0 20px 24px;">
+      <div style="background: linear-gradient(90deg, #C4956A, #B8860B); border-radius: 14px; padding: 16px; text-align: center; color: white; font-size: 16px; font-weight: 700; letter-spacing: 1px; box-shadow: 0 6px 20px rgba(196,149,106,0.35);">
+        🌸 确认选择 · 6月17日 09:00
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top: 24px;">Key Design Details</h3>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>✨ Spa-Calendar Features</h4>
+    <ul>
+      <li>Gold gradient selected date with soft glow shadow</li>
+      <li>30-minute interval time chips (matching existing <code>minutesInterval: 5</code>)</li>
+      <li>Full/unavailable slots shown in muted gray</li>
+      <li>Month navigation with clean arrow buttons</li>
+      <li>"Today" quick-jump pill</li>
+      <li>Gradient CTA button at the bottom</li>
+      <li>Selected date+time banner with warm gradient</li>
+      <li>Rounded cards matching the app's 14-20r border radius convention</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>📐 Technical Notes</h4>
+    <ul>
+      <li>Replaces <code>omni_datetime_picker</code> — no more third-party picker dependency</li>
+      <li>Built with <code>showModalBottomSheet</code> + custom widget</li>
+      <li>Flat weekday headers (一～日), no complex nested scrolling</li>
+      <li>State managed within the OrderController (no new controller needed)</li>
+      <li>Same 90-day forward window as current implementation</li>
+    </ul>
+  </div>
+</div>

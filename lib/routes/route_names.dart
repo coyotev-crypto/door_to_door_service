@@ -12,7 +12,7 @@ class RouteNames {
   static const String profile = '/profile';
   static const String profileEdit = '/profile-edit';
   static const String settings = '/settings';
-  
+
   // 入驻相关
   static const String providerJoin = '/provider-join';
   static const String providerQualification = '/provider-join/qualification';
@@ -36,6 +36,9 @@ class RouteNames {
   static const String search = '/search';
   static const String favorites = '/favorites';
 
+  // 聊天相关
+  static const String chatDetail = '/chat/detail';
+
   // 协议相关
   static const String privacyPolicy = '/privacy-policy';
   static const String userAgreement = '/user-agreement';
@@ -48,6 +51,7 @@ class RouteNames {
 
   // 账户安全相关
   static const String accountSecurity = '/account/security';
+  static const String setPassword = '/account/set-password';
   static const String changePassword = '/account/change-password';
   static const String setPaymentPassword = '/account/set-payment-password';
   static const String changePhone = '/account/change-phone';

@@ -1,6 +1,7 @@
 /// 服务项模型
 class ServiceItem {
   final int id;
+  final int userId;
   final String name;
   final double rating;
   final String price;
@@ -27,6 +28,7 @@ class ServiceItem {
 
   ServiceItem({
     required this.id,
+    required this.userId,
     required this.name,
     required this.rating,
     required this.price,
@@ -130,6 +132,7 @@ class ServiceItem {
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
     return ServiceItem(
       id: json['id'] as int? ?? 0,
+      userId: json['userId'] as int? ?? 0,
       name: json['name'] as String? ?? '',
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       price: _priceFromJson(json),
@@ -170,6 +173,7 @@ class ServiceItem {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'name': name,
       'rating': rating,
       'price': price,
@@ -196,6 +200,7 @@ class ServiceItem {
   /// 创建副本并修改部分字段
   ServiceItem copyWith({
     int? id,
+    int? userId,
     String? name,
     double? rating,
     String? price,
@@ -219,6 +224,7 @@ class ServiceItem {
   }) {
     return ServiceItem(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       rating: rating ?? this.rating,
       price: price ?? this.price,

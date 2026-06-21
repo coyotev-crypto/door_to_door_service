@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:door_to_door_service/core/services/agora_chat_service.dart';
 import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../routes/route_names.dart';
+import '../../data/repositories/account_security_repository.dart';
+import '../../data/repositories/agora_chat_repository.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
@@ -15,6 +18,9 @@ import 'sms_code_controller.dart';
 /// 登录控制器
 class LoginController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
+  final AccountSecurityRepository _accountSecurityRepository =
+      AccountSecurityRepository();
+  final AgoraChatRepository _agoraChatRepository = AgoraChatRepository();
   final AuthService _authService = AuthService.instance;
   final SmsCodeController smsCodeController = Get.find<SmsCodeController>();
 
@@ -139,9 +145,14 @@ class LoginController extends GetxController {
         LogUtil.e('获取用户信息失败: $e', tag: 'LoginController');
       }
 
+      await _loginAgoraChat();
+
       if (context.mounted) {
         // 登录成功,跳转到首页
-        Get.offAllNamed(RouteNames.home);
+        final hasPassword = await _accountSecurityRepository.hasPassword();
+        Get.offAllNamed(
+          hasPassword ? RouteNames.home : RouteNames.setPassword,
+        );
       }
     } on DioException catch (e) {
       ToastUtil.showError(e.message ?? '登录失败');
@@ -155,6 +166,25 @@ class LoginController extends GetxController {
 
   /// 更新协议同意状态
   /// [value] 是否同意
+  Future<void> _loginAgoraChat() async {
+    try {
+      final chatToken = await _agoraChatRepository.getToken();
+      final chatService = Get.isRegistered<AgoraChatService>()
+          ? AgoraChatService.to
+          : Get.put(AgoraChatService(), permanent: true);
+      await chatService.initialize(appKey: chatToken.appKey);
+      final user = AuthService.instance.user;
+      await chatService.login(
+        chatToken.chatUserId,
+        chatToken.token,
+        nickname: user?.nickname,
+        avatarUrl: user?.avatar,
+      );
+    } catch (e) {
+      LogUtil.e('Agora Chat登录失败: $e', tag: 'LoginController');
+    }
+  }
+
   void updateAgreement(bool value) {
     agreedToTerms.value = value;
   }

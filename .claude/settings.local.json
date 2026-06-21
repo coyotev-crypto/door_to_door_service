@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:openapi.apipost.net)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m ' *)",
+      "Bash(sed -n '1,50p' lib/data/models/service_item.dart)",
+      "Bash(sed -n '82,118p' lib/data/models/service_item.dart)",
+      "Bash(sed -n '119,145p' lib/data/models/service_item.dart)",
+      "Bash(sed -n '145,190p' lib/data/models/service_item.dart)",
+      "Bash(winget search *)",
+      "Bash(ls -la \"/c/Software/Android Studio/\" 2>/dev/null)",
+      "Read(//c/Software/**)",
+      "Bash(cmd //c \"dir \\\\\"C:\\\\Software\\\\Android Studio\\\\\" 2>nul & if exist \\\\\"C:\\\\Software\\\\Android Studio\\\\\" \\(echo EXISTS_AS\\) else \\(echo NOT_FOUND_AS\\) & if exist \\\\\"C:\\\\Software\\\\AndroidStudio\\\\\" \\(echo EXISTS_AS_NOSPACE\\) else \\(echo NOT_FOUND_AS_NOSPACE\\)\")",
+      "Bash(cmd //c \"dir \\\\\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\\" 2>nul & if exist \\\\\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\\" \\(echo FOUND_DEFAULT\\) else \\(echo NOT_FOUND_DEFAULT\\)\")",
+      "Bash(winget list *)",
+      "Bash(winget show *)",
+      "Bash(cmd //c \"dir /s /b \\\\\"C:\\\\Software\\\\studio64.exe\\\\\" 2>nul & dir /s /b \\\\\"%LOCALAPPDATA%\\\\Android\\\\Sdk\\\\\" 2>nul & where studio64 2>nul\")",
+      "Bash(git *)"
+    ]
+  }
+}

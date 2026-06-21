@@ -27,6 +27,9 @@ class ApiEndpoints {
   /// 退出登录
   static const String logout = '/logout';
 
+  static const String agoraChatToken = '/chat/agora/token';
+  static const String agoraChatUsersBatch = '/chat/users/batch';
+
   // ========== 用户相关 ==========
 
   /// 获取用户信息
@@ -158,6 +161,8 @@ class ApiEndpoints {
 
   /// 修改登录密码
   static const String changePassword = '/user/pwd/set';
+  static const String initPassword = '/user/pwd/init';
+  static const String hasPassword = '/user/pwd/has-password';
 
   /// 设置支付密码
   static const String setPaymentPassword = '/user/pay-password/set';

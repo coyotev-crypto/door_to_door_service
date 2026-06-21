@@ -1,17 +1,18 @@
 import 'package:door_to_door_service/core/config/app_config.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:door_to_door_service/presentation/screens/chat/conversations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/home_controller.dart';
-import 'home_content_widget.dart';
-import 'community/post_list_page.dart';
-import 'order/provider_order_list_page.dart';
-import '../widgets/home_bottom_nav_widget.dart';
-import 'chat/message_page_widget.dart';
-import 'account/profile_widget.dart';
-import '../../core/utils/screen_adapter.dart';
+
 import '../../core/services/auth_service.dart';
 import '../../core/themes/app_theme.dart';
+import '../../core/utils/screen_adapter.dart';
+import '../controllers/home_controller.dart';
+import '../widgets/home_bottom_nav_widget.dart';
+import 'account/profile_widget.dart';
+import 'community/post_list_page.dart';
+import 'home_content_widget.dart';
+import 'order/provider_order_list_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin {
   late final HomeController _controller;
   final Map<int, Widget> _pageCache = <int, Widget>{};
+  final Set<int> _loadedPages = <int>{0}; // 记录已加载的页面索引，默认加载首页
 
   @override
   bool get wantKeepAlive => true;
@@ -53,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen>
       case 1:
         return const PostListPage();
       case 2:
-        return const MessagePageWidget();
+        return const ConversationsScreen();
       case 3:
         return ProfileWidget();
       default:
@@ -78,9 +80,17 @@ class _HomeScreenState extends State<HomeScreen>
                   controller: _controller.pageController,
                   onPageChanged: (index) {
                     _controller.currentIndex.value = index;
+                    // 标记页面已加载，触发重建以显示真实内容
+                    if (_loadedPages.add(index)) {
+                      setState(() {});
+                    }
                   },
                   itemCount: 4,
                   itemBuilder: (_, index) {
+                    // 只有当页面已被访问过才构建真实内容，否则返回占位符
+                    if (!_loadedPages.contains(index)) {
+                      return const SizedBox.shrink();
+                    }
                     return _pageCache.putIfAbsent(
                       index,
                       () => _buildPageByIndex(index),

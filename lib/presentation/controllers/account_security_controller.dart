@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:door_to_door_service/core/services/agora_chat_service.dart';
 import 'package:door_to_door_service/core/services/auth_service.dart';
+import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:door_to_door_service/core/utils/loading_util.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../data/models/login_device_model.dart';
 import '../../data/repositories/account_security_repository.dart';
+import '../../data/repositories/agora_chat_repository.dart';
 import 'sms_code_controller.dart';
 
 /// 账户安全控制器
@@ -16,6 +19,7 @@ import 'sms_code_controller.dart';
 class AccountSecurityController extends GetxController {
   final AccountSecurityRepository _securityRepository =
       AccountSecurityRepository();
+  final AgoraChatRepository _agoraChatRepository = AgoraChatRepository();
   final SmsCodeController smsCodeController = Get.find<SmsCodeController>();
 
   // 登录设备列表
@@ -39,6 +43,16 @@ class AccountSecurityController extends GetxController {
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
+  // 首次设置登录密码表单
+  final GlobalKey<FormState> setLoginPasswordFormKey = GlobalKey<FormState>();
+  final TextEditingController setLoginPasswordController =
+      TextEditingController();
+  final TextEditingController setLoginConfirmPasswordController =
+      TextEditingController();
+  final RxBool _isSettingLoginPassword = false.obs;
+  final RxBool _obscureSetLoginPassword = true.obs;
+  final RxBool _obscureSetLoginConfirmPassword = true.obs;
 
   // 修改支付密码表单
   final GlobalKey<FormState> changePaymentPasswordFormKey =
@@ -92,6 +106,10 @@ class AccountSecurityController extends GetxController {
   bool get obscureOldPassword => _obscureOldPassword.value;
   bool get obscureNewPassword => _obscureNewPassword.value;
   bool get obscureConfirmPassword => _obscureConfirmPassword.value;
+  bool get isSettingLoginPassword => _isSettingLoginPassword.value;
+  bool get obscureSetLoginPassword => _obscureSetLoginPassword.value;
+  bool get obscureSetLoginConfirmPassword =>
+      _obscureSetLoginConfirmPassword.value;
 
   // 是否正在修改支付密码
   bool get isChangingPaymentPassword => _isChangingPaymentPassword.value;
@@ -110,13 +128,14 @@ class AccountSecurityController extends GetxController {
   // 更换手机号状态
   bool get isChangingPhone => _isChangingPhone.value;
 
-
   @override
   void onClose() {
     // 修改登录密码
     oldPasswordController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
+    setLoginPasswordController.dispose();
+    setLoginConfirmPasswordController.dispose();
     // 修改支付密码
     oldPaymentPasswordController.dispose();
     newPaymentPasswordController.dispose();
@@ -178,7 +197,50 @@ class AccountSecurityController extends GetxController {
     }
   }
 
+  Future<bool> setPassword() async {
+    if (!setLoginPasswordFormKey.currentState!.validate()) {
+      return false;
+    }
+
+    _isSettingLoginPassword.value = true;
+    LoadingUtil.show();
+    try {
+      await _securityRepository.setPassword(
+        newPassword: setLoginPasswordController.text,
+      );
+      ToastUtil.showSuccess('密码设置成功');
+      await _loginAgoraChat();
+      Get.offAllNamed(RouteNames.home);
+      return true;
+    } catch (e) {
+      ToastUtil.showError(e.toString().replaceAll('Exception: ', ''));
+      return false;
+    } finally {
+      _isSettingLoginPassword.value = false;
+      LoadingUtil.dismiss();
+    }
+  }
+
   /// 设置支付密码
+  Future<void> _loginAgoraChat() async {
+    try {
+      final chatToken = await _agoraChatRepository.getToken();
+      final chatService = Get.isRegistered<AgoraChatService>()
+          ? AgoraChatService.to
+          : Get.put(AgoraChatService(), permanent: true);
+      await chatService.initialize(appKey: chatToken.appKey);
+      final user = AuthService.instance.user;
+      await chatService.login(
+        chatToken.chatUserId,
+        chatToken.token,
+        nickname: user?.nickname,
+        avatarUrl: user?.avatar,
+      );
+    } catch (e) {
+      LogUtil.e('Agora Chat登录失败: $e', tag: 'AccountSecurityController');
+    }
+  }
+
   Future<bool> setPaymentPassword() async {
     if (!setPaymentPasswordFormKey.currentState!.validate()) {
       return false;
@@ -336,6 +398,15 @@ class AccountSecurityController extends GetxController {
   /// 切换确认密码可见性
   void toggleConfirmPasswordVisibility() {
     _obscureConfirmPassword.value = !_obscureConfirmPassword.value;
+  }
+
+  void toggleSetLoginPasswordVisibility() {
+    _obscureSetLoginPassword.value = !_obscureSetLoginPassword.value;
+  }
+
+  void toggleSetLoginConfirmPasswordVisibility() {
+    _obscureSetLoginConfirmPassword.value =
+        !_obscureSetLoginConfirmPassword.value;
   }
 
   /// 切换旧支付密码可见性

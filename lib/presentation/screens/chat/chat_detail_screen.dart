@@ -1,25 +1,31 @@
+import 'package:door_to_door_service/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
-import 'chat_detail_widget.dart';
+import 'package:shengwang_chat_uikit/provider/chat_uikit_profile.dart';
+import 'package:shengwang_chat_uikit/ui/views/messages_view.dart';
 
-/// 聊天详情页面
-class ChatDetailScreen extends StatelessWidget {
-  final String conversationId;
-  final String? userName;
-  final String? userAvatar;
+class ChatDetailScreen extends StatefulWidget {
+  final String userId;
 
   const ChatDetailScreen({
     super.key,
-    required this.conversationId,
-    this.userName,
-    this.userAvatar,
+    required this.userId,
   });
 
   @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+}
+
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
+
+  @override
   Widget build(BuildContext context) {
-    return ChatDetailWidget(
-      conversationId: conversationId,
-      userName: userName,
-      userAvatar: userAvatar,
+    return MessagesView(
+      profile: ChatUIKitProfile.contact(
+        id: widget.userId,
+      ),
+      onAvatarTap:  (context, model){
+        LogUtil.d('onAvatarTap');
+      },
     );
   }
 }

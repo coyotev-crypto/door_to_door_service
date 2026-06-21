@@ -33,6 +33,36 @@ class AccountSecurityRepository {
     return baseResponse;
   }
 
+  Future<BaseResponse<void>> setPassword({
+    required String newPassword,
+  }) async {
+    final response = await _dioClient.post(
+      ApiEndpoints.initPassword,
+      data: {
+        'newPassword': newPassword,
+      },
+    );
+
+    final baseResponse = BaseResponse<void>.fromJson(response.data);
+    if (!baseResponse.isSuccess) {
+      throw Exception(baseResponse.message);
+    }
+    return baseResponse;
+  }
+
+  /// 查询是否已设置登录密码
+  Future<bool> hasPassword() async {
+    final response = await _dioClient.get(ApiEndpoints.hasPassword);
+    final baseResponse = BaseResponse<bool>.fromJson(
+      response.data,
+      dataParser: (data) => data['hasPassword'] == true,
+    );
+    if (!baseResponse.isSuccess) {
+      throw Exception(baseResponse.message);
+    }
+    return baseResponse.data ?? false;
+  }
+
   /// 设置支付密码
   /// [payPassword] 支付密码
   /// [phone] 手机号
@@ -51,17 +81,17 @@ class AccountSecurityRepository {
         'code': code,
       },
     );
-    
+
     // 解析后端返回的数据
     final baseResponse = BaseResponse<dynamic>.fromJson(
       response.data,
     );
-    
+
     // 检查响应码，如果不是200则抛出异常
     if (!baseResponse.isSuccess) {
       throw Exception(baseResponse.message);
     }
-    
+
     return baseResponse;
   }
 
@@ -163,8 +193,8 @@ class AccountSecurityRepository {
   Future<BaseResponse<void>> removeLoginDevice({
     required String deviceId,
   }) async {
-    final endpoint = ApiEndpoints.removeLoginDevice
-        .replaceAll('{id}', deviceId);
+    final endpoint =
+        ApiEndpoints.removeLoginDevice.replaceAll('{id}', deviceId);
     final response = await _dioClient.delete(endpoint);
 
     final baseResponse = BaseResponse<void>.fromJson(response.data);

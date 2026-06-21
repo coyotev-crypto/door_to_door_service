@@ -59,11 +59,11 @@ class DioClient {
         // 解析响应数据
         if (response.data is Map<String, dynamic>) {
           final data = response.data as Map<String, dynamic>;
-          final code = data['code'] as int? ?? -1;
+          final code = data['code'] as int?;
           final message = data['msg'] as String? ?? '';
 
           // 检查响应码
-          if (code != 200) {
+          if (code != null && code != 200) {
             return handler.reject(
               DioException(
                 requestOptions: response.requestOptions,

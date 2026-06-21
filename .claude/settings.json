@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)",
+      "Bash(sed -n '60,85p' \"d:/Program development/Android/DoorToDoorService/door_to_door_service/lib/presentation/screens/order/order_create_screen.dart\")",
+      "Bash(sed -n '235,290p' \"d:/Program development/Android/DoorToDoorService/door_to_door_service/lib/presentation/screens/order/order_create_screen.dart\")",
+      "Bash(sed -n '370,440p' \"d:/Program development/Android/DoorToDoorService/door_to_door_service/lib/presentation/screens/order/order_create_screen.dart\")"
+    ]
+  }
+}

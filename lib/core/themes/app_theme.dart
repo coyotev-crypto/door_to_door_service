@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shengwang_chat_uikit/chat_uikit.dart';
 
 class AppTheme {
   // Legacy colors (keep for backward compatibility)
@@ -18,6 +19,37 @@ class AppTheme {
   static const sage = Color(0xFF6B8E7B);
   static const leather = Color(0xFF9B7653);
   static const rose = Color(0xFFD4A0A0);
+
+  static void setChatUIKitTheme() {
+    final brightness = WidgetsBinding.instance.window.platformBrightness;
+    final isDark = brightness == Brightness.dark;
+
+    // 重新设置颜色：根据 isDark 选择 light 或 dark
+    final goldHue = HSLColor.fromColor(AppTheme.gold).hue;
+    final amberHue = HSLColor.fromColor(AppTheme.amber).hue;
+
+    if (isDark) {
+      ChatUIKitTheme.instance.setColor(
+        ChatUIKitColor.dark(
+          primaryHue: goldHue,
+          secondaryHue: amberHue,
+          errorHue: 350,
+          neutralHue: 203,
+          neutralSpecialHue: 220,
+        ),
+      );
+    } else {
+      ChatUIKitTheme.instance.setColor(
+        ChatUIKitColor.light(
+          primaryHue: goldHue,
+          secondaryHue: amberHue,
+          errorHue: 350,
+          neutralHue: 203,
+          neutralSpecialHue: 220,
+        ),
+      );
+    }
+  }
 
   static final lightTheme = ThemeData(
     useMaterial3: true,

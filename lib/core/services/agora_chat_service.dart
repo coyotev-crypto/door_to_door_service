@@ -1,177 +1,145 @@
-import 'package:agora_chat_sdk/agora_chat_sdk.dart';
 import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:door_to_door_service/data/repositories/agora_chat_repository.dart';
 import 'package:get/get.dart';
+import 'package:shengwang_chat_uikit/chat_uikit.dart';
 
-/// 声网消息服务
 class AgoraChatService extends GetxService {
   static const String TAG = 'AgoraChatService';
+
   static AgoraChatService get to => Get.find();
 
-  // 声网聊天客户端
-  late ChatClient chatClient;
+  String? _appKey;
+  Future<void>? _loginFuture;
+  final AgoraChatRepository _agoraChatRepository = AgoraChatRepository();
 
-  // 连接状态
-  final RxBool isConnected = false.obs;
-
-  // 未读消息数量
-  final RxInt unreadCount = 0.obs;
-
-  // 会话列表
-  final RxList<ChatConversation> conversations = <ChatConversation>[].obs;
-
-  /// 初始化声网聊天（由外部调用，传入真实 AppKey）
   Future<void> initialize({required String appKey}) async {
+    if (_appKey == appKey) return;
+
+    LogUtil.d('声网聊天初始化: $appKey', tag: TAG);
     try {
-      final options = ChatOptions(
-        appKey: appKey,
-        autoLogin: false,
+      await ChatUIKit.instance.init(
+        options: Options.withAppId(appKey, autoLogin: false),
       );
-
-      await ChatClient.getInstance.init(options);
-
-      chatClient = ChatClient.getInstance;
-
-      ChatClient.getInstance.chatManager.addEventHandler(
-        'UNIQUE_HANDLER_ID',
-        ChatEventHandler(onMessagesReceived: _handleMessagesReceived),
-      );
-
+      _appKey = appKey;
       LogUtil.d('声网聊天初始化成功', tag: TAG);
     } catch (e) {
       LogUtil.d('声网聊天初始化失败: $e', tag: TAG);
+      rethrow;
     }
   }
 
-  /// 登录
-  Future<void> login(String userId, String token) async {
+  Future<void> login(
+    String userId,
+    String token, {
+    String? nickname,
+    String? avatarUrl,
+  }) async {
+    if (_loginFuture != null) {
+      return _loginFuture;
+    }
+    _loginFuture = _doLogin(
+      userId,
+      token,
+      nickname: nickname,
+      avatarUrl: avatarUrl,
+    );
     try {
-      await ChatClient.getInstance.loginWithToken(userId, token);
-      isConnected.value = true;
-      LogUtil.d('声网聊天登录成功: $userId', tag: TAG);
+      await _loginFuture;
+    } finally {
+      _loginFuture = null;
+    }
+  }
 
-      // 加载会话列表
-      _loadConversations();
+  Future<void> _doLogin(
+    String userId,
+    String token, {
+    String? nickname,
+    String? avatarUrl,
+  }) async {
+    LogUtil.d('声网聊天登录: $userId', tag: TAG);
+    try {
+      final currentUserId = ChatUIKit.instance.currentUserId;
+      if (currentUserId == userId) {
+        await refreshUserProfiles();
+        LogUtil.d('声网聊天已登录: $userId', tag: TAG);
+        return;
+      }
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        LogUtil.d('声网聊天切换用户: $currentUserId -> $userId', tag: TAG);
+        await ChatUIKit.instance.logout();
+      }
+      await ChatUIKit.instance
+          .loginWithToken(userId: userId, token: token)
+          .timeout(const Duration(seconds: 15));
+      await refreshUserProfiles();
+      LogUtil.d('声网聊天登录成功: $userId', tag: TAG);
     } catch (e) {
       LogUtil.d('声网聊天登录失败: $e', tag: TAG);
-      isConnected.value = false;
       rethrow;
     }
   }
 
-  /// 登出
-  Future<void> logout() async {
+  Future<void> refreshUserProfiles() async {
+    List<Conversation> conversations = await ChatUIKit.instance.getAllConversations();
+    String? currentUserId = ChatUIKit.instance.currentUserId;
+    List<String> userIds = [];
+    if (currentUserId != null) {
+      userIds.add(currentUserId);
+    }
+    LogUtil.d('refreshUserProfiles 会话列表长度: ${conversations.length}.', tag: TAG);
+    for (var conv in conversations) {
+      String conversationId = conv.id;
+      LogUtil.d("refreshUserProfiles 会话ID$conversationId ${conv.type}", tag: TAG);
+      if (ChatConversationType.Chat == conv.type) {
+        // 单聊：会话 ID 即对方用户 ID
+        String peerUserId = conversationId;
+        userIds.add(peerUserId);
+        LogUtil.d("refreshUserProfiles 对方用户ID$peerUserId", tag: TAG);
+      } else if (ChatConversationType.GroupChat == conv.type) {
+        // 群聊：会话 ID 是群组 ID
+        String groupId = conversationId;
+        LogUtil.d("refreshUserProfiles 群组ID$groupId", tag: TAG);
+      }
+    }
+    final normalizedIds =
+        userIds.map(_parseBusinessUserId).nonNulls.toSet().toList();
+    if (normalizedIds.isEmpty) return;
+
     try {
-      await ChatClient.getInstance.logout(true);
-      isConnected.value = false;
-      conversations.clear();
-      unreadCount.value = 0;
-      LogUtil.d('声网聊天登出成功', tag: TAG);
+      final profiles =
+          await _agoraChatRepository.getUserProfiles(normalizedIds);
+      if (profiles.isEmpty) return;
+
+      final chatProfiles = <ChatUIKitProfile>[];
+      for (final profile in profiles) {
+        chatProfiles.add(
+            ChatUIKitProfile.contact(
+              id: profile.userId.toString(),
+              nickname: profile.nickname,
+              avatarUrl: profile.avatarUrl,
+            ),
+          );
+      }
+      ChatUIKitProvider.instance.addProfiles(chatProfiles);
+    } catch (e) {
+      LogUtil.d('声网聊天用户信息刷新失败: $e', tag: TAG);
+    }
+  }
+
+  int? _parseBusinessUserId(String userId) {
+    final trimmed = userId.trim();
+    if (trimmed.isEmpty) return null;
+    return int.tryParse(trimmed);
+  }
+
+  Future<void> logout() async {
+    LogUtil.d('声网聊天登出', tag: TAG);
+    try {
+      if (ChatUIKit.instance.currentUserId?.isNotEmpty == true) {
+        await ChatUIKit.instance.logout();
+      }
     } catch (e) {
       LogUtil.d('声网聊天登出失败: $e', tag: TAG);
-      rethrow;
-    }
-  }
-
-  /// 发送文本消息
-  Future<void> sendTextMessage(String toUserId, String content) async {
-    try {
-      final msg = ChatMessage.createTxtSendMessage(
-        targetId: toUserId,
-        content: content,
-      );
-
-      await ChatClient.getInstance.chatManager.sendMessage(msg);
-      LogUtil.d('发送文本消息成功: $content', tag: TAG);
-    } catch (e) {
-      LogUtil.d('发送文本消息失败: $e', tag: TAG);
-      rethrow;
-    }
-  }
-
-  /// 加载会话列表
-  Future<void> _loadConversations() async {
-    try {
-      conversations.value = await ChatClient.getInstance.chatManager.loadAllConversations();
-
-      // 计算未读消息数量
-      int totalUnread = 0;
-      for (var conversation in conversations) {
-        totalUnread += await conversation.unreadCount();
-      }
-      unreadCount.value = totalUnread;
-
-      LogUtil.d('加载会话列表成功: ${conversations.length}', tag: TAG);
-    } catch (e) {
-      LogUtil.d('加载会话列表失败: $e', tag: TAG);
-    }
-  }
-
-  /// 处理收到的新消息
-  void _handleMessagesReceived(List<ChatMessage> messages) {
-    for (var message in messages) {
-      LogUtil.d('收到新消息: ${message.body}', tag: TAG);
-
-      // 更新未读数量
-      unreadCount.value++;
-    }
-
-    // 重新加载会话列表
-    _loadConversations();
-  }
-
-  /// 处理新会话
-  void _handleNewConversations(List<ChatConversation> newConversations) {
-    for (var conversation in newConversations) {
-      // 检查是否已存在
-      if (!conversations.any((c) => c.id == conversation.id)) {
-        conversations.add(conversation);
-      }
-    }
-    conversations.refresh();
-  }
-
-  /// 处理会话更新
-  void _handleConversationsUpdate(List<ChatConversation> updatedConversations) {
-    for (var updatedConv in updatedConversations) {
-      final index = conversations.indexWhere((c) => c.id == updatedConv.id);
-      if (index != -1) {
-        conversations[index] = updatedConv;
-      }
-    }
-    conversations.refresh();
-
-    // 重新计算未读数量
-    _updateUnreadCount();
-  }
-
-  /// 更新未读数量
-  Future<void> _updateUnreadCount() async {
-    int totalUnread = 0;
-    for (var conversation in conversations) {
-      totalUnread += await conversation.unreadCount();
-    }
-    unreadCount.value = totalUnread;
-  }
-
-  /// 标记会话为已读
-  Future<void> markConversationAsRead(String conversationId) async {
-    try {
-      await ChatClient.getInstance.chatManager.sendConversationReadAck(conversationId);
-      _loadConversations();
-    } catch (e) {
-      LogUtil.d('标记会话为已读失败: $e', tag: TAG);
-    }
-  }
-
-  /// 删除会话
-  Future<void> deleteConversation(String conversationId) async {
-    try {
-      await ChatClient.getInstance.chatManager.deleteConversation(conversationId);
-      conversations.removeWhere((c) => c.id == conversationId);
-      conversations.refresh();
-      _updateUnreadCount();
-    } catch (e) {
-      LogUtil.d('删除会话失败: $e', tag: TAG);
     }
   }
 }

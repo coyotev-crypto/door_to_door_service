@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../data/models/service_item.dart';
 import '../../core/themes/app_theme.dart';
+import '../../routes/route_names.dart';
 import 'user_avatar_widget.dart';
 
 /// 服务卡片 — 温润质感风格
@@ -10,6 +12,7 @@ class ServiceCardWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onOrderTap;
   final VoidCallback? onFavoriteTap;
+  final VoidCallback? onChatTap;
 
   const ServiceCardWidget({
     super.key,
@@ -17,6 +20,7 @@ class ServiceCardWidget extends StatelessWidget {
     this.onTap,
     this.onOrderTap,
     this.onFavoriteTap,
+    this.onChatTap,
   });
 
   @override
@@ -163,6 +167,31 @@ class ServiceCardWidget extends StatelessWidget {
                                     fontWeight: FontWeight.w600)),
                           ),
                         ),
+                        SizedBox(width: 8.w),
+                        GestureDetector(
+                          onTap: onChatTap ?? _navigateToChatDetail,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 7.h),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: AppTheme.gold.withValues(alpha: 0.5),
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child:
+                                Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.chat_bubble_outline_rounded,
+                                  size: 14.sp, color: AppTheme.gold),
+                              SizedBox(width: 4.w),
+                              Text('聊天',
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: AppTheme.gold,
+                                      fontWeight: FontWeight.w500)),
+                            ]),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -172,6 +201,13 @@ class ServiceCardWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _navigateToChatDetail() {
+    Get.toNamed(
+      RouteNames.chatDetail,
+      parameters: {'userId': service.userId.toString()},
     );
   }
 }

@@ -1,0 +1,103 @@
+<h2>Date/Time Picker — Which design direction feels right?</h2>
+<p class="subtitle">The current omni_datetime_picker looks generic and clashes with the app's Warm Spa aesthetic</p>
+
+<div class="section">
+  <h3>The Problem</h3>
+  <p>Current picker uses default Material 3 colors — no warmth, no brand personality, no <span style="color:#C4956A;font-weight:600;">gold/amber</span> tones. It looks like a generic system dialog dropped into a carefully designed app.</p>
+</div>
+
+<h3>Three Design Approaches</h3>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>🎨 Refined Omni Picker</h3>
+      <p>Keep using <code>omni_datetime_picker</code> but apply a comprehensive custom theme — gold accent colors, rounded cards, warm surface tones, spa-appropriate typography. <strong>Quickest fix, good result.</strong></p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>🛠️ Custom Date+Time Picker</h3>
+      <p>Build from scratch using Flutter's built-in <code>showDatePicker</code> + <code>showTimePicker</code> inside a custom dialog wrapper. Full control over every pixel. <strong>Matches the app perfectly, more work.</strong></p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>📋 Bottom Sheet Picker</h3>
+      <p>Slide-up bottom sheet with integrated date & time panels, using custom-built calendar and timewheel widgets. Native iOS-feel with warm spa styling. <strong>Most distinctive, most work.</strong></p>
+    </div>
+  </div>
+</div>
+
+<h3>Quick Mockup Comparison</h3>
+<p class="subtitle">How the picker dialog header could feel across the three approaches</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">A: Refined Omni</div>
+    <div class="mockup-body">
+      <div style="background: linear-gradient(135deg, #C4956A, #B8860B); border-radius: 16px 16px 0 0; padding: 20px; color: white; text-align: center;">
+        <div style="font-size: 13px; opacity: 0.9; margin-bottom: 4px;">选择服务时间</div>
+        <div style="font-size: 22px; font-weight: 700;">6月 2026</div>
+      </div>
+      <div style="background: #F7F5F2; padding: 16px; border-radius: 0 0 16px 16px; text-align: center;">
+        <div style="display: flex; justify-content: space-around; margin-bottom: 8px; color: #C4956A; font-weight: 600; font-size: 12px;">M T W T F S S</div>
+        <div style="display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;">
+          <div class="placeholder" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</div>
+          <div class="placeholder" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</div>
+          <div class="placeholder" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: #C4956A; color: white;">17</div>
+          <div class="placeholder" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">18</div>
+          <div class="placeholder" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">19</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">B: Custom Dialog</div>
+    <div class="mockup-body">
+      <div style="background: #FFF; border: 1.5px solid #C4956A; border-radius: 20px; padding: 24px 20px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+          <span style="font-size: 16px;">🌸</span>
+          <span style="font-size: 16px; font-weight: 700; color: #2D2A26;">选择服务时间</span>
+        </div>
+        <div style="background: #F7F5F2; border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+          <div style="font-size: 28px; font-weight: 800; color: #C4956A;">6月17日</div>
+          <div style="font-size: 14px; color: #6B5E53;">星期二 · 2026</div>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+          <button class="mock-button" style="background: #C4956A; color: white; border: none; padding: 8px 16px; border-radius: 8px;">09:00</button>
+          <button class="mock-button" style="background: #F7F5F2; border: 1px solid #E8E2D8; padding: 8px 16px; border-radius: 8px;">10:00</button>
+          <button class="mock-button" style="background: #F7F5F2; border: 1px solid #E8E2D8; padding: 8px 16px; border-radius: 8px;">11:00</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="margin-top: 16px;">
+  <div class="split">
+    <div></div>
+    <div class="mockup">
+      <div class="mockup-header">C: Bottom Sheet</div>
+      <div class="mockup-body">
+        <div style="background: #FFF; border-radius: 20px 20px 0 0; padding: 16px 20px;">
+          <div style="width: 40px; height: 4px; background: #E8E2D8; border-radius: 2px; margin: 0 auto 12px;"></div>
+          <div style="font-size: 16px; font-weight: 700; color: #2D2A26; text-align: center; margin-bottom: 12px;">选择服务时间</div>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1; background: #F7F5F2; border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 11px; color: #6B5E53;">日期</div>
+              <div style="font-size: 15px; font-weight: 700; color: #C4956A;">6月17日</div>
+            </div>
+            <div style="flex: 1; background: #F7F5F2; border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 11px; color: #6B5E53;">时间</div>
+              <div style="font-size: 15px; font-weight: 700; color: #C4956A;">09:00</div>
+            </div>
+          </div>
+          <div style="margin-top: 12px;"><button class="mock-button" style="width: 100%; background: linear-gradient(90deg, #C4956A, #B8860B); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700;">确认选择</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

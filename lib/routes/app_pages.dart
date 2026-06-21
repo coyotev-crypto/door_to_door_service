@@ -44,16 +44,17 @@ import '../presentation/screens/address/address_manage_screen.dart';
 import '../presentation/screens/address/address_edit_screen.dart';
 import '../presentation/screens/address/map_select_screen.dart';
 import '../presentation/screens/account/account_security_screen.dart';
+import '../presentation/screens/account/set_password_screen.dart';
 import '../presentation/screens/account/change_password_screen.dart';
 import '../presentation/screens/account/set_payment_password_screen.dart';
 import '../presentation/screens/account/change_phone_screen.dart';
 import '../presentation/screens/account/login_devices_screen.dart';
 import '../presentation/screens/account/delete_account_screen.dart';
+import '../presentation/screens/chat/chat_detail_screen.dart';
 import '../presentation/controllers/login_controller.dart';
 import '../presentation/controllers/privacy_policy_controller.dart';
 import '../presentation/controllers/user_agreement_controller.dart';
 import '../presentation/controllers/home_controller.dart';
-import '../presentation/controllers/message_controller.dart';
 import '../presentation/controllers/more_recommendations_controller.dart';
 import '../presentation/controllers/search_controller.dart';
 import '../presentation/controllers/address_controller.dart';
@@ -80,10 +81,10 @@ class AppPages {
       name: RouteNames.home,
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() => [
-            Get.lazyPut(() => AgoraChatService()),
+            if (!Get.isRegistered<AgoraChatService>())
+              Get.lazyPut(() => AgoraChatService()),
             Get.lazyPut(() => LocationService()),
             Get.lazyPut(() => HomeController()),
-            Get.lazyPut(() => MessageController()),
             Get.lazyPut(() => ServiceController()),
             Get.lazyPut(() => ProfileController()),
             Get.lazyPut(() => HomeContentController()),
@@ -219,8 +220,15 @@ class AppPages {
     GetPage(
       name: RouteNames.accountSecurity,
       page: () => const AccountSecurityScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
+            Get.lazyPut(() => SmsCodeController()),
+            Get.lazyPut(() => AccountSecurityController())
+          ]),
+    ),
+    GetPage(
+      name: RouteNames.setPassword,
+      page: () => const SetPasswordScreen(),
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
@@ -228,8 +236,7 @@ class AppPages {
     GetPage(
       name: RouteNames.changePassword,
       page: () => const ChangePasswordScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
@@ -237,8 +244,7 @@ class AppPages {
     GetPage(
       name: RouteNames.setPaymentPassword,
       page: () => const SetPaymentPasswordScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
@@ -246,8 +252,7 @@ class AppPages {
     GetPage(
       name: RouteNames.changePhone,
       page: () => const ChangePhoneScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
@@ -255,8 +260,7 @@ class AppPages {
     GetPage(
       name: RouteNames.loginDevices,
       page: () => const LoginDevicesScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
@@ -264,11 +268,17 @@ class AppPages {
     GetPage(
       name: RouteNames.deleteAccount,
       page: () => const DeleteAccountScreen(),
-      binding:
-          BindingsBuilder(() => [
+      binding: BindingsBuilder(() => [
             Get.lazyPut(() => SmsCodeController()),
             Get.lazyPut(() => AccountSecurityController())
           ]),
+    ),
+    // 聊天相关路由
+    GetPage(
+      name: RouteNames.chatDetail,
+      page: () => ChatDetailScreen(
+        userId: Get.parameters['userId'] ?? '',
+      ),
     ),
   ];
 }
