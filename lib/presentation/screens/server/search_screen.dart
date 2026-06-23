@@ -7,6 +7,7 @@ import '../../controllers/service_controller.dart';
 import '../../widgets/service_card_widget.dart';
 import '../../widgets/empty_placeholder_widget.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 搜索页面
 class SearchScreen extends GetWidget<search.SearchController> {
@@ -14,7 +15,7 @@ class SearchScreen extends GetWidget<search.SearchController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,

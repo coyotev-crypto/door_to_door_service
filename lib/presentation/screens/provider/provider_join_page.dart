@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/profile_controller.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 服务商入驻页面
 class ProviderJoinPage extends StatelessWidget {
@@ -12,6 +13,7 @@ class ProviderJoinPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         title: const Text('服务商入驻'),
         centerTitle: true,

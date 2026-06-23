@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/real_name_auth_controller.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 实名认证页面
 class RealNameAuthScreen extends StatefulWidget {
@@ -48,10 +50,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('实名认证'),
-        elevation: 0,
-      ),
+      appBar: const CommonAppBar(title: '实名认证'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
         child: Form(
@@ -80,7 +79,7 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
                 );
               }),
               SizedBox(height: 20.h),
-              _buildFormField(
+              PrimaryInputField(
                 controller: _realNameController,
                 label: '真实姓名',
                 hintText: '请输入真实姓名',
@@ -97,11 +96,10 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
                 },
               ),
               SizedBox(height: 12.h),
-              _buildFormField(
+              PrimaryInputField(
                 controller: _idCardController,
                 label: '身份证号',
                 hintText: '请输入18位身份证号',
-                textCapitalization: TextCapitalization.characters,
                 onChanged: _controller.updateIdCardNumber,
                 validator: (value) {
                   final input = (value ?? '').trim().toUpperCase();
@@ -296,71 +294,4 @@ class _RealNameAuthScreenState extends State<RealNameAuthScreen> {
     return value;
   }
 
-  /// 构建表单输入框
-  Widget _buildFormField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    required ValueChanged<String> onChanged,
-    required String? Function(String?) validator,
-    TextCapitalization textCapitalization = TextCapitalization.none,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          textCapitalization: textCapitalization,
-          onChanged: onChanged,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[500],
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              borderSide: const BorderSide(
-                color: AppTheme.servicePrimaryColor,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-              vertical: 14.h,
-            ),
-          ),
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.black87,
-          ),
-        ),
-      ],
-    );
-  }
 }

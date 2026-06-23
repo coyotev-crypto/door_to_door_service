@@ -6,6 +6,11 @@ class ApiEndpoints {
 
   // ========== 支付相关 ==========
   static const String payment = '/payment?orderNo=';
+  static const String wallet = '/wallet';
+  static const String walletTransactions = '/wallet/transactions';
+  static const String walletWithdraw = '/wallet/withdraw';
+  static const String walletWithdrawals = '/wallet/withdrawals';
+  static const String walletWithdrawalDetail = '/wallet/withdrawals/{id}';
 
   // ========== 认证相关 ==========
 

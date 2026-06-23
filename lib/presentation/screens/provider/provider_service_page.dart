@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../widgets/primary_button.dart';
+import '../../../core/themes/app_theme.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 服务商完善服务页面 — 温润质感风格
 class ProviderServicePage extends GetView<ProviderServiceController> {
@@ -13,7 +15,7 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F2),
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         title: Text(
           controller.isEditMode ? '编辑服务' : '完善服务',
@@ -46,15 +48,21 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
             _buildCard([
               _cardHeader('基本信息', Icons.spa_rounded, const Color(0xFFB8860B)),
               SizedBox(height: 20.h),
-              _field('服务名称', '给服务取个名字', controller.nameController,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? '请输入服务名称' : null),
+              PrimaryInputField(
+                label: '服务名称',
+                hintText: '给服务取个名字',
+                controller: controller.nameController,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? '请输入服务名称' : null),
               SizedBox(height: 16.h),
               _buildCategorySelector(context),
               SizedBox(height: 16.h),
-              _field('服务商名称', '请输入您的姓名或昵称', controller.providerNameController,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? '请输入服务商名称' : null),
+              PrimaryInputField(
+                label: '服务商名称',
+                hintText: '请输入您的姓名或昵称',
+                controller: controller.providerNameController,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? '请输入服务商名称' : null),
             ]),
             SizedBox(height: 14.h),
             _buildCard([
@@ -63,13 +71,17 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
               SizedBox(height: 20.h),
               _buildCitySelector(context),
               SizedBox(height: 16.h),
-              _field('配送范围（KM）', '可服务的最大距离', controller.deliveryRangeController,
-                  keyboardType: TextInputType.number, validator: (v) {
-                if (v == null || v.trim().isEmpty) return '请输入配送范围';
-                final r = double.tryParse(v);
-                if (r == null || r <= 0) return '请输入有效的范围';
-                return null;
-              }),
+              PrimaryInputField(
+                label: '配送范围（KM）',
+                hintText: '可服务的最大距离',
+                controller: controller.deliveryRangeController,
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return '请输入配送范围';
+                  final r = double.tryParse(v);
+                  if (r == null || r <= 0) return '请输入有效的范围';
+                  return null;
+                }),
             ]),
             SizedBox(height: 14.h),
             _buildCard([
@@ -138,43 +150,6 @@ class ProviderServicePage extends GetView<ProviderServiceController> {
     );
   }
 
-  // ═══ 输入框 ═══
-  Widget _field(String label, String hint, TextEditingController ctrl,
-      {TextInputType? keyboardType, FormFieldValidator<String>? validator}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF6B5E53))),
-        SizedBox(height: 6.h),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF9F7F4),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: const Color(0xFFE8E2D8)),
-          ),
-          child: TextFormField(
-            controller: ctrl,
-            keyboardType: keyboardType,
-            style: TextStyle(fontSize: 15.sp, color: const Color(0xFF2D2A26)),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle:
-                  TextStyle(fontSize: 15.sp, color: const Color(0xFFB8A99A)),
-              border: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              isCollapsed: true,
-            ),
-            validator: validator,
-          ),
-        ),
-      ],
-    );
-  }
 
   // ═══ 分类选择 ═══
   Widget _buildCategorySelector(BuildContext context) {

@@ -6,6 +6,7 @@ import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/login_controller.dart';
 import '../../widgets/primary_input_field.dart';
 import '../../widgets/info_tip_widget.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 忘记密码页面
 class ForgotPasswordScreen extends GetWidget<LoginController> {
@@ -14,21 +15,8 @@ class ForgotPasswordScreen extends GetWidget<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          '忘记密码',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
-      ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: const CommonAppBar(title: '忘记密码'),
       body: Form(
         key: controller.forgotPwdFormKey,
         child: ListView(

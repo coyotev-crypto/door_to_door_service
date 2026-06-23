@@ -6,6 +6,7 @@ import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/order_list_controller.dart';
 import '../../widgets/order_reason_dialog.dart';
 import '../../widgets/provider_order_card.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 服务商接单列表
 class ProviderOrderListPage extends GetView<OrderListController> {
@@ -15,17 +16,7 @@ class ProviderOrderListPage extends GetView<OrderListController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('接单列表',
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
-      ),
+      appBar: const CommonAppBar(title: '接单列表', showBackButton: false),
       body: Column(children: [
         _buildTabBar(),
         Expanded(child: _buildOrderList()),

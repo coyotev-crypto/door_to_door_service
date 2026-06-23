@@ -5,6 +5,7 @@ import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/order_list_controller.dart';
 import '../../widgets/customer_order_card.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 用户订单列表（我的订单）
 class CustomerOrderListPage extends GetView<OrderListController> {
@@ -14,17 +15,7 @@ class CustomerOrderListPage extends GetView<OrderListController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('我的订单',
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
-      ),
+      appBar: const CommonAppBar(title: '我的订单'),
       body: Column(children: [
         _buildTabBar(),
         Expanded(child: _buildOrderList()),

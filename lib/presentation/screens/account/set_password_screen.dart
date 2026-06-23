@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/account_security_controller.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 class SetPasswordScreen extends GetView<AccountSecurityController> {
   const SetPasswordScreen({super.key});
@@ -13,21 +15,7 @@ class SetPasswordScreen extends GetView<AccountSecurityController> {
     final c = controller;
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text(
-          '设置登录密码',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        scrolledUnderElevation: 0.5,
-      ),
+      appBar: const CommonAppBar(title: '设置登录密码', showBackButton: false),
       body: Form(
         key: c.setLoginPasswordFormKey,
         child: ListView(
@@ -36,12 +24,22 @@ class SetPasswordScreen extends GetView<AccountSecurityController> {
             _infoBanner(),
             SizedBox(height: 28.h),
             Obx(
-              () => _passwordField(
-                ctrl: c.setLoginPasswordController,
+              () => PrimaryInputField(
+                controller: c.setLoginPasswordController,
                 label: '新密码',
-                hint: '请输入新密码',
-                obscure: c.obscureSetLoginPassword,
-                onToggle: c.toggleSetLoginPasswordVisibility,
+                hintText: '请输入新密码',
+                obscureText: c.obscureSetLoginPassword,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    c.obscureSetLoginPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 20.sp,
+                    color: AppTheme.textMuted,
+                  ),
+                  onPressed: c.toggleSetLoginPasswordVisibility,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return '请输入新密码';
                   if (value.length < 6) return '密码长度不能少于6位';
@@ -51,12 +49,22 @@ class SetPasswordScreen extends GetView<AccountSecurityController> {
             ),
             SizedBox(height: 16.h),
             Obx(
-              () => _passwordField(
-                ctrl: c.setLoginConfirmPasswordController,
+              () => PrimaryInputField(
+                controller: c.setLoginConfirmPasswordController,
                 label: '确认密码',
-                hint: '请再次输入新密码',
-                obscure: c.obscureSetLoginConfirmPassword,
-                onToggle: c.toggleSetLoginConfirmPasswordVisibility,
+                hintText: '请再次输入新密码',
+                obscureText: c.obscureSetLoginConfirmPassword,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    c.obscureSetLoginConfirmPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 20.sp,
+                    color: AppTheme.textMuted,
+                  ),
+                  onPressed: c.toggleSetLoginConfirmPasswordVisibility,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return '请再次输入新密码';
                   if (value != c.setLoginPasswordController.text) {
@@ -114,85 +122,6 @@ class SetPasswordScreen extends GetView<AccountSecurityController> {
     );
   }
 
-  Widget _passwordField({
-    required TextEditingController ctrl,
-    required String label,
-    required String hint,
-    required bool obscure,
-    required VoidCallback onToggle,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: ctrl,
-          obscureText: obscure,
-          validator: validator,
-          style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
-          decoration: _decoration(
-            hint: hint,
-            prefix: Icons.lock_outline_rounded,
-            suffix: IconButton(
-              icon: Icon(
-                obscure
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                size: 20.sp,
-                color: AppTheme.textMuted,
-              ),
-              onPressed: onToggle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  InputDecoration _decoration({
-    required String hint,
-    required IconData prefix,
-    Widget? suffix,
-  }) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-      filled: true,
-      fillColor: AppTheme.creamBg,
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      prefixIcon: Icon(prefix, size: 18.sp, color: AppTheme.gold),
-      suffixIcon: suffix,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppTheme.gold),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppTheme.danger),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppTheme.danger),
-      ),
-    );
-  }
 
   Widget _gradientButton({
     required bool loading,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../data/models/comment_model.dart';
 import '../../controllers/post_detail_controller.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 帖子详情页 — 小红书风格
 class PostDetailPage extends GetView<PostDetailController> {
@@ -11,7 +12,7 @@ class PostDetailPage extends GetView<PostDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F2),
+      backgroundColor: AppTheme.creamBg,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

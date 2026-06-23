@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_baidu_mapapi_map/flutter_baidu_mapapi_map.dart';
 import 'package:flutter_baidu_mapapi_base/flutter_baidu_mapapi_base.dart';
 import 'package:get/get.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 地图选择地址页面
 class MapSelectScreen extends StatefulWidget {
@@ -37,10 +38,7 @@ class _MapSelectScreenState extends State<MapSelectScreen> {
       init: controller,
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text('选择位置', style: TextStyle(fontSize: 18.sp)),
-            elevation: 0,
-          ),
+          appBar: const CommonAppBar(title: '选择位置'),
           body: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : Stack(

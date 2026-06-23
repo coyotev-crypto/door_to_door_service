@@ -1,0 +1,102 @@
+import '../../core/network/api_endpoints.dart';
+import '../../core/network/base_response.dart';
+import '../../core/network/dio_client.dart';
+import '../models/wallet_model.dart';
+
+class WalletRepository {
+  final DioClient _dioClient;
+
+  WalletRepository() : _dioClient = DioClient.instance;
+
+  Future<WalletModel> getWallet() async {
+    final response = await _dioClient.get(ApiEndpoints.wallet);
+    final result = BaseResponse<WalletModel>.fromJson(
+      response.data,
+      dataParser: (data) => WalletModel.fromJson(data as Map<String, dynamic>),
+    );
+    if (!result.isSuccess) throw Exception(result.message);
+    return result.data ?? const WalletModel();
+  }
+
+  Future<List<WalletTransactionModel>> getTransactions({
+    int pageIndex = 1,
+    int pageSize = 10,
+  }) async {
+    final response = await _dioClient.get(
+      ApiEndpoints.walletTransactions,
+      queryParameters: {'pageIndex': pageIndex, 'pageSize': pageSize},
+    );
+    return BaseResponse<List<WalletTransactionModel>>.fromJson(
+          response.data,
+          dataParser: (data) => _parseList(
+            data,
+            (item) => WalletTransactionModel.fromJson(item),
+          ),
+        ).data ??
+        [];
+  }
+
+  Future<void> withdraw({
+    required double amount,
+    required String bankName,
+    required String bankCardTail,
+  }) async {
+    final response = await _dioClient.post(
+      ApiEndpoints.walletWithdraw,
+      data: {
+        'amount': amount,
+        'bankName': bankName,
+        'bankCardTail': bankCardTail,
+      },
+    );
+    final result = BaseResponse<dynamic>.fromJson(response.data);
+    if (!result.isSuccess) throw Exception(result.message);
+  }
+
+  Future<List<WithdrawalModel>> getWithdrawals({
+    int pageIndex = 1,
+    int pageSize = 10,
+  }) async {
+    final response = await _dioClient.get(
+      ApiEndpoints.walletWithdrawals,
+      queryParameters: {'pageIndex': pageIndex, 'pageSize': pageSize},
+    );
+    return BaseResponse<List<WithdrawalModel>>.fromJson(
+          response.data,
+          dataParser: (data) => _parseList(
+            data,
+            (item) => WithdrawalModel.fromJson(item),
+          ),
+        ).data ??
+        [];
+  }
+
+  Future<WithdrawalModel> getWithdrawalDetail(int id) async {
+    final path = ApiEndpoints.walletWithdrawalDetail.replaceAll(
+      '{id}',
+      id.toString(),
+    );
+    final response = await _dioClient.get(path);
+    final result = BaseResponse<WithdrawalModel>.fromJson(
+      response.data,
+      dataParser: (data) =>
+          WithdrawalModel.fromJson(data as Map<String, dynamic>),
+    );
+    if (!result.isSuccess || result.data == null) {
+      throw Exception(result.message);
+    }
+    return result.data!;
+  }
+
+  List<T> _parseList<T>(
+    dynamic data,
+    T Function(Map<String, dynamic>) parser,
+  ) {
+    final source = data is List
+        ? data
+        : data is Map<String, dynamic> && data['list'] is List
+            ? data['list'] as List
+            : const [];
+    return source.map((item) => parser(item as Map<String, dynamic>)).toList();
+  }
+}

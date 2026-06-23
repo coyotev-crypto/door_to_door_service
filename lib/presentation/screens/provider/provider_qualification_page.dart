@@ -9,6 +9,7 @@ import 'package:door_to_door_service/presentation/widgets/image_upload_card.dart
 import 'package:door_to_door_service/presentation/widgets/info_tip_widget.dart';
 import 'package:door_to_door_service/presentation/widgets/primary_button.dart';
 import 'package:door_to_door_service/presentation/widgets/primary_input_field.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 服务商资质材料页面
 class ProviderQualificationPage
@@ -18,7 +19,7 @@ class ProviderQualificationPage
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         title: Text(
           '资质材料',

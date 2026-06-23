@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
 import '../../../routes/route_names.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 登录页面 — 温润质感·臻境迎宾
 class LoginScreen extends GetWidget<LoginController> {
@@ -142,12 +143,49 @@ class LoginScreen extends GetWidget<LoginController> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 手机号
-          _buildPhoneField(),
+          PrimaryInputField(
+            controller: controller.phoneController,
+            label: '手机号',
+            hintText: '请输入手机号',
+            keyboardType: TextInputType.phone,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(11),
+            ],
+            prefixIcon: const Icon(Icons.phone_iphone_rounded),
+          ),
           SizedBox(height: 14.h),
           // 验证码 / 密码
           Obx(() => controller.isPasswordLogin.value
-              ? _buildPasswordField()
-              : _buildCodeField()),
+              ? PrimaryInputField(
+                  controller: controller.passwordController,
+                  label: '密码',
+                  hintText: '请输入密码',
+                  obscureText: !controller.isPasswordVisible.value,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.isPasswordVisible.value
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      size: 20.sp,
+                      color: AppTheme.textMuted,
+                    ),
+                    onPressed: controller.togglePasswordVisibility,
+                  ),
+                )
+              : PrimaryInputField(
+                  controller: controller.codeController,
+                  label: '验证码',
+                  hintText: '请输入验证码',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(6),
+                  ],
+                  prefixIcon: const Icon(Icons.sms_outlined),
+                  trailingButton: _buildSendCodeButton(),
+                )),
           SizedBox(height: 16.h),
           // 切换方式 + 忘记密码
           _buildBottomLinks(),
@@ -162,103 +200,6 @@ class LoginScreen extends GetWidget<LoginController> {
     );
   }
 
-  /// 手机号输入
-  Widget _buildPhoneField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('手机号',
-            style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary)),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller.phoneController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(11),
-          ],
-          style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-          decoration: _inputDecoration(
-            hint: '请输入手机号',
-            prefixIcon: Icons.phone_iphone_rounded,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 密码输入
-  Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('密码',
-            style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary)),
-        SizedBox(height: 8.h),
-        Obx(() => TextFormField(
-              controller: controller.passwordController,
-              obscureText: !controller.isPasswordVisible.value,
-              style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-              decoration: _inputDecoration(
-                hint: '请输入密码',
-                prefixIcon: Icons.lock_outline_rounded,
-                suffix: IconButton(
-                  icon: Icon(
-                    controller.isPasswordVisible.value
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    size: 20.sp,
-                    color: AppTheme.textMuted,
-                  ),
-                  onPressed: controller.togglePasswordVisibility,
-                ),
-              ),
-            )),
-      ],
-    );
-  }
-
-  /// 验证码输入 + 发送按钮
-  Widget _buildCodeField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('验证码',
-            style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary)),
-        SizedBox(height: 8.h),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: controller.codeController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(6),
-                ],
-                style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-                decoration: _inputDecoration(
-                  hint: '请输入验证码',
-                  prefixIcon: Icons.sms_outlined,
-                ),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Obx(() => _buildSendCodeButton()),
-          ],
-        ),
-      ],
-    );
-  }
 
   Widget _buildSendCodeButton() {
     final cd = controller.smsCodeController.countdown.value;
@@ -315,7 +256,7 @@ class LoginScreen extends GetWidget<LoginController> {
   /// 协议勾选
   Widget _buildAgreement() {
     return Obx(() => Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Transform.scale(
               scale: 0.85,
@@ -329,9 +270,7 @@ class LoginScreen extends GetWidget<LoginController> {
               ),
             ),
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(top: 8.h),
-                child: Wrap(
+              child: Wrap(
                   spacing: 2.w,
                   runSpacing: 2.h,
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -356,7 +295,6 @@ class LoginScreen extends GetWidget<LoginController> {
                     ),
                   ],
                 ),
-              ),
             ),
           ],
         ));
@@ -451,144 +389,102 @@ class LoginScreen extends GetWidget<LoginController> {
                     style: TextStyle(fontSize: 13.sp, color: AppTheme.textMuted)),
                 SizedBox(height: 24.h),
                 // 手机号
-                Text('手机号',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary)),
-                SizedBox(height: 8.h),
-                TextFormField(
+                PrimaryInputField(
                   controller: controller.forgotPhoneController,
+                  label: '手机号',
+                  hintText: '请输入手机号',
                   keyboardType: TextInputType.phone,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(11),
                   ],
-                  style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-                  decoration: _inputDecoration(
-                    hint: '请输入手机号',
-                    prefixIcon: Icons.phone_iphone_rounded,
-                  ),
+                  prefixIcon: const Icon(Icons.phone_iphone_rounded),
                 ),
                 SizedBox(height: 16.h),
                 // 验证码
-                Text('验证码',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary)),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: controller.forgotCodeController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(6),
-                        ],
-                        style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-                        decoration: _inputDecoration(
-                          hint: '请输入验证码',
-                          prefixIcon: Icons.sms_outlined,
+                PrimaryInputField(
+                  controller: controller.forgotCodeController,
+                  label: '验证码',
+                  hintText: '请输入验证码',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(6),
+                  ],
+                  prefixIcon: const Icon(Icons.sms_outlined),
+                  trailingButton: Obx(() {
+                    final cd = smsController.countdown.value;
+                    final active = cd == 0;
+                    return GestureDetector(
+                      onTap: active
+                          ? () => smsController.sendVerificationCode(
+                              phoneNumber:
+                                  controller.forgotPhoneController.text,
+                              type: AppConfig.FORGOT_PASSWORD_CODE)
+                          : null,
+                      child: Container(
+                        height: 40.h,
+                        width: 100.w,
+                        decoration: BoxDecoration(
+                          gradient: active
+                              ? const LinearGradient(
+                                  colors: [AppTheme.gold, AppTheme.amber])
+                              : const LinearGradient(
+                                  colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Center(
+                          child: Text(
+                            active ? '获取验证码' : '${cd}s',
+                            style: TextStyle(
+                                fontSize: 13.sp,
+                                color:
+                                    active ? Colors.white : AppTheme.textMuted,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Obx(() {
-                      final cd = smsController.countdown.value;
-                      final active = cd == 0;
-                      return GestureDetector(
-                        onTap: active
-                            ? () => smsController.sendVerificationCode(
-                                phoneNumber:
-                                    controller.forgotPhoneController.text,
-                                type: AppConfig.FORGOT_PASSWORD_CODE)
-                            : null,
-                        child: Container(
-                          height: 52.h,
-                          width: 110.w,
-                          decoration: BoxDecoration(
-                            gradient: active
-                                ? const LinearGradient(
-                                    colors: [AppTheme.gold, AppTheme.amber])
-                                : const LinearGradient(
-                                    colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Center(
-                            child: Text(
-                              active ? '获取验证码' : '${cd}s',
-                              style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color:
-                                      active ? Colors.white : AppTheme.textMuted,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
+                    );
+                  }),
                 ),
                 SizedBox(height: 16.h),
                 // 新密码
-                Text('新密码',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary)),
-                SizedBox(height: 8.h),
-                Obx(() => TextFormField(
-                      controller: controller.forgotNewPasswordController,
-                      obscureText: controller.forgotObscureNewPassword.value,
-                      style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-                      decoration: _inputDecoration(
-                        hint: '请输入新密码（至少6位）',
-                        prefixIcon: Icons.lock_outline_rounded,
-                        suffix: IconButton(
-                          icon: Icon(
-                            controller.forgotObscureNewPassword.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            size: 20.sp,
-                            color: AppTheme.textMuted,
-                          ),
-                          onPressed:
-                              controller.toggleForgotNewPasswordVisibility,
-                        ),
-                      ),
-                    )),
+                Obx(() => PrimaryInputField(
+                  controller: controller.forgotNewPasswordController,
+                  label: '新密码',
+                  hintText: '请输入新密码（至少6位）',
+                  obscureText: controller.forgotObscureNewPassword.value,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.forgotObscureNewPassword.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 20.sp,
+                      color: AppTheme.textMuted,
+                    ),
+                    onPressed: controller.toggleForgotNewPasswordVisibility,
+                  ),
+                )),
                 SizedBox(height: 16.h),
                 // 确认密码
-                Text('确认密码',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary)),
-                SizedBox(height: 8.h),
-                Obx(() => TextFormField(
-                      controller: controller.forgotConfirmPasswordController,
-                      obscureText:
-                          controller.forgotObscureConfirmPassword.value,
-                      style: TextStyle(fontSize: 16.sp, color: AppTheme.textPrimary),
-                      decoration: _inputDecoration(
-                        hint: '请再次输入新密码',
-                        prefixIcon: Icons.lock_outline_rounded,
-                        suffix: IconButton(
-                          icon: Icon(
-                            controller.forgotObscureConfirmPassword.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            size: 20.sp,
-                            color: AppTheme.textMuted,
-                          ),
-                          onPressed:
-                              controller.toggleForgotConfirmPasswordVisibility,
-                        ),
-                      ),
-                    )),
+                Obx(() => PrimaryInputField(
+                  controller: controller.forgotConfirmPasswordController,
+                  label: '确认密码',
+                  hintText: '请再次输入新密码',
+                  obscureText: controller.forgotObscureConfirmPassword.value,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.forgotObscureConfirmPassword.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 20.sp,
+                      color: AppTheme.textMuted,
+                    ),
+                    onPressed: controller.toggleForgotConfirmPasswordVisibility,
+                  ),
+                )),
                 SizedBox(height: 28.h),
                 // 提交按钮
                 Obx(() {
@@ -647,41 +543,4 @@ class LoginScreen extends GetWidget<LoginController> {
     );
   }
 
-  // ==================== 共用输入框样式 ====================
-
-  InputDecoration _inputDecoration({
-    required String hint,
-    required IconData prefixIcon,
-    Widget? suffix,
-  }) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-      filled: true,
-      fillColor: AppTheme.creamBg,
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      prefixIcon: Icon(prefixIcon, size: 18.sp, color: AppTheme.gold),
-      suffixIcon: suffix,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppTheme.gold, width: 1),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: Colors.redAccent),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: Colors.redAccent),
-      ),
-    );
-  }
 }

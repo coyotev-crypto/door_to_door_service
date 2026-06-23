@@ -35,6 +35,8 @@ class ProfileWidget extends StatelessWidget {
               SizedBox(height: 14.h),
               _menuCard([
                 _sectionTitle('服务商入驻'),
+                _fnItem(Icons.account_balance_wallet_rounded, '我的钱包',
+                    () => ctrl.navigateToWallet()),
                 _fnItem(Icons.description_rounded, '资质材料',
                     () => ctrl.navigateToProviderQualification()),
                 _fnItem(Icons.room_service_rounded, '完善服务',
@@ -51,8 +53,8 @@ class ProfileWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14.r),
-                      border:
-                          Border.all(color: AppTheme.danger.withValues(alpha: 0.2))),
+                      border: Border.all(
+                          color: AppTheme.danger.withValues(alpha: 0.2))),
                   child: Center(
                       child: Text('退出登录',
                           style: TextStyle(
@@ -101,13 +103,25 @@ class ProfileWidget extends StatelessWidget {
         ]),
         SizedBox(height: 18.h),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          OrderStatWidget(icon: Icons.payment_rounded, label: '待付款', count: ctrl.pendingPaymentCount,
+          OrderStatWidget(
+              icon: Icons.payment_rounded,
+              label: '待付款',
+              count: ctrl.pendingPaymentCount,
               onTap: () => ctrl.navigateToOrderList(1)),
-          OrderStatWidget(icon: Icons.local_shipping_rounded, label: '待发货', count: ctrl.pendingServiceCount,
+          OrderStatWidget(
+              icon: Icons.local_shipping_rounded,
+              label: '待发货',
+              count: ctrl.pendingServiceCount,
               onTap: () => ctrl.navigateToOrderList(2)),
-          OrderStatWidget(icon: Icons.play_circle_rounded, label: '待收货', count: ctrl.inProgressCount,
+          OrderStatWidget(
+              icon: Icons.play_circle_rounded,
+              label: '待收货',
+              count: ctrl.inProgressCount,
               onTap: () => ctrl.navigateToOrderList(3)),
-          OrderStatWidget(icon: Icons.star_border_rounded, label: '待评价', count: ctrl.completedCount,
+          OrderStatWidget(
+              icon: Icons.star_border_rounded,
+              label: '待评价',
+              count: ctrl.completedCount,
               onTap: () => ctrl.navigateToOrderList(4)),
         ]),
       ]),

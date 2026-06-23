@@ -137,16 +137,16 @@ class _PrimaryInputFieldState extends State<PrimaryInputField> {
   InputDecoration _getInputDecoration(BuildContext context) {
     return InputDecoration(
       hintText: widget.hintText,
-      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16.sp),
+      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
       filled: true,
       fillColor: widget.enabled ? Colors.grey[50] : Colors.grey[100],
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: Theme.of(context).primaryColor),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: Theme.of(context).primaryColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),

@@ -5,6 +5,7 @@ import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/toast_util.dart';
 import '../../controllers/account_security_controller.dart';
 import '../../../data/models/login_device_model.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 登录设备管理 — 温润质感
 class LoginDevicesScreen extends GetView<AccountSecurityController> {
@@ -14,12 +15,7 @@ class LoginDevicesScreen extends GetView<AccountSecurityController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('登录设备管理', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white, elevation: 0, scrolledUnderElevation: 0.5,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_rounded, size: 20.sp, color: AppTheme.textPrimary), onPressed: () => Get.back()),
-      ),
+      appBar: const CommonAppBar(title: '登录设备管理'),
       body: Obx(() {
         if (controller.isLoadingDevices) return const Center(child: CircularProgressIndicator(color: AppTheme.gold, strokeWidth: 2.5));
         if (controller.devices.isEmpty) return _emptyState();

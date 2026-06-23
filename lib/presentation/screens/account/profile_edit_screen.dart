@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../controllers/profile_controller.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 编辑个人信息 — 温润质感
 class ProfileEditScreen extends StatefulWidget {
@@ -30,25 +32,21 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('编辑个人信息', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-        centerTitle: true, backgroundColor: Colors.white, elevation: 0, scrolledUnderElevation: 0.5,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_rounded, size: 20.sp, color: AppTheme.textPrimary), onPressed: () => Get.back()),
-      ),
+      appBar: const CommonAppBar(title: '编辑个人信息'),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 40.h),
         child: Form(key: _formKey, child: Column(children: [
           _avatarSection(),
           SizedBox(height: 28.h),
-          _field(ctrl: _nickCtrl, label: '昵称', hint: '请输入昵称', onChanged: (v) => _ctrl.updateNickname(v), validator: (v) => v == null || v.trim().isEmpty ? '请输入昵称' : v.trim().length < 2 ? '昵称至少需要2个字符' : null),
+          PrimaryInputField(controller: _nickCtrl, label: '昵称', hintText: '请输入昵称', onChanged: (v) => _ctrl.updateNickname(v), validator: (v) => v == null || v.trim().isEmpty ? '请输入昵称' : v.trim().length < 2 ? '昵称至少需要2个字符' : null),
           SizedBox(height: 14.h),
-          _field(ctrl: _phoneCtrl, label: '手机号', hint: '请输入手机号', enabled: false, validator: (v) => v == null || v.trim().isEmpty ? '请输入手机号' : !RegExp(r'^1[3-9]\d{9}$').hasMatch(v) ? '请输入正确的手机号' : null),
+          PrimaryInputField(controller: _phoneCtrl, label: '手机号', hintText: '请输入手机号', enabled: false, validator: (v) => v == null || v.trim().isEmpty ? '请输入手机号' : !RegExp(r'^1[3-9]\d{9}$').hasMatch(v) ? '请输入正确的手机号' : null),
           SizedBox(height: 14.h),
-          _field(ctrl: _emailCtrl, label: '邮箱', hint: '请输入邮箱', onChanged: (v) => _ctrl.updateEmail(v), validator: (v) => v == null || v.trim().isEmpty ? null : !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v) ? '请输入正确的邮箱地址' : null),
+          PrimaryInputField(controller: _emailCtrl, label: '邮箱', hintText: '请输入邮箱', onChanged: (v) => _ctrl.updateEmail(v), validator: (v) => v == null || v.trim().isEmpty ? null : !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v) ? '请输入正确的邮箱地址' : null),
           SizedBox(height: 14.h),
           _genderSelector(),
           SizedBox(height: 14.h),
-          _field(ctrl: _remarkCtrl, label: '个人介绍', hint: '请输入个人介绍', maxLines: 3, onChanged: (v) => _ctrl.updateRemark(v)),
+          PrimaryInputField(controller: _remarkCtrl, label: '个人介绍', hintText: '请输入个人介绍', maxLines: 3, onChanged: (v) => _ctrl.updateRemark(v)),
           SizedBox(height: 32.h),
           Obx(() => _gradientBtn(loading: _ctrl.isSavingUserInfo, label: '保存', onTap: _ctrl.saveUserInfo)),
         ])),
@@ -126,26 +124,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     );
   }
 
-  Widget _field({required TextEditingController ctrl, required String label, required String hint, int maxLines = 1, bool enabled = true, void Function(String)? onChanged, String? Function(String?)? validator}) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-      SizedBox(height: 8.h),
-      TextFormField(
-        controller: ctrl, maxLines: maxLines, enabled: enabled, onChanged: onChanged, validator: validator,
-        style: TextStyle(fontSize: 15.sp, color: enabled ? AppTheme.textPrimary : AppTheme.textMuted),
-        decoration: InputDecoration(
-          hintText: hint, hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-          filled: true, fillColor: enabled ? AppTheme.creamBg : AppTheme.creamBg.withValues(alpha: 0.9),
-          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.gold)),
-          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.danger)),
-          focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.danger)),
-        ),
-      ),
-    ]);
-  }
 
   Widget _gradientBtn({required bool loading, required String label, required VoidCallback onTap}) {
     return GestureDetector(

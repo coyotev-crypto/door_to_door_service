@@ -4,6 +4,7 @@ import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../controllers/account_security_controller.dart';
 import '../../../routes/route_names.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 账户安全页面 — 温润质感·安全中心
 class AccountSecurityScreen extends GetView<AccountSecurityController> {
@@ -13,22 +14,7 @@ class AccountSecurityScreen extends GetView<AccountSecurityController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('账户安全',
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded,
-              size: 20.sp, color: AppTheme.textPrimary),
-          onPressed: () => Get.back(),
-        ),
-      ),
+      appBar: const CommonAppBar(title: '账户安全'),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 40.h),
         children: [

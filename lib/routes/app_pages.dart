@@ -12,6 +12,7 @@ import 'package:door_to_door_service/presentation/controllers/provider_service_c
 import 'package:door_to_door_service/presentation/controllers/provider_service_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/favorite_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/wallet_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/post_list_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/post_create_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/post_detail_controller.dart';
@@ -51,6 +52,10 @@ import '../presentation/screens/account/change_phone_screen.dart';
 import '../presentation/screens/account/login_devices_screen.dart';
 import '../presentation/screens/account/delete_account_screen.dart';
 import '../presentation/screens/chat/chat_detail_screen.dart';
+import '../presentation/screens/wallet/wallet_screen.dart';
+import '../presentation/screens/wallet/wallet_transactions_screen.dart';
+import '../presentation/screens/wallet/wallet_withdraw_screen.dart';
+import '../presentation/screens/wallet/wallet_withdrawal_detail_screen.dart';
 import '../presentation/controllers/login_controller.dart';
 import '../presentation/controllers/privacy_policy_controller.dart';
 import '../presentation/controllers/user_agreement_controller.dart';
@@ -217,6 +222,40 @@ class AppPages {
     ),
 
     // 账户安全相关路由
+    GetPage(
+      name: RouteNames.wallet,
+      page: () => const WalletScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => WalletController())),
+    ),
+    GetPage(
+      name: RouteNames.walletWithdraw,
+      page: () => const WalletWithdrawScreen(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<WalletController>()) {
+          Get.lazyPut(() => WalletController());
+        }
+      }),
+    ),
+    GetPage(
+      name: RouteNames.walletTransactions,
+      page: () => const WalletTransactionsScreen(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<WalletController>()) {
+          Get.lazyPut(() => WalletController());
+        }
+      }),
+    ),
+    GetPage(
+      name: RouteNames.walletWithdrawalDetail,
+      page: () => WalletWithdrawalDetailScreen(
+        id: int.tryParse(Get.parameters['id'] ?? '') ?? 0,
+      ),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<WalletController>()) {
+          Get.lazyPut(() => WalletController());
+        }
+      }),
+    ),
     GetPage(
       name: RouteNames.accountSecurity,
       page: () => const AccountSecurityScreen(),

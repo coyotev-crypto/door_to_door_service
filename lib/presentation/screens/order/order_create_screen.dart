@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../widgets/section_header_widget.dart';
 import '../../widgets/user_avatar_widget.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 下单页面 — 温润质感·臻享预约
 class OrderCreateScreen extends GetView<OrderController> {
@@ -15,22 +17,7 @@ class OrderCreateScreen extends GetView<OrderController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('确认下单',
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded,
-              size: 20.sp, color: AppTheme.textPrimary),
-          onPressed: () => Get.back(),
-        ),
-      ),
+      appBar: const CommonAppBar(title: '确认下单'),
       body: Obx(() {
         final service = controller.service;
         if (service == null) {
@@ -438,51 +425,12 @@ class OrderCreateScreen extends GetView<OrderController> {
 
   /// 备注输入
   Widget _buildRemarkField() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppTheme.warmBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('订单备注',
-              style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary)),
-          SizedBox(height: 8.h),
-          TextFormField(
-            controller: controller.remarkController,
-            maxLines: 3,
-            style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
-            decoration: InputDecoration(
-              hintText: '如有特殊要求请备注（选填）',
-              hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-              filled: true,
-              fillColor: AppTheme.creamBg,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-              prefixIcon: Icon(Icons.edit_note_rounded,
-                  size: 18.sp, color: AppTheme.gold),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                borderSide: const BorderSide(color: AppTheme.gold, width: 1),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return PrimaryInputField(
+      controller: controller.remarkController,
+      label: '订单备注',
+      hintText: '如有特殊要求请备注（选填）',
+      maxLines: 3,
+      prefixIcon: const Icon(Icons.edit_note_rounded),
     );
   }
 

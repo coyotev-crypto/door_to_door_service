@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:door_to_door_service/core/utils/screen_adapter.dart';
 import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 地址选择页面
 ///
@@ -16,18 +18,9 @@ class AddressSelectScreen extends StatelessWidget {
     final controller = Get.put(AddressController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          '选择地址',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: CommonAppBar(
+        title: '选择地址',
         actions: [
           TextButton(
             onPressed: () => Get.toNamed(RouteNames.addressManage),

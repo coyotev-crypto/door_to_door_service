@@ -5,6 +5,8 @@ import 'package:door_to_door_service/core/utils/screen_adapter.dart';
 import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 地址管理页面
 ///
@@ -18,20 +20,8 @@ class AddressManageScreen extends StatelessWidget {
     final themeColor = Theme.of(context).primaryColor;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          '地址管理',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black87),
-      ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: const CommonAppBar(title: '地址管理'),
       body: Obx(() {
         if (controller.isLoading.value) {
           return Center(

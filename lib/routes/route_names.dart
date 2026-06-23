@@ -19,6 +19,11 @@ class RouteNames {
   static const String providerService = '/provider-join/service';
   static const String providerServiceList = '/provider-join/service/list';
 
+  static const String wallet = '/wallet';
+  static const String walletWithdraw = '/wallet/withdraw';
+  static const String walletTransactions = '/wallet/transactions';
+  static const String walletWithdrawalDetail = '/wallet/withdrawals/:id';
+
   // 订单相关
   static const String orderCreate = '/order/create';
   static const String orderPayment = '/order/payment';

@@ -7,6 +7,7 @@ import '../../controllers/service_controller.dart';
 import '../../widgets/service_card_widget.dart';
 import '../../widgets/empty_placeholder_widget.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 更多推荐页面
 /// 展示更多新人推荐服务列表
@@ -16,7 +17,7 @@ class MoreRecommendationsScreen extends GetView<MoreRecommendationsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         title: const Text('更多推荐'),
         elevation: 0,

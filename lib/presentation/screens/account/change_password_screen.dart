@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../controllers/account_security_controller.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 修改登录密码 — 温润质感
 class ChangePasswordScreen extends GetView<AccountSecurityController> {
@@ -13,19 +15,7 @@ class ChangePasswordScreen extends GetView<AccountSecurityController> {
     final c = controller;
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('修改登录密码',
-            style: TextStyle(
-                fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
-        leading: IconButton(
-            icon:
-                Icon(Icons.arrow_back_ios_rounded, size: 20.sp, color: AppTheme.textPrimary),
-            onPressed: () => Get.back()),
-      ),
+      appBar: const CommonAppBar(title: '修改登录密码'),
       body: Form(
         key: c.changePasswordFormKey,
         child: ListView(
@@ -33,36 +23,48 @@ class ChangePasswordScreen extends GetView<AccountSecurityController> {
           children: [
             _infoBanner(),
             SizedBox(height: 28.h),
-            Obx(() => _pwField(
-                ctrl: c.oldPasswordController,
+            Obx(() => PrimaryInputField(
+                controller: c.oldPasswordController,
                 label: '旧密码',
-                hint: '请输入旧密码',
-                obscure: c.obscureOldPassword,
-                onToggle: c.toggleOldPasswordVisibility,
+                hintText: '请输入旧密码',
+                obscureText: c.obscureOldPassword,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(c.obscureOldPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20.sp, color: AppTheme.textMuted),
+                  onPressed: c.toggleOldPasswordVisibility,
+                ),
                 validator: (v) => v == null || v.isEmpty
                     ? '请输入旧密码'
                     : v.length < 6
                         ? '密码长度不能少于6位'
                         : null)),
             SizedBox(height: 16.h),
-            Obx(() => _pwField(
-                ctrl: c.newPasswordController,
+            Obx(() => PrimaryInputField(
+                controller: c.newPasswordController,
                 label: '新密码',
-                hint: '请输入新密码',
-                obscure: c.obscureNewPassword,
-                onToggle: c.toggleNewPasswordVisibility,
+                hintText: '请输入新密码',
+                obscureText: c.obscureNewPassword,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(c.obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20.sp, color: AppTheme.textMuted),
+                  onPressed: c.toggleNewPasswordVisibility,
+                ),
                 validator: (v) => v == null || v.isEmpty
                     ? '请输入新密码'
                     : v.length < 6
                         ? '密码长度不能少于6位'
                         : null)),
             SizedBox(height: 16.h),
-            Obx(() => _pwField(
-                ctrl: c.confirmPasswordController,
+            Obx(() => PrimaryInputField(
+                controller: c.confirmPasswordController,
                 label: '确认密码',
-                hint: '请再次输入新密码',
-                obscure: c.obscureConfirmPassword,
-                onToggle: c.toggleConfirmPasswordVisibility,
+                hintText: '请再次输入新密码',
+                obscureText: c.obscureConfirmPassword,
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  icon: Icon(c.obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20.sp, color: AppTheme.textMuted),
+                  onPressed: c.toggleConfirmPasswordVisibility,
+                ),
                 validator: (v) => v == null || v.isEmpty
                     ? '请再次输入新密码'
                     : v != c.newPasswordController.text
@@ -101,66 +103,6 @@ class ChangePasswordScreen extends GetView<AccountSecurityController> {
     );
   }
 
-  Widget _pwField(
-      {required TextEditingController ctrl,
-      required String label,
-      required String hint,
-      required bool obscure,
-      required VoidCallback onToggle,
-      String? Function(String?)? validator}) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label,
-          style: TextStyle(
-              fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-      SizedBox(height: 8.h),
-      TextFormField(
-        controller: ctrl,
-        obscureText: obscure,
-        validator: validator,
-        style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
-        decoration: _dec(
-            hint: hint,
-            prefix: Icons.lock_outline_rounded,
-            suffix: IconButton(
-              icon: Icon(
-                  obscure
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  size: 20.sp,
-                  color: AppTheme.textMuted),
-              onPressed: onToggle,
-            )),
-      ),
-    ]);
-  }
-
-  InputDecoration _dec(
-      {required String hint, required IconData prefix, Widget? suffix}) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-      filled: true,
-      fillColor: AppTheme.creamBg,
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      prefixIcon: Icon(prefix, size: 18.sp, color: AppTheme.gold),
-      suffixIcon: suffix,
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppTheme.gold)),
-      errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppTheme.danger)),
-      focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppTheme.danger)),
-    );
-  }
 
   Widget _gradientBtn(
       {required bool loading,

@@ -10,6 +10,7 @@ import '../../widgets/empty_placeholder_widget.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../../data/models/user_model.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 收藏列表页面
 class FavoriteListScreen extends StatefulWidget {
@@ -83,6 +84,7 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.creamBg,
       appBar: AppBar(
         title: const Text('我的收藏'),
         centerTitle: true,
@@ -104,14 +106,12 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
           onRefresh: _onRefresh,
           onLoad: _onLoad,
           child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: controller.favorites.length,
             itemBuilder: (context, index) {
               final favorite = controller.favorites[index];
               return ServiceCardWidget(
                 service: favorite.service,
                 onTap: () {
-                  // TODO: replace with actual service detail route
                   Get.toNamed('/service/detail/${favorite.service.id}');
                 },
                 onOrderTap: () {

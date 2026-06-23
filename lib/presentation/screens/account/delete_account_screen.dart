@@ -7,6 +7,8 @@ import '../../../core/utils/toast_util.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../routes/route_names.dart';
 import '../../controllers/account_security_controller.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 账号注销 — 温润质感
 class DeleteAccountScreen extends StatefulWidget {
@@ -52,12 +54,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('账号注销', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-        centerTitle: true,
-        backgroundColor: Colors.white, elevation: 0, scrolledUnderElevation: 0.5,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_rounded, size: 20.sp, color: AppTheme.textPrimary), onPressed: () => Get.back()),
-      ),
+      appBar: const CommonAppBar(title: '账号注销'),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -65,20 +62,18 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           children: [
             _warningCard(),
             SizedBox(height: 24.h),
-            _label('验证码'), SizedBox(height: 8.h),
-            Row(children: [
-              Expanded(child: TextFormField(
-                controller: _smsController, keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(6)],
-                style: TextStyle(fontSize: 15.sp, color: AppTheme.textPrimary),
-                validator: (v) => v == null || v.isEmpty ? '请输入验证码' : v.length != 6 ? '验证码长度应为6位' : null,
-                decoration: _inputDeco('请输入验证码', Icons.sms_outlined),
-              )),
-              SizedBox(width: 12.w),
-              GestureDetector(
+            PrimaryInputField(
+              controller: _smsController,
+              label: '验证码',
+              hintText: '请输入验证码',
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(6)],
+              prefixIcon: const Icon(Icons.sms_outlined),
+              validator: (v) => v == null || v.isEmpty ? '请输入验证码' : v.length != 6 ? '验证码长度应为6位' : null,
+              trailingButton: GestureDetector(
                 onTap: _canSend ? _sendSms : null,
                 child: Container(
-                  height: 52.h, width: 110.w,
+                  height: 40.h, width: 100.w,
                   decoration: BoxDecoration(
                     gradient: _canSend ? const LinearGradient(colors: [AppTheme.gold, AppTheme.amber]) : const LinearGradient(colors: [AppTheme.warmBorder, AppTheme.warmBorder]),
                     borderRadius: BorderRadius.circular(12.r),
@@ -87,7 +82,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       style: TextStyle(fontSize: 13.sp, color: _canSend ? Colors.white : AppTheme.textMuted, fontWeight: FontWeight.w600))),
                 ),
               ),
-            ]),
+            ),
             SizedBox(height: 20.h),
             Row(children: [
               Transform.scale(scale: 0.85, child: Checkbox(value: _agreed, onChanged: (v) => setState(() => _agreed = v ?? false), activeColor: AppTheme.gold, side: const BorderSide(color: AppTheme.warmBorder, width: 1.5), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact)),
@@ -123,17 +118,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     );
   }
 
-  Widget _label(String t) => Text(t, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppTheme.textPrimary));
-
-  InputDecoration _inputDeco(String hint, IconData icon) => InputDecoration(
-    hintText: hint, hintStyle: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-    filled: true, fillColor: AppTheme.creamBg,
-    contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-    prefixIcon: Icon(icon, size: 18.sp, color: AppTheme.gold),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppTheme.gold)),
-  );
 
   Widget _dangerBtn() {
     return GestureDetector(

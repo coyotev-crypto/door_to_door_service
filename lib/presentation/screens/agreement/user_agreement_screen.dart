@@ -3,6 +3,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import '../../controllers/user_agreement_controller.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 用户协议页面
 ///
@@ -13,10 +15,8 @@ class UserAgreementScreen extends GetWidget<UserAgreementController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('用户协议', style: TextStyle(fontSize: 18.sp)),
-      ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: const CommonAppBar(title: '用户协议'),
       body: Obx(() {
         // 显示加载状态
         if (controller.isLoading) {

@@ -3,6 +3,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import '../../controllers/privacy_policy_controller.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../../core/themes/app_theme.dart';
 
 /// 隐私政策页面
 ///
@@ -13,10 +15,8 @@ class PrivacyPolicyScreen extends GetWidget<PrivacyPolicyController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('隐私政策', style: TextStyle(fontSize: 18.sp)),
-      ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: const CommonAppBar(title: '隐私政策'),
       body: Obx(() {
         // 显示加载状态
         if (controller.isLoading) {

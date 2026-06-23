@@ -4,6 +4,7 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/utils/screen_adapter.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../widgets/common_app_bar.dart';
 
 /// 个人中心 — 温润质感
 class ProfileScreen extends StatefulWidget {
@@ -58,10 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
-      appBar: AppBar(
-        title: Text('Profile', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-        centerTitle: true, backgroundColor: Colors.white, elevation: 0,
-      ),
+      appBar: const CommonAppBar(title: 'Profile', showBackButton: false),
       body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('Profile Screen', style: TextStyle(fontSize: 15.sp, color: AppTheme.textMuted)),
         SizedBox(height: 20.h),

@@ -283,6 +283,10 @@ class ProfileController extends GetxController {
     Get.toNamed(RouteNames.providerServiceList);
   }
 
+  void navigateToWallet() {
+    Get.toNamed(RouteNames.wallet);
+  }
+
   /// 跳转到账户安全页
   void navigateToAccountSecurity() {
     Get.toNamed(RouteNames.accountSecurity);

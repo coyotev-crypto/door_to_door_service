@@ -5,6 +5,9 @@ import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:door_to_door_service/routes/route_names.dart';
 import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
 import 'package:door_to_door_service/data/models/address_model.dart';
+import '../../widgets/common_app_bar.dart';
+import '../../../core/themes/app_theme.dart';
+import '../../widgets/primary_input_field.dart';
 
 /// 地址编辑页面
 ///
@@ -147,20 +150,8 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
     final themeColor = Theme.of(context).primaryColor;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          _isEditMode ? '编辑地址' : '新增地址',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black87),
-      ),
+      backgroundColor: AppTheme.creamBg,
+      appBar: CommonAppBar(title: _isEditMode ? '编辑地址' : '新增地址'),
       body: Form(
         key: _formKey,
         child: Column(
@@ -171,7 +162,7 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 children: [
                   // 收货人
-                  _buildFormField(
+                  PrimaryInputField(
                     label: '收货人',
                     controller: _contactNameController,
                     hintText: '请输入收货人姓名',
@@ -187,7 +178,7 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
                   SizedBox(height: 8.h),
 
                   // 联系电话
-                  _buildFormField(
+                  PrimaryInputField(
                     label: '联系电话',
                     controller: _contactPhoneController,
                     hintText: '请输入联系电话',
@@ -213,66 +204,17 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
                   SizedBox(height: 8.h),
 
                   // 详细地址
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            '详细地址',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            ' *',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        controller: _detailAddressController,
-                        decoration: InputDecoration(
-                          hintText: '请输入详细地址',
-                          hintStyle: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.grey[400],
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: themeColor),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 14.h,
-                          ),
-                        ),
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 2,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '请输入详细地址';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                  PrimaryInputField(
+                    label: '详细地址',
+                    controller: _detailAddressController,
+                    hintText: '请输入详细地址',
+                    maxLines: 2,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '请输入详细地址';
+                      }
+                      return null;
+                    },
                   ),
 
                   SizedBox(height: 12.h),
@@ -378,76 +320,6 @@ class _AddressEditScreenState extends State<AddressEditScreen> {
     );
   }
 
-  /// 构建表单字段
-  Widget _buildFormField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    int? maxLength,
-  }) {
-    final themeColor = Theme.of(context).primaryColor;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-              ),
-            ),
-            Text(
-              ' *',
-              style: TextStyle(
-                fontSize: 15.sp,
-                color: Colors.red,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[400],
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: themeColor),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
-            ),
-            counterText: maxLength != null ? '' : null, // 隐藏字符计数器
-          ),
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.black87,
-          ),
-          keyboardType: keyboardType,
-          validator: validator,
-          maxLength: maxLength,
-        ),
-      ],
-    );
-  }
 
   /// 构建地区选择器
   Widget _buildRegionSelector(Color themeColor) {
