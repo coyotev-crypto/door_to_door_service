@@ -90,7 +90,19 @@ class OrderRepository {
     );
   }
 
-  /// 取消订单
+  /// Get provider order detail
+  Future<BaseResponse<OrderModel>> getProviderOrderDetail(int orderId) async {
+    final path =
+        ApiEndpoints.getProviderOrderDetail.replaceAll('{id}', '$orderId');
+    final response = await _dioClient.get(path);
+    return BaseResponse<OrderModel>.fromJson(
+      response.data,
+      dataParser: (data) => OrderModel.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+
+  /// Cancel order
   Future<BaseResponse<dynamic>> cancelOrder(int orderId, String reason) async {
     final path =
         ApiEndpoints.cancelOrder.replaceAll('{id}', orderId.toString());

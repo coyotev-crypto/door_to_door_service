@@ -4,6 +4,7 @@ import 'package:door_to_door_service/core/services/location_service.dart';
 import 'package:door_to_door_service/presentation/controllers/home_content_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/order_list_controller.dart';
+import 'package:door_to_door_service/presentation/controllers/order_detail_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/payment_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
 import 'package:door_to_door_service/presentation/controllers/profile_controller.dart';
@@ -25,6 +26,7 @@ import '../presentation/screens/community/post_list_page.dart';
 import '../presentation/screens/community/post_create_page.dart';
 import '../presentation/screens/community/post_detail_page.dart';
 import '../presentation/screens/order/order_create_screen.dart';
+import '../presentation/screens/order/order_detail_screen.dart';
 import '../presentation/screens/order/customer_order_list_page.dart';
 import '../presentation/screens/order/provider_order_list_page.dart';
 import '../presentation/screens/order/payment_screen.dart';
@@ -56,6 +58,8 @@ import '../presentation/screens/wallet/wallet_screen.dart';
 import '../presentation/screens/wallet/wallet_transactions_screen.dart';
 import '../presentation/screens/wallet/wallet_withdraw_screen.dart';
 import '../presentation/screens/wallet/wallet_withdrawal_detail_screen.dart';
+import '../presentation/screens/wallet/payment_account_screen.dart';
+import '../presentation/screens/wallet/bind_alipay_screen.dart';
 import '../presentation/controllers/login_controller.dart';
 import '../presentation/controllers/privacy_policy_controller.dart';
 import '../presentation/controllers/user_agreement_controller.dart';
@@ -171,6 +175,11 @@ class AppPages {
       binding: BindingsBuilder(() => Get.lazyPut(() => PaymentController())),
     ),
     GetPage(
+      name: RouteNames.orderDetail,
+      page: () => const OrderDetailScreen(),
+      binding: BindingsBuilder(() => Get.lazyPut(() => OrderDetailController())),
+    ),
+    GetPage(
       name: RouteNames.customerOrderList,
       page: () => const CustomerOrderListPage(),
       binding: BindingsBuilder(() => Get.lazyPut(() => OrderListController())),
@@ -245,17 +254,25 @@ class AppPages {
         }
       }),
     ),
-    GetPage(
-      name: RouteNames.walletWithdrawalDetail,
-      page: () => WalletWithdrawalDetailScreen(
-        id: int.tryParse(Get.parameters['id'] ?? '') ?? 0,
-      ),
-      binding: BindingsBuilder(() {
-        if (!Get.isRegistered<WalletController>()) {
-          Get.lazyPut(() => WalletController());
-        }
-      }),
-    ),
+     GetPage(
+       name: RouteNames.walletWithdrawalDetail,
+       page: () => WalletWithdrawalDetailScreen(
+         id: int.tryParse(Get.parameters['id'] ?? '') ?? 0,
+       ),
+       binding: BindingsBuilder(() {
+         if (!Get.isRegistered<WalletController>()) {
+           Get.lazyPut(() => WalletController());
+         }
+       }),
+     ),
+     GetPage(
+       name: RouteNames.paymentAccount,
+       page: () => const PaymentAccountScreen(),
+     ),
+     GetPage(
+       name: RouteNames.bindAlipay,
+       page: () => const BindAlipayScreen(),
+     ),
     GetPage(
       name: RouteNames.accountSecurity,
       page: () => const AccountSecurityScreen(),

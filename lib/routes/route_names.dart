@@ -19,14 +19,17 @@ class RouteNames {
   static const String providerService = '/provider-join/service';
   static const String providerServiceList = '/provider-join/service/list';
 
-  static const String wallet = '/wallet';
-  static const String walletWithdraw = '/wallet/withdraw';
-  static const String walletTransactions = '/wallet/transactions';
-  static const String walletWithdrawalDetail = '/wallet/withdrawals/:id';
+   static const String wallet = '/wallet';
+   static const String walletWithdraw = '/wallet/withdraw';
+   static const String walletTransactions = '/wallet/transactions';
+   static const String walletWithdrawalDetail = '/wallet/withdrawals/:id';
+   static const String paymentAccount = '/wallet/payment-account';
+   static const String bindAlipay = '/wallet/bind-alipay';
 
   // 订单相关
   static const String orderCreate = '/order/create';
   static const String orderPayment = '/order/payment';
+  static const String orderDetail = '/order/detail/:id';
   static const String customerOrderList = '/order/list';
   static const String providerOrderList = '/order/provider-list';
 

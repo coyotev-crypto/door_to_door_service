@@ -18,6 +18,17 @@ class WalletRepository {
     return result.data ?? const WalletModel();
   }
 
+  Future<CommissionRateModel> getCommissionRate() async {
+    final response = await _dioClient.get(ApiEndpoints.commissionRate);
+    final result = BaseResponse<CommissionRateModel>.fromJson(
+      response.data,
+      dataParser: (data) =>
+          CommissionRateModel.fromJson(data as Map<String, dynamic>),
+    );
+    if (!result.isSuccess) throw Exception(result.message);
+    return result.data ?? const CommissionRateModel();
+  }
+
   Future<List<WalletTransactionModel>> getTransactions({
     int pageIndex = 1,
     int pageSize = 10,
@@ -86,6 +97,19 @@ class WalletRepository {
       throw Exception(result.message);
     }
     return result.data!;
+  }
+
+  /// 获取收款账户列表
+  Future<List<PaymentAccountModel>> getPaymentAccounts() async {
+    final response = await _dioClient.get(ApiEndpoints.paymentAccounts);
+    return BaseResponse<List<PaymentAccountModel>>.fromJson(
+          response.data,
+          dataParser: (data) => _parseList(
+            data,
+            (item) => PaymentAccountModel.fromJson(item),
+          ),
+        ).data ??
+        [];
   }
 
   List<T> _parseList<T>(

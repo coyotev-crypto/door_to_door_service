@@ -41,10 +41,14 @@ class WalletTransactionModel {
     return WalletTransactionModel(
       id: _toInt(json['id']),
       type: json['type']?.toString() ?? '',
-      description:
-          json['description']?.toString() ?? json['remark']?.toString() ?? '',
+      description: json['description']?.toString() ??
+          json['remark']?.toString() ??
+          _transactionTypeText(json['type']?.toString() ?? ''),
       amount: _toDouble(json['amount']),
-      orderNo: json['orderNo']?.toString(),
+      orderNo: json['orderNo']?.toString() ??
+          json['referenceNo']?.toString() ??
+          json['transactionNo']?.toString() ??
+          json['orderId']?.toString(),
       createdAt: _toDateTime(json['createdAt'] ?? json['createTime']),
     );
   }
@@ -91,6 +95,70 @@ class WithdrawalModel {
   double get arrivalAmount => amount - fee;
 }
 
+class CommissionRateModel {
+  final double rate;
+  final String rateText;
+  final DateTime? updatedAt;
+
+  const CommissionRateModel({
+    this.rate = 0,
+    this.rateText = '',
+    this.updatedAt,
+  });
+
+  factory CommissionRateModel.fromJson(Map<String, dynamic> json) {
+    return CommissionRateModel(
+      rate: _normalizeRate(_toDouble(json['rate'])),
+      rateText: json['rateText']?.toString() ?? '',
+      updatedAt: _toDateTime(json['updatedAt']),
+    );
+  }
+}
+
+class PaymentAccountModel {
+  final int id;
+  final int userId;
+  final String method; // 支付方式: alipay, wechat, bank_card
+  final String accountNo;
+  final String accountNoMask; // 掩码后的账号
+  final String accountName; // 账户名称
+  final int status; // 账户状态: 0=有效, 1=无效
+  final int isDefault; // 是否为默认账户: 0=否, 1=是
+  final DateTime? createTime;
+  final DateTime? updateTime;
+
+  const PaymentAccountModel({
+    required this.id,
+    required this.userId,
+    required this.method,
+    required this.accountNo,
+    required this.accountNoMask,
+    required this.accountName,
+    required this.status,
+    required this.isDefault,
+    this.createTime,
+    this.updateTime,
+  });
+
+  factory PaymentAccountModel.fromJson(Map<String, dynamic> json) {
+    return PaymentAccountModel(
+      id: _toInt(json['id']),
+      userId: _toInt(json['userId']),
+      method: json['method']?.toString() ?? '',
+      accountNo: json['accountNo']?.toString() ?? '',
+      accountNoMask: json['accountNoMask']?.toString() ?? '',
+      accountName: json['accountName']?.toString() ?? '',
+      status: _toInt(json['status']),
+      isDefault: _toInt(json['isDefault']),
+      createTime: _toDateTime(json['createTime']),
+      updateTime: _toDateTime(json['updateTime']),
+    );
+  }
+
+  bool get isValid => status == 0;
+  bool get isPrimary => isDefault == 1;
+}
+
 double _toDouble(dynamic value) {
   if (value is num) return value.toDouble();
   return double.tryParse(value?.toString() ?? '') ?? 0;
@@ -104,4 +172,26 @@ int _toInt(dynamic value) {
 DateTime? _toDateTime(dynamic value) {
   if (value == null) return null;
   return DateTime.tryParse(value.toString());
+}
+
+double _normalizeRate(double rate) {
+  if (rate > 1) return rate / 100;
+  return rate;
+}
+
+String _transactionTypeText(String type) {
+  switch (type) {
+    case 'income':
+      return '订单收入';
+    case 'withdraw':
+      return '提现';
+    case 'refund':
+      return '退款';
+    case 'freeze':
+      return '冻结';
+    case 'unfreeze':
+      return '解冻';
+    default:
+      return type;
+  }
 }

@@ -1,4 +1,6 @@
 /// 订单数据模型
+import 'package:flutter/material.dart';
+
 class OrderModel {
   final int id;
   final String? orderNo;
@@ -24,6 +26,12 @@ class OrderModel {
   final String? refundReason;
   final String? refundAmount;
 
+  // 核销相���
+  final String? verificationCode; // 二维码数据/核销码
+  final String? providerName; // 服务人员名称
+  final String? providerPhone; // 服务人员电话
+  final String? providerAvatar; // 服务人员头像
+
   OrderModel({
     this.id = 0,
     this.orderNo,
@@ -46,6 +54,10 @@ class OrderModel {
     this.refundStatus = 0,
     this.refundReason,
     this.refundAmount,
+    this.verificationCode,
+    this.providerName,
+    this.providerPhone,
+    this.providerAvatar,
   });
 
   /// 解析 decimal 字符串为 double
@@ -96,6 +108,10 @@ class OrderModel {
       refundStatus: json['refundStatus'] as int? ?? 0,
       refundReason: json['refundReason'] as String?,
       refundAmount: json['refundAmount']?.toString(),
+      verificationCode: json['verificationCode'] as String?,
+      providerName: json['providerName'] as String?,
+      providerPhone: json['providerPhone'] as String?,
+      providerAvatar: json['providerAvatar'] as String?,
     );
   }
 
@@ -139,6 +155,10 @@ class OrderModel {
       'refundStatus': refundStatus,
       'refundReason': refundReason,
       'refundAmount': refundAmount,
+      'verificationCode': verificationCode,
+      'providerName': providerName,
+      'providerPhone': providerPhone,
+      'providerAvatar': providerAvatar,
     };
   }
 
@@ -160,6 +180,39 @@ class OrderModel {
         return '已取消';
       default:
         return '未知';
+    }
+  }
+
+  /// 是否应该显示二维码（已支付但未完成）
+  bool get shouldShowQRCode {
+    return status >= 1 && status < 5 && verificationCode != null;
+  }
+
+  /// 是否已支付
+  bool get isPaid => status >= 1;
+
+  /// 是否已完成
+  bool get isCompleted => status == 5;
+
+  /// 是否已取消
+  bool get isCancelled => status == 6;
+
+  /// 订单状态颜色
+  Color get statusColor {
+    switch (status) {
+      case 0:
+        return const Color(0xFFFF9500); // 待支付 - 橙色
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        return const Color(0xFFC4956A); // 已支付 - 金色
+      case 5:
+        return const Color(0xFF4CAF50); // 已完成 - 绿色
+      case 6:
+        return const Color(0xFF999999); // 已取消 - 灰色
+      default:
+        return const Color(0xFF999999);
     }
   }
 }

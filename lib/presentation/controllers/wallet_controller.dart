@@ -12,6 +12,8 @@ class WalletController extends GetxController {
   final TextEditingController amountController = TextEditingController();
 
   final Rx<WalletModel> wallet = const WalletModel().obs;
+  final Rx<CommissionRateModel> commissionRate =
+      const CommissionRateModel().obs;
   final RxList<WalletTransactionModel> recentTransactions =
       <WalletTransactionModel>[].obs;
   final RxList<WalletTransactionModel> transactions =
@@ -22,6 +24,8 @@ class WalletController extends GetxController {
   final RxBool isSubmitting = false.obs;
   final RxBool hasMoreTransactions = true.obs;
   final RxBool hasMoreWithdrawals = true.obs;
+  final RxBool hasBindPaymentAccount = true.obs; // 是否已绑定收款账户
+  final RxList<PaymentAccountModel> paymentAccounts = <PaymentAccountModel>[].obs; // 收款账户列表
 
   int _transactionPage = 1;
   int _withdrawalPage = 1;
@@ -31,9 +35,15 @@ class WalletController extends GetxController {
 
   double get withdrawAmount =>
       double.tryParse(amountController.text.trim()) ?? 0;
-  double get withdrawFee => 0;
+  double get withdrawFee => withdrawAmount * commissionRate.value.rate;
   double get arrivalAmount =>
       (withdrawAmount - withdrawFee).clamp(0, double.infinity);
+  String get commissionRateText {
+    if (commissionRate.value.rateText.isNotEmpty) {
+      return commissionRate.value.rateText;
+    }
+    return '${(commissionRate.value.rate * 100).toStringAsFixed(2)}%';
+  }
 
   @override
   void onInit() {
@@ -52,14 +62,23 @@ class WalletController extends GetxController {
     try {
       final results = await Future.wait([
         _repository.getWallet(),
+        _repository.getCommissionRate(),
         _repository.getTransactions(pageIndex: 1, pageSize: 3),
         _repository.getWithdrawals(pageIndex: 1, pageSize: 3),
+        _repository.getPaymentAccounts(),
       ]);
       wallet.value = results[0] as WalletModel;
+      commissionRate.value = results[1] as CommissionRateModel;
       recentTransactions.assignAll(
-        results[1] as List<WalletTransactionModel>,
+        results[2] as List<WalletTransactionModel>,
       );
-      withdrawals.assignAll(results[2] as List<WithdrawalModel>);
+      withdrawals.assignAll(results[3] as List<WithdrawalModel>);
+
+      // 处理收款账户列表
+      final accounts = results[4] as List<PaymentAccountModel>;
+      paymentAccounts.assignAll(accounts);
+      // 更新是否有绑定账户的状态
+      hasBindPaymentAccount.value = accounts.isNotEmpty;
     } catch (e) {
       ToastUtil.showError('加载钱包失败: $e');
     } finally {

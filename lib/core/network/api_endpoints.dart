@@ -11,6 +11,8 @@ class ApiEndpoints {
   static const String walletWithdraw = '/wallet/withdraw';
   static const String walletWithdrawals = '/wallet/withdrawals';
   static const String walletWithdrawalDetail = '/wallet/withdrawals/{id}';
+  static const String commissionRate = '/admin/commission/rate';
+  static const String paymentAccounts = '/api/v1/wallet/accounts';
 
   // ========== 认证相关 ==========
 

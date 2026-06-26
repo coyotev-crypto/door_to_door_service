@@ -15,20 +15,22 @@ class CustomerOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final price = order.totalPrice ?? order.servicePrice ?? '0';
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        boxShadow: [
-          BoxShadow(
-              color: AppTheme.textPrimary.withValues(alpha: 0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return GestureDetector(
+      onTap: _openOrderDetail,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+                color: AppTheme.textPrimary.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2)),
+          ],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Text(order.serviceName ?? '服务订单',
@@ -155,8 +157,13 @@ class CustomerOrderCard extends StatelessWidget {
           SizedBox(height: 12.h),
           _buildRefundStatusBanner(),
         ],
-      ]),
+        ]),
+      ),
     );
+  }
+
+  void _openOrderDetail() {
+    Get.toNamed(RouteNames.orderDetail.replaceFirst(':id', '${order.id}'));
   }
 
   void _showCancelDialog(BuildContext context) {
