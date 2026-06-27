@@ -8,6 +8,7 @@ import '../../../data/models/wallet_model.dart';
 import '../../../routes/route_names.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../widgets/empty_placeholder_widget.dart';
+import '../../widgets/payment_password_dialog.dart';
 import 'wallet_widgets.dart';
 
 class WalletWithdrawScreen extends GetWidget<WalletController> {
@@ -283,7 +284,7 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
                             widget.controller.paymentAccounts.isEmpty ||
                             _selectedAccount == null)
                         ? null
-                        : () => widget.controller.submitWithdraw(_selectedAccount!),
+                        : _confirmWithdraw,
                     child: Text(
                       widget.controller.paymentAccounts.isEmpty
                           ? '请先绑定收款账户'
@@ -303,6 +304,17 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmWithdraw() async {
+    final account = _selectedAccount;
+    if (account == null) return;
+    final password = await PaymentPasswordDialog.show(
+      title: '确认提现',
+      message: '请输入支付密码完成提现申请',
+    );
+    if (password == null || password.isEmpty) return;
+    await widget.controller.submitWithdraw(account, password);
   }
 
   Widget _withdrawalList() {

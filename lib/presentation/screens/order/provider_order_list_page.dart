@@ -1,4 +1,3 @@
-import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';

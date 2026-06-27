@@ -127,7 +127,10 @@ class WalletController extends GetxController {
     hasMoreWithdrawals.value = list.length >= pageSize;
   }
 
-  Future<void> submitWithdraw(PaymentAccountModel account) async {
+  Future<void> submitWithdraw(
+    PaymentAccountModel account,
+    String paymentPassword,
+  ) async {
     final amount = withdrawAmount;
     if (amount < 10) {
       ToastUtil.showError('最低提现金额为¥10.00');
@@ -141,11 +144,12 @@ class WalletController extends GetxController {
     isSubmitting.value = true;
     try {
       await _repository.withdraw(
+        accountId: account.id,
+        accountName: account.accountName,
+        accountNo: account.accountNo,
         amount: amount,
-        bankName: account.accountName,
-        bankCardTail: account.accountNoMask.length >= 4
-            ? account.accountNoMask.substring(account.accountNoMask.length - 4)
-            : account.accountNoMask,
+        method: account.method,
+        payPassword: paymentPassword,
       );
       ToastUtil.showSuccess('提现申请已提交');
       amountController.clear();

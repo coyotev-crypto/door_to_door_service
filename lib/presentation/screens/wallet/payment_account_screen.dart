@@ -300,44 +300,6 @@ class PaymentAccountScreen extends GetView<WalletController> {
     );
   }
 
-  /// 空��态提示
-  Widget _buildEmptyBindMessage() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppTheme.warmBorder),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.check_circle_outline_rounded,
-            color: AppTheme.sage,
-            size: 36.sp,
-          ),
-          SizedBox(height: 10.h),
-          Text(
-            '已绑定支付宝账号',
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            '点击上方账号可进行管理',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: AppTheme.textMuted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// 可绑定的方式分组
   Widget _buildBindableMethodsSection() {
     return Column(

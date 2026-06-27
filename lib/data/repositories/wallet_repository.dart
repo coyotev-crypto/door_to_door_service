@@ -48,16 +48,24 @@ class WalletRepository {
   }
 
   Future<void> withdraw({
+    required int accountId,
+    required String accountName,
+    required String accountNo,
     required double amount,
-    required String bankName,
-    required String bankCardTail,
+    required String method,
+    required String payPassword,
+    String remark = '',
   }) async {
     final response = await _dioClient.post(
       ApiEndpoints.walletWithdraw,
       data: {
+        'accountId': accountId,
+        'accountName': accountName,
+        'accountNo': accountNo,
         'amount': amount,
-        'bankName': bankName,
-        'bankCardTail': bankCardTail,
+        'method': method,
+        'payPassword': payPassword,
+        'remark': remark,
       },
     );
     final result = BaseResponse<dynamic>.fromJson(response.data);

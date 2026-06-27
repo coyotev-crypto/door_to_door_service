@@ -147,6 +147,7 @@ class LoginScreen extends GetWidget<LoginController> {
             controller: controller.phoneController,
             label: '手机号',
             hintText: '请输入手机号',
+            maxLength: 11,
             keyboardType: TextInputType.phone,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
@@ -178,6 +179,7 @@ class LoginScreen extends GetWidget<LoginController> {
                   controller: controller.codeController,
                   label: '验证码',
                   hintText: '请输入验证码',
+                  maxLength: 6,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,

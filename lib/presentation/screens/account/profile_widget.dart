@@ -38,7 +38,6 @@ class ProfileWidget extends StatelessWidget {
             if (isProvider) ...[
               SizedBox(height: 14.h),
               _menuCard([
-                _sectionTitle('服务商入驻'),
                 _fnItem(Icons.account_balance_wallet_rounded, '我的钱包',
                     () => ctrl.navigateToWallet()),
                 _fnItem(Icons.description_rounded, '资质材料',
