@@ -16,22 +16,26 @@ class ProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => RefreshIndicator(
+    return Obx(() {
+      final isProvider = AuthService.instance.userRx.value?.roleId ==
+          AppConfig.MERCHANT_USER_TYPE;
+      return RefreshIndicator(
           onRefresh: () async => await ctrl.refreshUserInfo(),
           child: ListView(padding: EdgeInsets.zero, children: [
             SizedBox(height: 14.h),
             ProfileHeaderWidget(controller: ctrl),
-            SizedBox(height: 14.h),
-            _orderCard(),
-            SizedBox(height: 14.h),
-            _menuCard([
-              _fnItem(Icons.location_on_rounded, '地址管理',
-                  () => ctrl.navigateToAddressManage()),
-              _fnItem(Icons.favorite_rounded, '我的收藏',
-                  () => ctrl.navigateToFavorites()),
-            ]),
-            if (AuthService.instance.userRx.value?.roleId ==
-                AppConfig.MERCHANT_USER_TYPE) ...[
+            if (!isProvider) ...[
+              SizedBox(height: 14.h),
+              _orderCard(),
+              SizedBox(height: 14.h),
+              _menuCard([
+                _fnItem(Icons.location_on_rounded, '地址管理',
+                    () => ctrl.navigateToAddressManage()),
+                _fnItem(Icons.favorite_rounded, '我的收藏',
+                    () => ctrl.navigateToFavorites()),
+              ]),
+            ],
+            if (isProvider) ...[
               SizedBox(height: 14.h),
               _menuCard([
                 _sectionTitle('服务商入驻'),
@@ -66,7 +70,8 @@ class ProfileWidget extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
           ]),
-        ));
+        );
+    });
   }
 
   Widget _orderCard() {

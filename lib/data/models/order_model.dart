@@ -28,6 +28,8 @@ class OrderModel {
 
   // 核销相���
   final String? verificationCode; // 二维码数据/核销码
+  final String? verificationCodeExpireAt;
+  final String? verificationCodeUsedAt;
   final String? providerName; // 服务人员名称
   final String? providerPhone; // 服务人员电话
   final String? providerAvatar; // 服务人员头像
@@ -55,6 +57,8 @@ class OrderModel {
     this.refundReason,
     this.refundAmount,
     this.verificationCode,
+    this.verificationCodeExpireAt,
+    this.verificationCodeUsedAt,
     this.providerName,
     this.providerPhone,
     this.providerAvatar,
@@ -108,7 +112,15 @@ class OrderModel {
       refundStatus: json['refundStatus'] as int? ?? 0,
       refundReason: json['refundReason'] as String?,
       refundAmount: json['refundAmount']?.toString(),
-      verificationCode: json['verificationCode'] as String?,
+      verificationCode:
+          (json['verification_code'] ?? json['verificationCode']) as String?,
+      verificationCodeExpireAt:
+          (json['verification_code_expire_at'] ??
+                  json['verificationCodeExpireAt'])
+              as String?,
+      verificationCodeUsedAt:
+          (json['verification_code_used_at'] ?? json['verificationCodeUsedAt'])
+              as String?,
       providerName: json['providerName'] as String?,
       providerPhone: json['providerPhone'] as String?,
       providerAvatar: json['providerAvatar'] as String?,
@@ -156,6 +168,11 @@ class OrderModel {
       'refundReason': refundReason,
       'refundAmount': refundAmount,
       'verificationCode': verificationCode,
+      'verification_code': verificationCode,
+      'verificationCodeExpireAt': verificationCodeExpireAt,
+      'verification_code_expire_at': verificationCodeExpireAt,
+      'verificationCodeUsedAt': verificationCodeUsedAt,
+      'verification_code_used_at': verificationCodeUsedAt,
       'providerName': providerName,
       'providerPhone': providerPhone,
       'providerAvatar': providerAvatar,
@@ -183,9 +200,23 @@ class OrderModel {
     }
   }
 
-  /// 是否应该显示二维码（已支付但未完成）
+  /// 是否应该显示核销码（服务中且后端返回了核销码）
   bool get shouldShowQRCode {
-    return status >= 1 && status < 5 && verificationCode != null;
+    return status == 4 && (verificationCode?.isNotEmpty ?? false);
+  }
+
+  bool get isVerificationCodeUsed {
+    return verificationCodeUsedAt != null && verificationCodeUsedAt!.isNotEmpty;
+  }
+
+  bool get isVerificationCodeExpired {
+    if (verificationCodeExpireAt == null || verificationCodeExpireAt!.isEmpty) {
+      return false;
+    }
+    final expireAt =
+        DateTime.tryParse(verificationCodeExpireAt!.replaceFirst(' ', 'T'));
+    if (expireAt == null) return false;
+    return DateTime.now().isAfter(expireAt);
   }
 
   /// 是否已支付

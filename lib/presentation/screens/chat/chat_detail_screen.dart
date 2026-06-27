@@ -23,8 +23,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       profile: ChatUIKitProfile.contact(
         id: widget.userId,
       ),
-      onAvatarTap:  (context, model){
+      onAvatarTap:  (context, model) {
         LogUtil.d('onAvatarTap');
+        return null;
       },
     );
   }

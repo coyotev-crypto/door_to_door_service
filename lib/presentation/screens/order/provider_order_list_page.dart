@@ -1,12 +1,16 @@
+import 'package:door_to_door_service/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../data/models/order_model.dart';
 import '../../controllers/order_list_controller.dart';
+import 'verification_code_scan_page.dart';
 import '../../widgets/order_reason_dialog.dart';
 import '../../widgets/provider_order_card.dart';
 import '../../widgets/common_app_bar.dart';
+import '../../widgets/verification_code_complete_dialog.dart';
 
 /// 服务商接单列表
 class ProviderOrderListPage extends GetView<OrderListController> {
@@ -108,10 +112,23 @@ class ProviderOrderListPage extends GetView<OrderListController> {
                   onStart: () =>
                       controller.startService(controller.orders[i].id),
                   onComplete: () =>
-                      controller.completeService(controller.orders[i].id),
+                      _showCompleteServiceDialog(controller.orders[i]),
                 ),
               ),
       );
     });
+  }
+
+  Future<void> _showCompleteServiceDialog(OrderModel order) async {
+    final verificationCode = await Get.dialog<String>(
+      VerificationCodeCompleteDialog(
+        onScan: () async => Get.to<String>(
+          () => const VerificationCodeScanPage(),
+        ),
+      ),
+    );
+    if (verificationCode == null || verificationCode.isEmpty) return;
+    await WidgetsBinding.instance.endOfFrame;
+    await controller.completeService(order.id, verificationCode);
   }
 }

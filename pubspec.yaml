@@ -36,6 +36,7 @@ dependencies:
   http: ^1.1.0
   webview_flutter: ^4.13.1
   shengwang_chat_uikit: ^2.0.1
+  mobile_scanner: ^7.2.0
 
 dev_dependencies:
   flutter_test:

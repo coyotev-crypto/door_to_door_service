@@ -176,8 +176,15 @@ class OrderListController extends GetxController {
   Future<void> startService(int id) =>
       _providerAction(() => _repository.startService(id), '服务已开始', '操作失败');
 
-  Future<void> completeService(int id) =>
-      _providerAction(() => _repository.completeService(id), '服务已完成', '操作失败');
+  Future<void> completeService(
+    int id,
+    String verificationCode,
+  ) =>
+      _providerAction(
+        () => _repository.completeService(id, verificationCode),
+        '服务已完成',
+        '操作失败',
+      );
 
   Future<void> cancelOrder(int id, String reason) =>
       _providerAction(() => _repository.cancelOrder(id, reason), '已取消', '取消失败');

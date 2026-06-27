@@ -150,6 +150,17 @@ class OrderDetailScreen extends GetView<OrderDetailController> {
 
   /// 二维码核销区域
   Widget _buildQRCodeSection(OrderModel order) {
+    final codeStatus = order.isVerificationCodeUsed
+        ? '已核销'
+        : order.isVerificationCodeExpired
+            ? '核销码已过期'
+            : null;
+    final codeStatusColor = order.isVerificationCodeUsed
+        ? AppTheme.sage
+        : order.isVerificationCodeExpired
+            ? AppTheme.danger
+            : AppTheme.gold;
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -195,10 +206,12 @@ class OrderDetailScreen extends GetView<OrderDetailController> {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '服务人员扫码核销订单',
+                    codeStatus ?? '服务人员输入核销码完成订单',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppTheme.textMuted,
+                      color: codeStatus == null
+                          ? AppTheme.textMuted
+                          : codeStatusColor,
                     ),
                   ),
                 ],
@@ -307,6 +320,40 @@ class OrderDetailScreen extends GetView<OrderDetailController> {
                     ),
                   ],
                 ),
+                if (order.verificationCodeExpireAt != null &&
+                    order.verificationCodeExpireAt!.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Text(
+                    '有效期至 ${order.verificationCodeExpireAt}',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: AppTheme.textMuted,
+                    ),
+                  ),
+                ],
+                if (codeStatus != null) ...[
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(
+                        order.isVerificationCodeUsed
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.error_outline_rounded,
+                        size: 14.sp,
+                        color: codeStatusColor,
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        codeStatus,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: codeStatusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -329,7 +376,7 @@ class OrderDetailScreen extends GetView<OrderDetailController> {
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
-                    '��将此核销码展示给服务人员，以完成订单核销',
+                    '请将此核销码展示给服务人员，以完成订单核销',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: AppTheme.gold,

@@ -205,11 +205,15 @@ class OrderRepository {
   }
 
   /// 完成服务
-  Future<BaseResponse<dynamic>> completeService(int id) async {
+  Future<BaseResponse<dynamic>> completeService(
+    int id,
+    String verificationCode,
+  ) async {
     final path =
         ApiEndpoints.completeService.replaceAll('{id}', id.toString());
     final response = await _dioClient.post(path, data: {
       'orderId': id,
+      'verification_code': verificationCode,
     });
     return BaseResponse<dynamic>.fromJson(response.data);
   }

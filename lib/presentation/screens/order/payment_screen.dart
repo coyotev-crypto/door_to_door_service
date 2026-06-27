@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/utils/log_util.dart';
-import '../../../core/utils/screen_adapter.dart';
 import '../../controllers/payment_controller.dart';
 import '../../widgets/common_app_bar.dart';
 

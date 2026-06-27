@@ -1,7 +1,6 @@
 import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
 import 'package:door_to_door_service/presentation/widgets/service_card_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import '../../../routes/route_names.dart';
