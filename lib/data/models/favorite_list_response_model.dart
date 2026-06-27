@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/data/models/service_item.dart';
+import 'package:dtd/data/models/service_item.dart';
 
 import '../../core/network/base_response.dart';
 

@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:dtd/core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';

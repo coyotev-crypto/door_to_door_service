@@ -1,10 +1,10 @@
 
 import 'package:get/get.dart';
-import 'package:door_to_door_service/data/models/address_model.dart';
-import 'package:door_to_door_service/data/repositories/address_repository.dart';
-import 'package:door_to_door_service/core/services/location_service.dart';
-import 'package:door_to_door_service/core/services/auth_service.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:dtd/data/models/address_model.dart';
+import 'package:dtd/data/repositories/address_repository.dart';
+import 'package:dtd/core/services/location_service.dart';
+import 'package:dtd/core/services/auth_service.dart';
+import 'package:dtd/core/utils/log_util.dart';
 
 /// 地址控制器
 ///

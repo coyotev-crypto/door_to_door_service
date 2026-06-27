@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../core/utils/log_util.dart';
 import '../../data/models/post_model.dart';

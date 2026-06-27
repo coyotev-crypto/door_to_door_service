@@ -1,6 +1,6 @@
-import 'package:door_to_door_service/core/themes/app_theme.dart';
-import 'package:door_to_door_service/data/models/service_item.dart';
-import 'package:door_to_door_service/presentation/controllers/order_controller.dart';
+import 'package:dtd/core/themes/app_theme.dart';
+import 'package:dtd/data/models/service_item.dart';
+import 'package:dtd/presentation/controllers/order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';

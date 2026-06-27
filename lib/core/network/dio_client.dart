@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
-import 'package:door_to_door_service/routes/route_names.dart';
-import 'package:door_to_door_service/core/services/auth_service.dart';
 import 'package:get/get.dart' as GetX;
+import '../../routes/route_names.dart';
 import '../config/app_config.dart';
+import '../services/auth_service.dart';
 import '../utils/log_util.dart';
 import '../services/token_service.dart';
+import '../utils/toast_util.dart';
 
 class DioClient {
   static DioClient? _instance;

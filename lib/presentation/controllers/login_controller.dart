@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:door_to_door_service/core/config/app_config.dart';
-import 'package:door_to_door_service/core/services/agora_chat_service.dart';
-import 'package:door_to_door_service/core/utils/loading_util.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/services/agora_chat_service.dart';
+import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../routes/route_names.dart';

@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:dtd/core/config/app_config.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import '../../core/services/auth_service.dart';

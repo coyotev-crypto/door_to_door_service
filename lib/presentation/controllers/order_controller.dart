@@ -1,5 +1,5 @@
-import 'package:door_to_door_service/core/utils/loading_util.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/utils/log_util.dart';

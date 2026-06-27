@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/routes/route_names.dart';
+import 'package:dtd/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/utils/screen_adapter.dart';

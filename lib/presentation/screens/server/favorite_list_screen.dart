@@ -1,5 +1,5 @@
-import 'package:door_to_door_service/presentation/controllers/service_controller.dart';
-import 'package:door_to_door_service/presentation/widgets/service_card_widget.dart';
+import 'package:dtd/presentation/controllers/service_controller.dart';
+import 'package:dtd/presentation/widgets/service_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_refresh/easy_refresh.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:door_to_door_service/core/config/app_config.dart';
+import 'package:dtd/core/config/app_config.dart';
 import '../network/api_endpoints.dart';
 import '../network/dio_client.dart';
 import '../../core/utils/log_util.dart';

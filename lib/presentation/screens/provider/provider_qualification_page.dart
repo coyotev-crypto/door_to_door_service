@@ -1,14 +1,14 @@
-import 'package:door_to_door_service/presentation/controllers/provider_qualification_controller.dart';
+import 'package:dtd/presentation/controllers/provider_qualification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:door_to_door_service/core/utils/screen_adapter.dart';
-import 'package:door_to_door_service/presentation/widgets/certificate_level_selector.dart';
-import 'package:door_to_door_service/presentation/widgets/gender_selector.dart';
-import 'package:door_to_door_service/presentation/widgets/image_upload_card.dart';
-import 'package:door_to_door_service/presentation/widgets/info_tip_widget.dart';
-import 'package:door_to_door_service/presentation/widgets/primary_button.dart';
-import 'package:door_to_door_service/presentation/widgets/primary_input_field.dart';
+import 'package:dtd/core/utils/screen_adapter.dart';
+import 'package:dtd/presentation/widgets/certificate_level_selector.dart';
+import 'package:dtd/presentation/widgets/gender_selector.dart';
+import 'package:dtd/presentation/widgets/image_upload_card.dart';
+import 'package:dtd/presentation/widgets/info_tip_widget.dart';
+import 'package:dtd/presentation/widgets/primary_button.dart';
+import 'package:dtd/presentation/widgets/primary_input_field.dart';
 import '../../../core/themes/app_theme.dart';
 
 /// 服务商资质材料页面

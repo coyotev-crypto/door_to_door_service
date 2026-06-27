@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:door_to_door_service/core/services/image_upload_service.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
-import 'package:door_to_door_service/data/models/address_model.dart';
-import 'package:door_to_door_service/data/models/provider_qualification_model.dart';
+import 'package:dtd/core/services/image_upload_service.dart';
+import 'package:dtd/core/utils/toast_util.dart';
+import 'package:dtd/data/models/address_model.dart';
+import 'package:dtd/data/models/provider_qualification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';

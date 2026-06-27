@@ -14,6 +14,9 @@ class ApiEndpoints {
   static const String commissionRate = '/admin/commission/rate';
   static const String paymentAccounts = '/wallet/accounts';
 
+  // ========== App版本相关 ==========
+  static const String appVersionCheck = '/app/version/check';
+
   // ========== 认证相关 ==========
 
   /// 发送短信验证码

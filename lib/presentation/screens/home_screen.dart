@@ -1,6 +1,8 @@
-import 'package:door_to_door_service/core/config/app_config.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/presentation/screens/chat/conversations_screen.dart';
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/services/app_update_service.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/presentation/widgets/app_update_dialog.dart';
+import 'package:dtd/presentation/screens/chat/conversations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final HomeController _controller;
   final Map<int, Widget> _pageCache = <int, Widget>{};
   final Set<int> _loadedPages = <int>{0}; // 记录已加载的页面索引，默认加载首页
@@ -33,7 +35,30 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = Get.find<HomeController>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAppUpdate();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkAppUpdate();
+    }
+  }
+
+  Future<void> _checkAppUpdate() async {
+    final result = await AppUpdateService.instance.checkForUpdate();
+    if (!mounted || result == null || !result.hasUpdate) return;
+    await AppUpdateDialog.show(result);
   }
 
   Widget _buildPageByIndex(int index) {

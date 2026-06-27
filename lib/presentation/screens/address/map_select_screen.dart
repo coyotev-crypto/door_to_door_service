@@ -1,5 +1,5 @@
-import 'package:door_to_door_service/core/utils/screen_adapter.dart';
-import 'package:door_to_door_service/presentation/controllers/map_select_controller.dart';
+import 'package:dtd/core/utils/screen_adapter.dart';
+import 'package:dtd/presentation/controllers/map_select_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_baidu_mapapi_map/flutter_baidu_mapapi_map.dart';
 import 'package:flutter_baidu_mapapi_base/flutter_baidu_mapapi_base.dart';

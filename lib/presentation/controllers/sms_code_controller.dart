@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
 

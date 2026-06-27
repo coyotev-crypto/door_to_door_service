@@ -1,6 +1,6 @@
-import 'package:door_to_door_service/core/config/app_config.dart';
-import 'package:door_to_door_service/core/network/api_endpoints.dart';
-import 'package:door_to_door_service/core/services/token_service.dart';
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/network/api_endpoints.dart';
+import 'package:dtd/core/services/token_service.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../core/utils/log_util.dart';

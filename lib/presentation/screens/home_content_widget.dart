@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/routes/route_names.dart';
+import 'package:dtd/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/rendering.dart';

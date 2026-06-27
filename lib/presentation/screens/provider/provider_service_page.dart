@@ -1,5 +1,5 @@
-import 'package:door_to_door_service/data/models/category_model.dart';
-import 'package:door_to_door_service/presentation/controllers/provider_service_controller.dart';
+import 'package:dtd/data/models/category_model.dart';
+import 'package:dtd/presentation/controllers/provider_service_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';

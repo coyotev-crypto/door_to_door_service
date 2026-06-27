@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/core/themes/app_theme.dart';
+import 'package:dtd/core/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';

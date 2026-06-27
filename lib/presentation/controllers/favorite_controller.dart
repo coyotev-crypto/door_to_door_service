@@ -1,7 +1,7 @@
-import 'package:door_to_door_service/core/utils/loading_util.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
-import 'package:door_to_door_service/data/models/favorite_list_response_model.dart';
+import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
+import 'package:dtd/data/models/favorite_list_response_model.dart';
 import 'package:get/get.dart';
 import '../../data/repositories/service_repository.dart';
 

@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:door_to_door_service/routes/route_names.dart';
+import 'package:dtd/routes/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:door_to_door_service/core/config/app_config.dart';
-import 'package:door_to_door_service/core/services/agora_chat_service.dart';
-import 'package:door_to_door_service/core/services/auth_service.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/core/utils/loading_util.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/services/agora_chat_service.dart';
+import 'package:dtd/core/services/auth_service.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../data/models/login_device_model.dart';
 import '../../data/repositories/account_security_repository.dart';

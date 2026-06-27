@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:dtd/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:shengwang_chat_uikit/provider/chat_uikit_profile.dart';
 import 'package:shengwang_chat_uikit/ui/views/messages_view.dart';

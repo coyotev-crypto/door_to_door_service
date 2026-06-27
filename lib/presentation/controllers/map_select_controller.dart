@@ -1,12 +1,12 @@
-import 'package:door_to_door_service/core/themes/resource.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/themes/resource.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:flutter_baidu_mapapi_map/flutter_baidu_mapapi_map.dart';
 import 'package:flutter_baidu_mapapi_base/flutter_baidu_mapapi_base.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:door_to_door_service/core/services/location_service.dart';
-import 'package:door_to_door_service/data/models/address_model.dart';
+import 'package:dtd/core/services/location_service.dart';
+import 'package:dtd/data/models/address_model.dart';
 
 /// 地图选择地址控制器
 /// 负责管理地图选择地址页面的状态和业务逻辑

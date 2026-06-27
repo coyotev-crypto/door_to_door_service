@@ -1,6 +1,6 @@
-import 'package:door_to_door_service/core/config/app_config.dart';
-import 'package:door_to_door_service/core/services/auth_service.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/services/auth_service.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import '../../data/models/order_model.dart';

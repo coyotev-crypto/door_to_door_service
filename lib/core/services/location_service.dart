@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:door_to_door_service/core/utils/log_util.dart';
+import 'package:dtd/core/utils/log_util.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';

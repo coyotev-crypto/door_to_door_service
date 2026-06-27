@@ -1,6 +1,6 @@
-import 'package:door_to_door_service/core/utils/loading_util.dart';
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/core/utils/toast_util.dart';
+import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/core/utils/toast_util.dart';
 import 'package:get/get.dart';
 import '../../data/models/service_item.dart';
 import '../../data/models/sort_option.dart';

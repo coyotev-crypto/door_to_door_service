@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:door_to_door_service/core/utils/screen_adapter.dart';
-import 'package:door_to_door_service/data/models/address_model.dart';
-import 'package:door_to_door_service/routes/route_names.dart';
-import 'package:door_to_door_service/presentation/controllers/address_controller.dart';
+import 'package:dtd/core/utils/screen_adapter.dart';
+import 'package:dtd/data/models/address_model.dart';
+import 'package:dtd/routes/route_names.dart';
+import 'package:dtd/presentation/controllers/address_controller.dart';
 
 /// 地址栏组件
 /// 

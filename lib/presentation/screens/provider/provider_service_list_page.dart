@@ -1,4 +1,4 @@
-import 'package:door_to_door_service/presentation/widgets/primary_button.dart';
+import 'package:dtd/presentation/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/themes/app_theme.dart';

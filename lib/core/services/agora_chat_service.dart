@@ -1,5 +1,5 @@
-import 'package:door_to_door_service/core/utils/log_util.dart';
-import 'package:door_to_door_service/data/repositories/agora_chat_repository.dart';
+import 'package:dtd/core/utils/log_util.dart';
+import 'package:dtd/data/repositories/agora_chat_repository.dart';
 import 'package:get/get.dart';
 import 'package:shengwang_chat_uikit/chat_uikit.dart';
 
