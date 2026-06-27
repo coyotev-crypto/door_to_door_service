@@ -7,6 +7,7 @@ import '../../../core/themes/app_theme.dart';
 import '../../../routes/route_names.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../widgets/empty_placeholder_widget.dart';
+import '../../widgets/transaction_card.dart';
 import 'wallet_widgets.dart';
 
 class WalletScreen extends GetWidget<WalletController> {
@@ -159,15 +160,15 @@ class WalletScreen extends GetWidget<WalletController> {
       );
     }
 
-    return _whiteCard(
-      Column(
-        children: List.generate(controller.recentTransactions.length, (index) {
-          return WalletTransactionTile(
-            item: controller.recentTransactions[index],
-            showDivider: index != controller.recentTransactions.length - 1,
-          );
-        }),
-      ),
+    return Column(
+      children: List.generate(controller.recentTransactions.length, (index) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index == controller.recentTransactions.length - 1 ? 0 : 10.h,
+          ),
+          child: TransactionCard(item: controller.recentTransactions[index]),
+        );
+      }),
     );
   }
 
