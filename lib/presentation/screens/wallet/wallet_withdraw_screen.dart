@@ -30,12 +30,31 @@ class _WalletWithdrawBody extends StatefulWidget {
 
 class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
   PaymentAccountModel? _selectedAccount;
+  late final Worker _accountsWorker;
 
   @override
   void initState() {
     super.initState();
+    // 进入页面时刷新数据，确保余额和账户列表是最新的
+    widget.controller.loadHome();
+
+    // 监听账户列表变化，自动选择默认账户
+    _accountsWorker = ever(widget.controller.paymentAccounts, (accounts) {
+      if (_selectedAccount == null && accounts.isNotEmpty) {
+        setState(() {
+          _initializeSelectedAccount();
+        });
+      }
+    });
+    
     // 初始化时选择默认账户或第一个账户
     _initializeSelectedAccount();
+  }
+
+  @override
+  void dispose() {
+    _accountsWorker.dispose();
+    super.dispose();
   }
 
   void _initializeSelectedAccount() {
@@ -169,6 +188,7 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
                      : null,
                ),
                child: Row(
+                 crossAxisAlignment: CrossAxisAlignment.center,
                  children: [
                    Icon(
                      widget.controller.paymentAccounts.isNotEmpty
@@ -182,28 +202,31 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
                    SizedBox(width: 8.w),
                    Expanded(
                      child: Column(
+                       mainAxisSize: MainAxisSize.min,
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Text(
-                           widget.controller.paymentAccounts.isEmpty
-                               ? '未绑定，点击绑定'
-                               : (_selectedAccount?.accountName ??
-                                   _selectedAccount?.method ??
-                                   '未选择'),
-                           style: TextStyle(
-                             fontSize: 14.sp,
-                             fontWeight: FontWeight.w600,
-                             color: widget.controller.paymentAccounts.isEmpty
-                                 ? AppTheme.textMuted
-                                 : AppTheme.textPrimary,
+                         if(_selectedAccount == null) ...[
+                           Text(
+                             widget.controller.paymentAccounts.isEmpty
+                                 ? '未绑定，点击绑定'
+                                 : (_selectedAccount?.accountName ??
+                                 _selectedAccount?.method ??
+                                 '未选择'),
+                             style: TextStyle(
+                               fontSize: 14.sp,
+                               fontWeight: FontWeight.w600,
+                               color: widget.controller.paymentAccounts.isEmpty
+                                   ? AppTheme.textMuted
+                                   : AppTheme.textPrimary,
+                             ),
                            ),
-                         ),
+                         ],
                          if (_selectedAccount != null) ...[
-                           SizedBox(height: 2.h),
                            Text(
                              _selectedAccount!.accountNoMask,
                              style: TextStyle(
-                               fontSize: 12.sp,
+                               fontSize: 14.sp,
+                               fontWeight: FontWeight.w600,
                                color: AppTheme.textMuted,
                              ),
                            ),
@@ -260,7 +283,7 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
                             widget.controller.paymentAccounts.isEmpty ||
                             _selectedAccount == null)
                         ? null
-                        : widget.controller.submitWithdraw,
+                        : () => widget.controller.submitWithdraw(_selectedAccount!),
                     child: Text(
                       widget.controller.paymentAccounts.isEmpty
                           ? '请先绑定收款账户'

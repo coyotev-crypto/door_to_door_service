@@ -30,9 +30,6 @@ class WalletController extends GetxController {
   int _transactionPage = 1;
   int _withdrawalPage = 1;
 
-  static const String bankName = '中国银行';
-  static const String bankCardTail = '3829';
-
   double get withdrawAmount =>
       double.tryParse(amountController.text.trim()) ?? 0;
   double get withdrawFee => withdrawAmount * commissionRate.value.rate;
@@ -130,7 +127,7 @@ class WalletController extends GetxController {
     hasMoreWithdrawals.value = list.length >= pageSize;
   }
 
-  Future<void> submitWithdraw() async {
+  Future<void> submitWithdraw(PaymentAccountModel account) async {
     final amount = withdrawAmount;
     if (amount < 10) {
       ToastUtil.showError('最低提现金额为¥10.00');
@@ -145,8 +142,10 @@ class WalletController extends GetxController {
     try {
       await _repository.withdraw(
         amount: amount,
-        bankName: bankName,
-        bankCardTail: bankCardTail,
+        bankName: account.accountName,
+        bankCardTail: account.accountNoMask.length >= 4
+            ? account.accountNoMask.substring(account.accountNoMask.length - 4)
+            : account.accountNoMask,
       );
       ToastUtil.showSuccess('提现申请已提交');
       amountController.clear();
@@ -168,6 +167,30 @@ class WalletController extends GetxController {
       ToastUtil.showError('加载提现详情失败: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> bindPaymentAccount({
+    required String accountName,
+    required String accountNo,
+    required String method,
+    bool isDefault = false,
+  }) async {
+    isSubmitting.value = true;
+    try {
+      await _repository.bindPaymentAccount(
+        accountName: accountName,
+        accountNo: accountNo,
+        method: method,
+        isDefault: isDefault ? 1 : 0,
+      );
+      ToastUtil.showSuccess('绑定成功');
+      await loadHome();
+      Get.back();
+    } catch (e) {
+      ToastUtil.showError('绑定失败: $e');
+    } finally {
+      isSubmitting.value = false;
     }
   }
 }

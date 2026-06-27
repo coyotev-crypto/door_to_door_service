@@ -112,6 +112,26 @@ class WalletRepository {
         [];
   }
 
+  /// 绑定收款账户
+  Future<void> bindPaymentAccount({
+    required String accountName,
+    required String accountNo,
+    required String method,
+    int isDefault = 0,
+  }) async {
+    final response = await _dioClient.post(
+      ApiEndpoints.paymentAccounts,
+      data: {
+        'accountName': accountName,
+        'accountNo': accountNo,
+        'method': method,
+        'isDefault': isDefault,
+      },
+    );
+    final result = BaseResponse<dynamic>.fromJson(response.data);
+    if (!result.isSuccess) throw Exception(result.message);
+  }
+
   List<T> _parseList<T>(
     dynamic data,
     T Function(Map<String, dynamic>) parser,

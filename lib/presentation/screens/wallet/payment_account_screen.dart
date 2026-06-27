@@ -3,11 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../core/themes/app_theme.dart';
 import '../../../routes/route_names.dart';
+import '../../controllers/wallet_controller.dart';
 import '../../widgets/common_app_bar.dart';
 
 /// 收款账号管理页面 - 主流应用设计参考
 /// 支持支付宝、微信等多个账号绑定和管理
-class PaymentAccountScreen extends StatelessWidget {
+class PaymentAccountScreen extends GetView<WalletController> {
   const PaymentAccountScreen({super.key});
 
   @override
@@ -15,21 +16,25 @@ class PaymentAccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.creamBg,
       appBar: const CommonAppBar(title: '收款账号'),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 40.h),
-        children: [
-          // 提示信息卡片
-          _buildInfoBanner(),
-          SizedBox(height: 24.h),
-          // 已绑定账号分组
-          _buildBoundAccountsSection(),
-          SizedBox(height: 24.h),
-          // 可绑定方式分组
-          _buildBindableMethodsSection(),
-          SizedBox(height: 24.h),
-          // 绑定规则提示
-          _buildBindingRulesTip(),
-        ],
+      body: Obx(
+        () => ListView(
+          padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 40.h),
+          children: [
+            // 提示信息卡片
+            _buildInfoBanner(),
+            if (controller.paymentAccounts.isNotEmpty) ...[
+              SizedBox(height: 24.h),
+              // 已绑定账号分组
+              _buildBoundAccountsSection(),
+            ],
+            SizedBox(height: 24.h),
+            // 可绑定方式分组
+            _buildBindableMethodsSection(),
+            SizedBox(height: 24.h),
+            // 绑定规则提示
+            _buildBindingRulesTip(),
+          ],
+        ),
       ),
     );
   }
@@ -103,18 +108,23 @@ class PaymentAccountScreen extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         // 已绑定账号卡片列表
-        _buildAccountCard(
-          method: '支付宝',
-          icon: '🅰️',
-          account: 'zhang****@alipay.com',
-          realName: '张三',
-          isBound: true,
-          isPrimary: true,
-          onManage: () => Get.toNamed(RouteNames.bindAlipay),
-        ),
-        SizedBox(height: 12.h),
-        // 显示空状态或其他账号
-        _buildEmptyBindMessage(),
+        ...controller.paymentAccounts.map((account) {
+          final isAlipay = account.method == 'alipay';
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: _buildAccountCard(
+              method: isAlipay ? '支付宝' : (account.method == 'wechat' ? '微信' : '银行卡'),
+              icon: isAlipay ? '🅰️' : (account.method == 'wechat' ? '💚' : '🏦'),
+              account: account.accountNoMask,
+              realName: account.accountName,
+              isBound: true,
+              isPrimary: account.isPrimary,
+              onManage: () {
+                // TODO: 实现管理逻辑，比如设为默认、删除等
+              },
+            ),
+          );
+        }),
       ],
     );
   }
