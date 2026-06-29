@@ -1,7 +1,10 @@
-import 'package:dtd/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
-import 'package:shengwang_chat_uikit/provider/chat_uikit_profile.dart';
-import 'package:shengwang_chat_uikit/ui/views/messages_view.dart';
+import 'package:get/get.dart';
+
+import '../../controllers/chat_detail_controller.dart';
+import '../../widgets/chat_composer.dart';
+import '../../widgets/chat_message_bubble.dart';
+import '../../widgets/common_app_bar.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final String userId;
@@ -16,17 +19,63 @@ class ChatDetailScreen extends StatefulWidget {
 }
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
+  late final ChatDetailController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.put(
+      ChatDetailController(
+        userID: widget.userId,
+        initialConversationID: Get.arguments?['conversationID']?.toString(),
+      ),
+      tag: widget.userId,
+    );
+  }
+
+  @override
+  void dispose() {
+    Get.delete<ChatDetailController>(tag: widget.userId);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MessagesView(
-      profile: ChatUIKitProfile.contact(
-        id: widget.userId,
+    return Obx(
+      () => Scaffold(
+        appBar: CommonAppBar(title: _controller.title.value),
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(
+                () {
+                  if (_controller.isLoading.value &&
+                      _controller.messages.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final messages = _controller.messages;
+                  if (messages.isEmpty) {
+                    return const Center(child: Text('暂无消息'));
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () => _controller.loadHistory(),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        return ChatMessageBubble(message: messages[index]);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            ChatComposer(onSend: _controller.sendText),
+          ],
+        ),
       ),
-      onAvatarTap:  (context, model) {
-        LogUtil.d('onAvatarTap');
-        return null;
-      },
     );
   }
 }

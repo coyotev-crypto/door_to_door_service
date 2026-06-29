@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:dtd/core/config/app_config.dart';
-import 'package:dtd/core/services/agora_chat_service.dart';
+import 'package:dtd/core/services/openim_chat_service.dart';
 import 'package:dtd/core/utils/loading_util.dart';
 import 'package:dtd/core/utils/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../routes/route_names.dart';
 import '../../data/repositories/account_security_repository.dart';
-import '../../data/repositories/agora_chat_repository.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
@@ -20,7 +19,6 @@ class LoginController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
   final AccountSecurityRepository _accountSecurityRepository =
       AccountSecurityRepository();
-  final AgoraChatRepository _agoraChatRepository = AgoraChatRepository();
   final AuthService _authService = AuthService.instance;
   final SmsCodeController smsCodeController = Get.find<SmsCodeController>();
 
@@ -145,7 +143,7 @@ class LoginController extends GetxController {
         LogUtil.e('获取用户信息失败: $e', tag: 'LoginController');
       }
 
-      await _loginAgoraChat();
+      await _loginOpenIMChat();
 
       if (context.mounted) {
         // 登录成功,跳转到首页
@@ -166,22 +164,14 @@ class LoginController extends GetxController {
 
   /// 更新协议同意状态
   /// [value] 是否同意
-  Future<void> _loginAgoraChat() async {
+  Future<void> _loginOpenIMChat() async {
     try {
-      final chatToken = await _agoraChatRepository.getToken();
-      final chatService = Get.isRegistered<AgoraChatService>()
-          ? AgoraChatService.to
-          : Get.put(AgoraChatService(), permanent: true);
-      await chatService.initialize(appKey: chatToken.appKey);
-      final user = AuthService.instance.user;
-      await chatService.login(
-        chatToken.chatUserId,
-        chatToken.token,
-        nickname: user?.nickname,
-        avatarUrl: user?.avatar,
-      );
+      final chatService = Get.isRegistered<OpenIMChatService>()
+          ? OpenIMChatService.to
+          : Get.put(OpenIMChatService(), permanent: true);
+      await chatService.loginWithBackendToken();
     } catch (e) {
-      LogUtil.e('Agora Chat登录失败: $e', tag: 'LoginController');
+      LogUtil.e('OpenIM Chat登录失败: $e', tag: 'LoginController');
     }
   }
 

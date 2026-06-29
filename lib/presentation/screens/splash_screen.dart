@@ -1,10 +1,9 @@
 import 'package:dtd/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/services/agora_chat_service.dart';
+import '../../core/services/openim_chat_service.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/utils/log_util.dart';
-import '../../data/repositories/agora_chat_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (isLoggedIn) {
       // 已登录，跳转到首页
-      await _loginAgoraChat();
+      await _loginOpenIMChat();
       Get.toNamed(RouteNames.home);
     } else {
       // 未登录，跳转到登录页
@@ -37,22 +36,14 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<void> _loginAgoraChat() async {
+  Future<void> _loginOpenIMChat() async {
     try {
-      final chatToken = await AgoraChatRepository().getToken();
-      final chatService = Get.isRegistered<AgoraChatService>()
-          ? AgoraChatService.to
-          : Get.put(AgoraChatService(), permanent: true);
-      await chatService.initialize(appKey: chatToken.appKey);
-      final user = AuthService.instance.user;
-      await chatService.login(
-        chatToken.chatUserId,
-        chatToken.token,
-        nickname: user?.nickname,
-        avatarUrl: user?.avatar,
-      );
+      final chatService = Get.isRegistered<OpenIMChatService>()
+          ? OpenIMChatService.to
+          : Get.put(OpenIMChatService(), permanent: true);
+      await chatService.loginWithBackendToken();
     } catch (e) {
-      LogUtil.e('Agora Chat登录失败: $e', tag: 'SplashScreen');
+      LogUtil.e('OpenIM Chat登录失败: $e', tag: 'SplashScreen');
     }
   }
 

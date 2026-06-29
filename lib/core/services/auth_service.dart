@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/token_service.dart';
 import '../utils/log_util.dart';
 import '../../data/models/user_model.dart';
-import 'agora_chat_service.dart';
+import 'openim_chat_service.dart';
 
 /// 认证服务
 /// 管理用户登录状态、用户信息等
@@ -204,9 +204,9 @@ class AuthService extends GetxService {
       // 清除用户信息
       _user.value = null;
       _isLoggedIn.value = false;
-      final chatService = Get.isRegistered<AgoraChatService>()
-          ? AgoraChatService.to
-          : Get.put(AgoraChatService(), permanent: true);
+      final chatService = Get.isRegistered<OpenIMChatService>()
+          ? OpenIMChatService.to
+          : Get.put(OpenIMChatService(), permanent: true);
       await chatService.logout();
       return true;
     } catch (e) {

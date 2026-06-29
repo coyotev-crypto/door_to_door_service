@@ -37,8 +37,10 @@ class ApiEndpoints {
   /// 退出登录
   static const String logout = '/logout';
 
+  static const String openIMToken = '/chat/openim/token';
+  static const String chatUsersBatch = '/chat/users/batch';
   static const String agoraChatToken = '/chat/agora/token';
-  static const String agoraChatUsersBatch = '/chat/users/batch';
+  static const String agoraChatUsersBatch = chatUsersBatch;
 
   // ========== 用户相关 ==========
 

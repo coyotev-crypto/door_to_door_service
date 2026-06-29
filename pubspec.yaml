@@ -35,7 +35,7 @@ dependencies:
   # 图片上传
   http: ^1.1.0
   webview_flutter: ^4.13.1
-  shengwang_chat_uikit: ^2.0.1
+  flutter_openim_sdk: ^3.8.3+hotfix.12
   mobile_scanner: ^7.2.0
   package_info_plus: ^8.1.2
   path_provider: ^2.1.4

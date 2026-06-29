@@ -1,5 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:shengwang_chat_uikit/chat_uikit.dart';
+
+class ChatUIKitTheme {
+  static final ChatUIKitTheme instance = ChatUIKitTheme._();
+
+  ChatUIKitTheme._();
+
+  void setColor(Object color) {}
+}
+
+class ChatUIKitColor {
+  static Object dark({
+    required double primaryHue,
+    required double secondaryHue,
+    required double errorHue,
+    required double neutralHue,
+    required double neutralSpecialHue,
+  }) {
+    return Object();
+  }
+
+  static Object light({
+    required double primaryHue,
+    required double secondaryHue,
+    required double errorHue,
+    required double neutralHue,
+    required double neutralSpecialHue,
+  }) {
+    return Object();
+  }
+}
 
 class AppTheme {
   // Legacy colors (keep for backward compatibility)

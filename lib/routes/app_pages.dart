@@ -1,6 +1,6 @@
-import 'package:dtd/core/services/agora_chat_service.dart';
 import 'package:dtd/core/services/auth_service.dart';
 import 'package:dtd/core/services/location_service.dart';
+import 'package:dtd/core/services/openim_chat_service.dart';
 import 'package:dtd/presentation/controllers/home_content_controller.dart';
 import 'package:dtd/presentation/controllers/order_controller.dart';
 import 'package:dtd/presentation/controllers/order_list_controller.dart';
@@ -68,6 +68,7 @@ import '../presentation/controllers/more_recommendations_controller.dart';
 import '../presentation/controllers/search_controller.dart';
 import '../presentation/controllers/address_controller.dart';
 import '../presentation/controllers/account_security_controller.dart';
+import '../presentation/controllers/conversation_controller.dart';
 
 class AppPages {
   static const String initial = RouteNames.splash;
@@ -90,8 +91,8 @@ class AppPages {
       name: RouteNames.home,
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() => [
-            if (!Get.isRegistered<AgoraChatService>())
-              Get.lazyPut(() => AgoraChatService()),
+            if (!Get.isRegistered<OpenIMChatService>())
+              Get.lazyPut(() => OpenIMChatService()),
             Get.lazyPut(() => LocationService()),
             Get.lazyPut(() => HomeController()),
             Get.lazyPut(() => ServiceController()),
@@ -99,6 +100,7 @@ class AppPages {
             Get.lazyPut(() => HomeContentController()),
             Get.lazyPut(() => PostListController()),
             Get.lazyPut(() => OrderListController()),
+            Get.lazyPut(() => ConversationController()),
           ]),
     ),
     GetPage(
