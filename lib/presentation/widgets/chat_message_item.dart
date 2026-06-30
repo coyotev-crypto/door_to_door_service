@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../core/themes/resource.dart';
 import '../../core/themes/app_theme.dart';
 import '../../data/models/chat_message_model.dart';
 import 'chat_file_bubble.dart';
 import 'chat_image_bubble.dart';
 import 'chat_location_bubble.dart';
-import 'chat_message_action_sheet.dart';
+import 'chat_message_pop_menu.dart';
 import 'chat_send_status_view.dart';
 import 'chat_text_bubble.dart';
 import 'chat_time_label.dart';
@@ -58,9 +59,8 @@ class ChatMessageItem extends StatelessWidget {
                       ? CrossAxisAlignment.end
                       : CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onLongPress: () => _showActionSheet(context),
+                    ChatMessagePopMenu(
+                      actions: _menuActions,
                       child: _buildBubble(),
                     ),
                     const SizedBox(height: 4),
@@ -116,18 +116,36 @@ class ChatMessageItem extends StatelessWidget {
     return ChatTextBubble(message: message);
   }
 
-  void _showActionSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      showDragHandle: false,
-      builder: (_) => ChatMessageActionSheet(
-        message: message,
-        onCopy: onCopy,
-        onDelete: onDelete,
-        onRetry: onRetry,
-        onRevoke: onRevoke,
+  List<ChatMessageMenuAction> get _menuActions {
+    final canRevoke = message.isSelf &&
+        !message.isRevoked &&
+        !message.isSendFailed &&
+        !message.isSending;
+    return [
+      if (message.type == ChatMessageType.text && !message.isRevoked)
+        ChatMessageMenuAction(
+          iconAsset: Resource.chatMenuCopy,
+          label: '\u590d\u5236',
+          onTap: () => onCopy?.call(),
+        ),
+      if (message.isSendFailed)
+        ChatMessageMenuAction(
+          iconAsset: Resource.chatFailedResend,
+          label: '\u91cd\u53d1',
+          onTap: () => onRetry?.call(),
+        ),
+      if (canRevoke)
+        ChatMessageMenuAction(
+          iconAsset: Resource.chatMenuRevoke,
+          label: '\u64a4\u56de',
+          onTap: () => onRevoke?.call(),
+        ),
+      ChatMessageMenuAction(
+        iconAsset: Resource.chatMenuDelete,
+        label: '\u5220\u9664',
+        onTap: () => onDelete?.call(),
       ),
-    );
+    ];
   }
 }
 
