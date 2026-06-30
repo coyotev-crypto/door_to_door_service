@@ -20,6 +20,8 @@ class OpenIMChatService extends GetxService {
   final RxList<ConversationInfo> conversationChanged =
       <ConversationInfo>[].obs;
   final Rxn<Message> newMessage = Rxn<Message>();
+  final Rxn<List<ReadReceiptInfo>> readReceipt = Rxn<List<ReadReceiptInfo>>();
+  final Rxn<RevokedInfo> messageRevoked = Rxn<RevokedInfo>();
   final RxInt totalUnreadCount = 0.obs;
 
   String? _apiAddr;
@@ -144,6 +146,8 @@ class OpenIMChatService extends GetxService {
       isLoggedIn.value = false;
       conversationChanged.clear();
       newMessage.value = null;
+      readReceipt.value = null;
+      messageRevoked.value = null;
       totalUnreadCount.value = 0;
     }
   }
@@ -172,6 +176,13 @@ class OpenIMChatService extends GetxService {
         },
         onRecvOfflineNewMessage: (message) {
           newMessage.value = message;
+          refreshConversations();
+        },
+        onRecvC2CReadReceipt: (list) {
+          readReceipt.value = list;
+        },
+        onNewRecvMessageRevoked: (info) {
+          messageRevoked.value = info;
           refreshConversations();
         },
       ),

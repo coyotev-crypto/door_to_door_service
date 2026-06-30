@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../controllers/chat_detail_controller.dart';
 import '../../widgets/chat_composer.dart';
-import '../../widgets/chat_message_bubble.dart';
+import '../../widgets/chat_message_list.dart';
 import '../../widgets/common_app_bar.dart';
 
 class ChatDetailScreen extends StatefulWidget {
@@ -49,9 +49,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             Expanded(
               child: Obx(
                 () {
-                  if (_controller.isLoading.value &&
+                  if (_controller.isInitialLoading.value &&
                       _controller.messages.isEmpty) {
                     return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (_controller.errorMessage.value.isNotEmpty &&
+                      _controller.messages.isEmpty) {
+                    return Center(
+                      child: Text(_controller.errorMessage.value),
+                    );
                   }
 
                   final messages = _controller.messages;
@@ -59,20 +66,35 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     return const Center(child: Text('暂无消息'));
                   }
 
-                  return RefreshIndicator(
+                  return ChatMessageList(
+                    messages: _controller.messages,
+                    scrollController: _controller.scrollController,
+                    isLoadingMore: _controller.isLoadingMore,
+                    showNewMessageIndicator:
+                        _controller.showNewMessageIndicator,
                     onRefresh: () => _controller.loadHistory(),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        return ChatMessageBubble(message: messages[index]);
-                      },
-                    ),
+                    onCopy: _controller.copyMessage,
+                    onDelete: _controller.deleteLocalMessage,
+                    onRetry: _controller.retryMessage,
+                    onRevoke: _controller.revokeMessage,
+                    onPlayVoice: _controller.playVoice,
+                    onOpenFile: _controller.openFile,
+                    onOpenLocation: _controller.openLocation,
+                    onJumpToBottom: _controller.scrollToBottom,
                   );
                 },
               ),
             ),
-            ChatComposer(onSend: _controller.sendText),
+            ChatComposer(
+              controller: _controller.inputController,
+              focusNode: _controller.focusNode,
+              onSend: _controller.sendText,
+              onPickImage: _controller.pickAndSendImage,
+              onPickFile: _controller.pickAndSendFile,
+              onSendLocation: _controller.sendCurrentLocation,
+              onStartRecord: _controller.startRecordVoice,
+              onStopRecord: _controller.stopRecordAndSendVoice,
+            ),
           ],
         ),
       ),
