@@ -130,14 +130,15 @@ class ChatDetailController extends GetxController {
       final list = result.messageList ?? [];
       final mapped =
           list.map(_mapMessage).whereType<ChatMessageModel>().toList();
+      final sorted = _sortNewestFirst(mapped);
 
       if (refresh || _isFirstLoad) {
-        messages.assignAll(mapped);
+        messages.assignAll(sorted);
       } else {
-        _appendHistory(mapped);
+        _appendHistory(sorted);
       }
 
-      _oldestMessage = list.isNotEmpty ? list.last : _oldestMessage;
+      _oldestMessage = _oldestRawMessage(list) ?? _oldestMessage;
       _isFirstLoad = false;
       hasMore.value = result.isEnd != true && list.isNotEmpty;
       await markRead();
@@ -647,6 +648,25 @@ class ChatDetailController extends GetxController {
     final deduped =
         history.where((item) => !exists.contains(item.clientMsgID)).toList();
     messages.addAll(deduped);
+  }
+
+  List<ChatMessageModel> _sortNewestFirst(List<ChatMessageModel> list) {
+    final indexed = list.indexed.toList();
+    indexed.sort((a, b) {
+      final timeCompare = b.$2.sendTime.compareTo(a.$2.sendTime);
+      if (timeCompare != 0) return timeCompare;
+      return a.$1.compareTo(b.$1);
+    });
+    return indexed.map((item) => item.$2).toList();
+  }
+
+  Message? _oldestRawMessage(List<Message> list) {
+    if (list.isEmpty) return null;
+    return list.reduce((oldest, current) {
+      final oldestTime = oldest.sendTime ?? 0;
+      final currentTime = current.sendTime ?? 0;
+      return currentTime < oldestTime ? current : oldest;
+    });
   }
 
   void _markMessageFailed(String? clientMsgID) {

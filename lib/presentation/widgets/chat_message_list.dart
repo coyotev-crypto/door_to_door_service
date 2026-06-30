@@ -10,7 +10,6 @@ class ChatMessageList extends StatelessWidget {
   final ScrollController scrollController;
   final RxBool isLoadingMore;
   final RxBool showNewMessageIndicator;
-  final Future<void> Function() onRefresh;
   final ValueChanged<ChatMessageModel> onCopy;
   final ValueChanged<ChatMessageModel> onDelete;
   final ValueChanged<ChatMessageModel> onRetry;
@@ -26,7 +25,6 @@ class ChatMessageList extends StatelessWidget {
     required this.scrollController,
     required this.isLoadingMore,
     required this.showNewMessageIndicator,
-    required this.onRefresh,
     required this.onCopy,
     required this.onDelete,
     required this.onRetry,
@@ -41,45 +39,40 @@ class ChatMessageList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        RefreshIndicator(
-          onRefresh: onRefresh,
-          child: Obx(
-            () => ListView.builder(
-              controller: scrollController,
-              reverse: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              itemCount: messages.length + (isLoadingMore.value ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == messages.length) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                  );
-                }
+        Obx(
+          () => ListView.builder(
+            controller: scrollController,
+            reverse: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              final previous =
+                  index + 1 < messages.length ? messages[index + 1] : null;
+              final item = ChatMessageItem(
+                message: message,
+                previousMessage: previous,
+                onCopy: () => onCopy(message),
+                onDelete: () => onDelete(message),
+                onRetry: () => onRetry(message),
+                onRevoke: () => onRevoke(message),
+                onPlayVoice: () => onPlayVoice(message),
+                onOpenFile: () => onOpenFile(message),
+                onOpenLocation: () => onOpenLocation(message),
+              );
 
-                final message = messages[index];
-                final previous =
-                    index + 1 < messages.length ? messages[index + 1] : null;
-                return ChatMessageItem(
-                  message: message,
-                  previousMessage: previous,
-                  onCopy: () => onCopy(message),
-                  onDelete: () => onDelete(message),
-                  onRetry: () => onRetry(message),
-                  onRevoke: () => onRevoke(message),
-                  onPlayVoice: () => onPlayVoice(message),
-                  onOpenFile: () => onOpenFile(message),
-                  onOpenLocation: () => onOpenLocation(message),
+              if (index == messages.length - 1 && isLoadingMore.value) {
+                return Column(
+                  children: [
+                    const _HistoryLoadingIndicator(),
+                    item,
+                  ],
                 );
-              },
-            ),
+              }
+
+              return item;
+            },
           ),
         ),
         Obx(
@@ -100,6 +93,24 @@ class ChatMessageList extends StatelessWidget {
               : const SizedBox.shrink(),
         ),
       ],
+    );
+  }
+}
+
+class _HistoryLoadingIndicator extends StatelessWidget {
+  const _HistoryLoadingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
     );
   }
 }

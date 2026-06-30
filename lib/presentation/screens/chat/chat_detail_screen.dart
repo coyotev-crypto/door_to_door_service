@@ -72,7 +72,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     isLoadingMore: _controller.isLoadingMore,
                     showNewMessageIndicator:
                         _controller.showNewMessageIndicator,
-                    onRefresh: () => _controller.loadHistory(),
                     onCopy: _controller.copyMessage,
                     onDelete: _controller.deleteLocalMessage,
                     onRetry: _controller.retryMessage,
