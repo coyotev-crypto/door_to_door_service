@@ -27,9 +27,6 @@ class LocationService extends GetxService {
   static const String _keyCity = 'city';
   static const String _keyDistrict = 'district';
   static const String _keyAddress = 'address';
-  static const String _keyLocationPermissionRequested =
-      'location_permission_requested';
-
   // 外部回调
   Function(double latitude, double longitude)? onLocationUpdated;
 
@@ -112,17 +109,7 @@ class LocationService extends GetxService {
     if (status.isGranted) return true;
 
     if (status.isDenied) {
-      final prefs = await SharedPreferences.getInstance();
-      final hasRequested =
-          prefs.getBool(_keyLocationPermissionRequested) ?? false;
-      if (hasRequested) {
-        if (isDebug) {
-          LogUtil.w('定位权限被拒绝，请前往设置开启', tag: _tag);
-        }
-        return false;
-      }
       final result = await Permission.location.request();
-      await prefs.setBool(_keyLocationPermissionRequested, true);
       return result.isGranted;
     }
 
@@ -142,6 +129,7 @@ class LocationService extends GetxService {
     _locationPlugin.seriesLocationCallback(
       callback: (BaiduLocation result) {
         LogUtil.d('持续定位结果: $result', tag: _tag);
+        if (!_hasValidCoordinate(result)) return;
         _currentLocation.value = result;
         _saveLocation(result);
         _updateCityFromLocation(result);
@@ -195,11 +183,15 @@ class LocationService extends GetxService {
           if (isDebug) {
             LogUtil.d('单次定位结果: $result', tag: _tag);
           }
-          _currentLocation.value = result;
-          _saveLocation(result);
-          _updateCityFromLocation(result);
-          _notifyLocationUpdated(result);
-          if (!completer.isCompleted) completer.complete(result);
+          if (_hasValidCoordinate(result)) {
+            _currentLocation.value = result;
+            _saveLocation(result);
+            _updateCityFromLocation(result);
+            _notifyLocationUpdated(result);
+            if (!completer.isCompleted) completer.complete(result);
+          } else if (!completer.isCompleted) {
+            completer.complete(null);
+          }
         },
       );
       if (Platform.isIOS) {
@@ -223,6 +215,9 @@ class LocationService extends GetxService {
       }
       return null;
     } finally {
+      if (Platform.isAndroid) {
+        await _locationPlugin.stopLocation();
+      }
       _isLocating.value = false;
     }
   }
@@ -253,10 +248,11 @@ class LocationService extends GetxService {
 
   /// 保存位置到本地
   Future<void> _saveLocation(BaiduLocation location) async {
+    if (!_hasValidCoordinate(location)) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setDouble(_keyLatitude, location.latitude ?? 0.0);
-      await prefs.setDouble(_keyLongitude, location.longitude ?? 0.0);
+      await prefs.setDouble(_keyLatitude, location.latitude!);
+      await prefs.setDouble(_keyLongitude, location.longitude!);
       await prefs.setString(_keyProvince, location.province ?? '');
       await prefs.setString(_keyCity, location.city ?? '');
       await prefs.setString(_keyDistrict, location.district ?? '');
@@ -272,7 +268,7 @@ class LocationService extends GetxService {
       final prefs = await SharedPreferences.getInstance();
       final lat = prefs.getDouble(_keyLatitude);
       final lng = prefs.getDouble(_keyLongitude);
-      if (lat != null && lng != null) {
+      if (_isValidCoordinate(lat, lng)) {
         _currentLocation.value = BaiduLocation(
           latitude: lat,
           longitude: lng,
@@ -333,9 +329,22 @@ class LocationService extends GetxService {
 
   /// 通知外部位置更新
   void _notifyLocationUpdated(BaiduLocation location) {
-    if (location.latitude != null && location.longitude != null) {
+    if (_hasValidCoordinate(location)) {
       onLocationUpdated?.call(location.latitude!, location.longitude!);
     }
+  }
+
+  bool _hasValidCoordinate(BaiduLocation location) {
+    return _isValidCoordinate(location.latitude, location.longitude);
+  }
+
+  bool _isValidCoordinate(double? latitude, double? longitude) {
+    if (latitude == null || longitude == null) return false;
+    if (latitude == 0.0 && longitude == 0.0) return false;
+    return latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
   }
 
   @override

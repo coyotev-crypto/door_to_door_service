@@ -24,9 +24,7 @@ class HomeContentController extends GetxController {
   final Rx<String?> _cityId = Rx<String?>(null);
   final Rx<String?> _areaId = Rx<String?>(null);
 
-  // 服务列表状态
-  final RxList<ServiceItem> _services = <ServiceItem>[].obs;
-  final RxList<ServiceItem> _newcomerServices = <ServiceItem>[].obs;
+  // 服务列表状态由 ServiceController 统一管理，避免定位刷新后出现双份列表不同步。
   final ServiceController _serviceController = Get.find<ServiceController>();
 
   // 搜索相关状态
@@ -35,6 +33,7 @@ class HomeContentController extends GetxController {
 
   // 初始化状态
   final RxBool _isInitialized = false.obs;
+  int _requestVersion = 0;
 
   // 手动选择的城市（地址选择页面返回）
   final Rx<AddressModel?> _selectedCity = Rx<AddressModel?>(null);
@@ -61,10 +60,7 @@ class HomeContentController extends GetxController {
   String? get areaId => _areaId.value;
 
   /// 获取服务列表
-  List<ServiceItem> get services => _services;
-
-  /// 获取新人推荐列表
-  List<ServiceItem> get newcomerServices => _newcomerServices;
+  List<ServiceItem> get services => _serviceController.services;
 
   /// 是否已初始化
   bool get isInitialized => _isInitialized.value;
@@ -98,7 +94,7 @@ class HomeContentController extends GetxController {
     final locationService = Get.find<LocationService>();
     final lc = locationService.currentCity;
     if (lc != null && lc.isNotEmpty) return lc;
-    return '北京';
+    return locationService.isLocating ? '定位中' : '选择城市';
   }
 
   @override
@@ -114,7 +110,6 @@ class HomeContentController extends GetxController {
   @override
   void onClose() {
     refreshController.dispose();
-    _serviceController.dispose();
     super.onClose();
   }
 
@@ -169,6 +164,7 @@ class HomeContentController extends GetxController {
 
   /// 处理分类选择
   void handleCategorySelected(int index) {
+    if (index < 0 || index >= _categories.length) return;
     _selectedCategoryIndex.value = index;
     // 重新加载服务列表
     loadServices();
@@ -192,40 +188,34 @@ class HomeContentController extends GetxController {
 
   /// 加载服务列表
   Future<void> loadServices() async {
+    final requestVersion = ++_requestVersion;
     try {
+      final category = _selectedCategory;
       // 调用ServiceController加载服务列表
-      await _serviceController.loadServices(
+      final applied = await _serviceController.loadServices(
         refresh: true,
-        categoryId: _selectedCategoryIndex.value > 0
-            ? _selectedCategoryIndex.value
-            : null,
+        categoryId: category != null && category.id > 0 ? category.id : null,
         provinceId: _provinceId.value,
         cityId: _cityId.value,
         areaId: _areaId.value,
         keyword: _searchKeyword.value,
       );
-
-      // 更新服务列表
-      _services.clear();
-      _services.addAll(_serviceController.services);
-      _newcomerServices.clear();
-      _newcomerServices.addAll(_serviceController.newcomerServices);
+      if (!applied || requestVersion != _requestVersion) return;
     } catch (e) {
-      // 错误处理
-      _services.clear();
       rethrow;
     }
   }
 
   /// 下拉刷新
   Future<void> refreshServices() async {
+    final requestVersion = ++_requestVersion;
     try {
-      await _serviceController.refreshServices();
+      final applied = await _serviceController.refreshServices();
+      if (!applied || requestVersion != _requestVersion) {
+        refreshController.finishRefresh();
+        return;
+      }
 
-      _services.clear();
-      _services.addAll(_serviceController.services);
-      _newcomerServices.clear();
-      _newcomerServices.addAll(_serviceController.newcomerServices);
       refreshController.finishRefresh();
     } catch (e) {
       refreshController.finishRefresh(IndicatorResult.fail);
@@ -240,11 +230,13 @@ class HomeContentController extends GetxController {
       return;
     }
 
+    final requestVersion = ++_requestVersion;
     try {
-      await _serviceController.loadMoreServices();
-
-      _services.clear();
-      _services.addAll(_serviceController.services);
+      final applied = await _serviceController.loadMoreServices();
+      if (!applied || requestVersion != _requestVersion) {
+        refreshController.finishLoad();
+        return;
+      }
 
       refreshController.finishLoad(_serviceController.hasMore
           ? IndicatorResult.success
@@ -260,16 +252,12 @@ class HomeContentController extends GetxController {
   Future<void> performSearch(String keyword) async {
     _searchKeyword.value = keyword;
     _isSearching.value = true;
+    final requestVersion = ++_requestVersion;
 
     try {
-      await _serviceController.searchServices(keyword);
-
-      // 更新服务列表
-      _services.clear();
-      _services.addAll(_serviceController.services);
+      final applied = await _serviceController.searchServices(keyword);
+      if (!applied || requestVersion != _requestVersion) return;
     } catch (e) {
-      // 错误处理
-      _services.clear();
       rethrow;
     } finally {
       _isSearching.value = false;
@@ -283,35 +271,10 @@ class HomeContentController extends GetxController {
     loadServices();
   }
 
-  /// 更新服务收藏状态
-  /// [serviceId] 服务ID
-  /// [isFavorite] 是否收藏
-  void updateServiceFavorite(int serviceId, bool isFavorite) {
-    // 更新服务列表中的收藏状态
-    final index = _services.indexWhere((service) => service.id == serviceId);
-    if (index != -1) {
-      final s = _services[index];
-      _services[index] = s.copyWith(
-        isFavorite: isFavorite,
-        favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
-      );
-      _services.refresh();
-    }
-
-    // 更新新人推荐列表中的收藏状态
-    final newcomerIndex = _newcomerServices.indexWhere((service) => service.id == serviceId);
-    if (newcomerIndex != -1) {
-      final s = _newcomerServices[newcomerIndex];
-      _newcomerServices[newcomerIndex] = s.copyWith(
-        isFavorite: isFavorite,
-        favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
-      );
-      _newcomerServices.refresh();
-    }
+  CategoryModel? get _selectedCategory {
+    final index = _selectedCategoryIndex.value;
+    if (index < 0 || index >= _categories.length) return null;
+    return _categories[index];
   }
 
-  int _nextFavoriteCount(int? current, bool isFavorite) {
-    final c = current ?? 0;
-    return isFavorite ? c + 1 : (c > 0 ? c - 1 : 0);
-  }
 }

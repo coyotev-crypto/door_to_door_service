@@ -54,6 +54,7 @@ class ServiceController extends GetxController {
 
   // 新人推荐列表
   final RxList<ServiceItem> _newcomerServices = <ServiceItem>[].obs;
+  int _requestVersion = 0;
 
   @override
   void onInit() {
@@ -129,7 +130,7 @@ class ServiceController extends GetxController {
   /// [latitude] 用户纬度（可选，不传则使用当前用户位置）
   /// [longitude] 用户经度（可选，不传则使用当前用户位置）
   /// [radius] 搜索半径，默认为20.0
-  Future<void> loadServices({
+  Future<bool> loadServices({
     bool refresh = false,
     int? categoryId,
     ServiceSortOption? sortOption,
@@ -142,6 +143,7 @@ class ServiceController extends GetxController {
     double? longitude,
     double radius = 20.0,
   }) async {
+    final requestVersion = ++_requestVersion;
     // 如果是刷新，重置页码
     LogUtil.d(
         'loadServices called with refresh=$refresh, categoryId=$categoryId, sortOption=$sortOption',
@@ -178,6 +180,7 @@ class ServiceController extends GetxController {
         longitude: useLongitude,
         radius: radius,
       );
+      if (requestVersion != _requestVersion) return false;
 
       if (refresh) {
         _services.value = response.list ?? [];
@@ -189,28 +192,42 @@ class ServiceController extends GetxController {
 
       _totalCount.value = response.count ?? 0;
       _errorMessage.value = '';
+      return true;
     } catch (e) {
+      if (requestVersion != _requestVersion) return false;
       _errorMessage.value = e.toString();
       if (refresh) {
         _services.clear();
         _filteredServices.clear();
       }
+      return false;
     } finally {
-      _isLoading.value = false;
+      if (requestVersion == _requestVersion) {
+        _isLoading.value = false;
+      }
     }
   }
 
   /// 加载更多服务
-  Future<void> loadMoreServices() async {
-    if (_isLoading.value || !hasMore) return;
+  Future<bool> loadMoreServices() async {
+    if (_isLoading.value || !hasMore) return false;
 
     _currentPage.value++;
-    await loadServices(refresh: false);
+    return loadServices(
+      refresh: false,
+      categoryId: _selectedCategoryId.value,
+      provinceId: _provinceId.value,
+      cityId: _cityId.value,
+      areaId: _areaId.value,
+      keyword: _searchKeyword.value,
+      latitude: _userLatitude.value,
+      longitude: _userLongitude.value,
+    );
   }
 
   /// 刷新服务列表
-  Future<void> refreshServices() async {
-    await loadServices(
+  Future<bool> refreshServices() async {
+    return loadServices(
       refresh: true,
       categoryId: _selectedCategoryId.value,
       provinceId: _provinceId.value,
@@ -234,9 +251,18 @@ class ServiceController extends GetxController {
   /// 搜索服务
   /// [keyword] 搜索关键词
   /// [refresh] 是否刷新
-  Future<void> searchServices(String keyword, {bool refresh = true}) async {
+  Future<bool> searchServices(String keyword, {bool refresh = true}) async {
     _searchKeyword.value = keyword;
-    await loadServices(refresh: refresh);
+    return loadServices(
+      refresh: refresh,
+      categoryId: _selectedCategoryId.value,
+      provinceId: _provinceId.value,
+      cityId: _cityId.value,
+      areaId: _areaId.value,
+      keyword: keyword,
+      latitude: _userLatitude.value,
+      longitude: _userLongitude.value,
+    );
   }
 
   /// 清空搜索
@@ -248,7 +274,7 @@ class ServiceController extends GetxController {
   /// [latitude] 用户纬度
   /// [longitude] 用户经度
   /// [refresh] 是否刷新服务列表
-  Future<void> setUserLocation({
+  Future<bool> setUserLocation({
     required double latitude,
     required double longitude,
     bool refresh = true,
@@ -256,19 +282,21 @@ class ServiceController extends GetxController {
     _userLatitude.value = latitude;
     _userLongitude.value = longitude;
     if (refresh) {
-      await refreshServices();
+      return refreshServices();
     }
+    return true;
   }
 
   /// 清除用户位置
   /// [refresh] 是否刷新服务列表
-  Future<void> clearUserLocation({bool refresh = true}) async {
+  Future<bool> clearUserLocation({bool refresh = true}) async {
     _userLatitude.value = null;
     _userLongitude.value = null;
     LogUtil.d('清除用户位置', tag: _tag);
     if (refresh) {
-      await refreshServices();
+      return refreshServices();
     }
+    return true;
   }
 
   /// 初始化位置更新回调
@@ -303,7 +331,7 @@ class ServiceController extends GetxController {
   /// 切换收藏状态
   /// [serviceId] 服务ID
   /// [isFavorite] 是否收藏
-  Future<void> toggleFavorite(
+  Future<bool> toggleFavorite(
     int serviceId,
     bool isFavorite,
   ) async {
@@ -345,9 +373,11 @@ class ServiceController extends GetxController {
           favoriteCount: _nextFavoriteCount(s.favoriteCount, isFavorite),
         );
       }
+      return true;
     } catch (e) {
       _errorMessage.value = e.toString();
       ToastUtil.showError('操作失败: $e');
+      return false;
     } finally {
       LoadingUtil.dismiss();
     }

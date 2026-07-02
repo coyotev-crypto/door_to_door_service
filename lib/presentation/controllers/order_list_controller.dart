@@ -19,6 +19,8 @@ class OrderListController extends GetxController {
 
   static const pageSize = 10;
   bool _noMore = false;
+  bool? _lastIsProvider;
+  Worker? _roleWorker;
   bool get hasMore => !_noMore;
 
   bool get isProvider {
@@ -72,12 +74,33 @@ class OrderListController extends GetxController {
     super.onInit();
     final args = Get.arguments;
     if (args is int) selectedTab.value = args.clamp(0, 4);
+    _lastIsProvider = isProvider;
+    _roleWorker = ever(AuthService.instance.userRx, (_) => _handleRoleChanged());
     onRefresh();
+  }
+
+  @override
+  void onClose() {
+    _roleWorker?.dispose();
+    refreshController.dispose();
+    super.onClose();
   }
 
   void switchTab(int index) {
     if (selectedTab.value == index) return;
     selectedTab.value = index;
+    onRefresh();
+  }
+
+  void _handleRoleChanged() {
+    final nextIsProvider = isProvider;
+    if (_lastIsProvider == nextIsProvider) return;
+
+    _lastIsProvider = nextIsProvider;
+    selectedTab.value = 0;
+    currentPage.value = 1;
+    _noMore = false;
+    orders.clear();
     onRefresh();
   }
 

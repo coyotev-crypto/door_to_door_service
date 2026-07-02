@@ -1,3 +1,5 @@
+import 'package:dtd/core/config/app_config.dart';
+import 'package:dtd/core/services/auth_service.dart';
 import 'package:dtd/core/utils/log_util.dart';
 import 'package:dtd/core/utils/toast_util.dart';
 import 'package:dtd/data/models/category_model.dart';
@@ -24,14 +26,24 @@ class HomeController extends GetxController {
   // 当前选中的分类
   final Rx<CategoryModel?> selectedCategory = Rx<CategoryModel?>(null);
 
+  Worker? _roleWorker;
+
   @override
   void onInit() {
     super.onInit();
-    loadHomeData();
+    if (!_isProvider) {
+      loadHomeData();
+    }
+    _roleWorker = ever(AuthService.instance.userRx, (_) {
+      if (!_isProvider && categories.isEmpty) {
+        loadHomeData();
+      }
+    });
   }
 
   @override
   void onClose() {
+    _roleWorker?.dispose();
     pageController.dispose();
     super.onClose();
   }
@@ -41,8 +53,7 @@ class HomeController extends GetxController {
     LogUtil.d('切换到页面索引: $index', tag: _tag);
     // 如果已经是当前页面，则不执行切换
     if (currentIndex.value == index) return;
-    
-    currentIndex.value = index;
+
     pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -52,6 +63,8 @@ class HomeController extends GetxController {
 
   /// 加载首页数据
   Future<void> loadHomeData() async {
+    if (_isProvider) return;
+
     isLoading.value = true;
     try {
       // 加载服务分类
@@ -72,5 +85,10 @@ class HomeController extends GetxController {
   /// 刷新首页
   Future<void> refreshHome() async {
     await loadHomeData();
+  }
+
+  bool get _isProvider {
+    return AuthService.instance.userRx.value?.roleId ==
+        AppConfig.MERCHANT_USER_TYPE;
   }
 }

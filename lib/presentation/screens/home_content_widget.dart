@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import '../../core/utils/screen_adapter.dart';
 import '../widgets/category_filter_bar_widget.dart';
-import '../widgets/newcomer_recommendation_widget.dart';
 import '../widgets/service_card_widget.dart';
 import '../controllers/home_content_controller.dart';
 import '../controllers/service_controller.dart';
@@ -17,14 +16,13 @@ import '../../core/themes/app_theme.dart';
 /// 首页内容组件 — CustomScrollView + Slivers
 class HomeContentWidget extends GetWidget<HomeContentController> {
   final Future<void> Function() onRefresh;
-  final bool isRefreshing;
   final serviceController = Get.find<ServiceController>();
 
-  HomeContentWidget(
-      {super.key, required this.onRefresh, this.isRefreshing = false});
+  HomeContentWidget({super.key, required this.onRefresh});
 
   Future<void> _onRefresh() async {
     try {
+      await onRefresh();
       await controller.refreshServices();
     } catch (e) {
       if (Get.context?.mounted == true) {
@@ -89,25 +87,8 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
               onRefresh: _onRefresh,
               onLoad: _onLoad,
               child: CustomScrollView(
-                scrollCacheExtent: const ScrollCacheExtent.pixels(800), slivers: [
-                  // 新人推荐
-                  if (controller.newcomerServices.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: RepaintBoundary(
-                        child: NewcomerRecommendationWidget(
-                          services: controller.newcomerServices,
-                          onMorePressed: () {
-                            Get.toNamed(RouteNames.moreRecommendations,
-                                arguments: {
-                                  'provinceId': controller.provinceId,
-                                  'cityId': controller.cityId,
-                                  'areaId': controller.areaId,
-                                });
-                          },
-                          onServiceTap: (service) {/* TODO */},
-                        ),
-                      ),
-                    ),
+                scrollCacheExtent: const ScrollCacheExtent.pixels(800),
+                slivers: [
                   const SliverToBoxAdapter(
                       child: SectionHeaderWidget(
                           title: '推荐商户', badge: '精选')),
@@ -136,10 +117,12 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
                                 onFavoriteTap: () async {
                                   final s =
                                       !(service.isFavorite ?? false);
-                                  await serviceController.toggleFavorite(
-                                      service.id, s);
-                                  controller.updateServiceFavorite(
-                                      service.id, s);
+                                  final success =
+                                      await serviceController.toggleFavorite(
+                                    service.id,
+                                    s,
+                                  );
+                                  if (!success) return;
                                 },
                               ),
                               if (index <

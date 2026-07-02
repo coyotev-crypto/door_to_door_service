@@ -93,7 +93,8 @@ class AppPages {
       binding: BindingsBuilder(() => [
             if (!Get.isRegistered<OpenIMChatService>())
               Get.lazyPut(() => OpenIMChatService()),
-            Get.lazyPut(() => LocationService()),
+            if (!Get.isRegistered<LocationService>())
+              Get.put(LocationService(), permanent: true),
             Get.lazyPut(() => HomeController()),
             Get.lazyPut(() => ServiceController()),
             Get.lazyPut(() => ProfileController()),

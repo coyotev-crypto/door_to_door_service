@@ -74,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen>
             onRefresh: () async {
               await _controller.refreshHome();
             },
-            isRefreshing: _controller.isLoading.value,
           );
         });
       case 1:
@@ -131,6 +130,9 @@ class _HomeScreenState extends State<HomeScreen>
                 child: Obx(() => HomeBottomNavWidget(
                       currentIndex: _controller.currentIndex.value,
                       onTap: (index) {
+                        if (_loadedPages.add(index)) {
+                          setState(() {});
+                        }
                         _controller.changePage(index);
                       },
                     )),
