@@ -11,4 +11,9 @@ class Resource {
   static const String chatToolboxFile = 'resources/chat/ic_toolbox_file.webp';
   static const String chatToolboxLocation =
       'resources/chat/ic_toolbox_location.webp';
+
+  static const String chatOpenVoice = 'resources/chat/ic_open_voice.webp';
+  static const String chatOpenKeyboard = 'resources/chat/ic_open_keyboard.webp';
+  static const String chatOpenToolbox = 'resources/chat/ic_open_toolbox.webp';
+  static const String chatSendMessage = 'resources/chat/ic_send_message.webp';
 }

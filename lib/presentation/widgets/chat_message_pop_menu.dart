@@ -34,6 +34,8 @@ class _ChatMessagePopMenuState extends State<ChatMessagePopMenu> {
   RenderBox? _childBox;
   RenderBox? _overlayBox;
   TapDownDetails? _tapDownDetails;
+  ModalRoute<dynamic>? _route;
+  bool _willPopRegistered = false;
 
   @override
   void dispose() {
@@ -61,6 +63,7 @@ class _ChatMessagePopMenuState extends State<ChatMessagePopMenu> {
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
+        final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
         return Listener(
           behavior: HitTestBehavior.translucent,
           onPointerDown: (event) {
@@ -85,6 +88,7 @@ class _ChatMessagePopMenuState extends State<ChatMessagePopMenu> {
                     const Offset(-_horizontalMargin, 0),
                   ),
                   verticalMargin: _verticalMargin,
+                  keyboardHeight: keyboardHeight,
                   onTapDownOffset: _tapDownDetails?.globalPosition,
                 ),
                 children: [
@@ -103,12 +107,34 @@ class _ChatMessagePopMenuState extends State<ChatMessagePopMenu> {
       },
     );
 
+    _registerWillPopCallback();
     Overlay.of(context).insert(_overlayEntry!);
   }
 
   void _hideMenu() {
     _overlayEntry?.remove();
     _overlayEntry = null;
+    _removeWillPopCallback();
+  }
+
+  void _registerWillPopCallback() {
+    if (_willPopRegistered) return;
+    _route = ModalRoute.of(context);
+    _route?.addScopedWillPopCallback(_handleWillPop);
+    _willPopRegistered = _route != null;
+  }
+
+  void _removeWillPopCallback() {
+    if (!_willPopRegistered) return;
+    _route?.removeScopedWillPopCallback(_handleWillPop);
+    _route = null;
+    _willPopRegistered = false;
+  }
+
+  Future<bool> _handleWillPop() async {
+    if (_overlayEntry == null) return true;
+    _hideMenu();
+    return false;
   }
 }
 
@@ -175,12 +201,14 @@ class _MenuLayoutDelegate extends MultiChildLayoutDelegate {
   final Size anchorSize;
   final Offset anchorOffset;
   final double verticalMargin;
+  final double keyboardHeight;
   final Offset? onTapDownOffset;
 
   _MenuLayoutDelegate({
     required this.anchorSize,
     required this.anchorOffset,
     required this.verticalMargin,
+    required this.keyboardHeight,
     this.onTapDownOffset,
   });
 
@@ -201,7 +229,8 @@ class _MenuLayoutDelegate extends MultiChildLayoutDelegate {
       );
     }
 
-    var isTop = anchorBottomY > size.height / 2;
+    final visibleHeight = size.height - keyboardHeight;
+    var isTop = anchorBottomY > visibleHeight / 2;
     final minTopMargin = contentSize.height;
     if (touchY != null && anchorTopY < minTopMargin) {
       if (touchY < minTopMargin) {
@@ -258,6 +287,13 @@ class _MenuLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_MenuLayoutId.content)) {
+      final maxTop = visibleHeight - contentSize.height;
+      if (contentOffset.dy > maxTop) {
+        contentOffset = Offset(contentOffset.dx, maxTop);
+      }
+      if (contentOffset.dy < 0) {
+        contentOffset = Offset(contentOffset.dx, 0);
+      }
       positionChild(_MenuLayoutId.content, contentOffset);
     }
 
@@ -289,6 +325,7 @@ class _MenuLayoutDelegate extends MultiChildLayoutDelegate {
     return anchorSize != oldDelegate.anchorSize ||
         anchorOffset != oldDelegate.anchorOffset ||
         verticalMargin != oldDelegate.verticalMargin ||
+        keyboardHeight != oldDelegate.keyboardHeight ||
         onTapDownOffset != oldDelegate.onTapDownOffset;
   }
 }

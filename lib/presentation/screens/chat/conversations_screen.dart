@@ -15,6 +15,7 @@ class ConversationsScreen extends StatelessWidget {
         : Get.put(ConversationController());
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: const CommonAppBar(title: '聊天', showBackButton: false),
       body: Obx(
         () {
@@ -31,7 +32,14 @@ class ConversationsScreen extends StatelessWidget {
             onRefresh: controller.loadFirstPage,
             child: ListView.separated(
               itemCount: conversations.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, __) => const Padding(
+                padding: EdgeInsets.only(left: 76),
+                child: Divider(
+                  height: 1,
+                  thickness: 0.5,
+                  color: Color(0xFFEDEFF3),
+                ),
+              ),
               itemBuilder: (context, index) {
                 final conversation = conversations[index];
                 return ConversationTile(

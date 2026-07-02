@@ -1,5 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../core/themes/app_theme.dart';
 import '../../data/models/chat_message_model.dart';
 
@@ -36,7 +39,7 @@ class ChatTextBubble extends StatelessWidget {
             ? Border.all(color: AppTheme.warmBorder, width: 1)
             : null,
       ),
-      child: Text(
+      child: _LinkedText(
         _content,
         style: TextStyle(
           fontSize: 15,
@@ -59,6 +62,8 @@ class ChatTextBubble extends StatelessWidget {
         return message.text ?? '';
       case ChatMessageType.image:
         return '[图片]';
+      case ChatMessageType.video:
+        return '[视频]';
       case ChatMessageType.voice:
         return '[语音]';
       case ChatMessageType.file:
@@ -67,7 +72,93 @@ class ChatTextBubble extends StatelessWidget {
         return '[位置]';
       case ChatMessageType.custom:
       case ChatMessageType.unsupported:
-        return '[暂不支持的消息]';
+        return message.text?.trim().isNotEmpty == true
+            ? message.text!.trim()
+            : '[暂不支持的消息]';
     }
+  }
+}
+
+class _LinkedText extends StatefulWidget {
+  static final _pattern = RegExp(
+    r'((https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[^\s]*)?)|([\w.+-]+@[\w-]+(\.[\w-]+)+)|(\b1[3-9]\d{9}\b)',
+    caseSensitive: false,
+  );
+
+  final String text;
+  final TextStyle style;
+
+  const _LinkedText(
+    this.text, {
+    required this.style,
+  });
+
+  @override
+  State<_LinkedText> createState() => _LinkedTextState();
+}
+
+class _LinkedTextState extends State<_LinkedText> {
+  final _recognizers = <TapGestureRecognizer>[];
+
+  @override
+  void dispose() {
+    for (final recognizer in _recognizers) {
+      recognizer.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    for (final recognizer in _recognizers) {
+      recognizer.dispose();
+    }
+    _recognizers.clear();
+
+    final spans = <TextSpan>[];
+    var start = 0;
+    for (final match in _LinkedText._pattern.allMatches(widget.text)) {
+      if (match.start > start) {
+        spans.add(TextSpan(text: widget.text.substring(start, match.start)));
+      }
+      final value = widget.text.substring(match.start, match.end);
+      final recognizer = TapGestureRecognizer()..onTap = () => _open(value);
+      _recognizers.add(recognizer);
+      spans.add(
+        TextSpan(
+          text: value,
+          style: widget.style.copyWith(
+            decoration: TextDecoration.underline,
+            decorationColor: widget.style.color,
+          ),
+          recognizer: recognizer,
+        ),
+      );
+      start = match.end;
+    }
+    if (start < widget.text.length) {
+      spans.add(TextSpan(text: widget.text.substring(start)));
+    }
+    return RichText(text: TextSpan(style: widget.style, children: spans));
+  }
+
+  Future<void> _open(String value) async {
+    final uri = _uriFor(value);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Uri? _uriFor(String value) {
+    if (value.contains('@') && !value.startsWith('http')) {
+      return Uri(scheme: 'mailto', path: value);
+    }
+    if (RegExp(r'^1[3-9]\d{9}$').hasMatch(value)) {
+      return Uri(scheme: 'tel', path: value);
+    }
+    final normalized =
+        value.startsWith('http://') || value.startsWith('https://')
+            ? value
+            : 'https://$value';
+    return Uri.tryParse(normalized);
   }
 }

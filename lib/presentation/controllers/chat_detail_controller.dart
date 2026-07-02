@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/services/chat_user_profile_service.dart';
 import '../../core/services/location_service.dart';
 import '../../core/services/openim_chat_service.dart';
 import '../../core/utils/log_util.dart';
@@ -31,6 +32,10 @@ class ChatDetailController extends GetxController {
   final OpenIMChatService _chatService = Get.isRegistered<OpenIMChatService>()
       ? OpenIMChatService.to
       : Get.put(OpenIMChatService(), permanent: true);
+  final ChatUserProfileService _userProfileService =
+      Get.isRegistered<ChatUserProfileService>()
+          ? ChatUserProfileService.to
+          : Get.put(ChatUserProfileService(), permanent: true);
   final LocationService? _locationService = Get.isRegistered<LocationService>()
       ? Get.find<LocationService>()
       : null;
@@ -97,6 +102,7 @@ class ChatDetailController extends GetxController {
     errorMessage.value = '';
     try {
       await _prepareConversation();
+      await _loadChatUserProfiles();
       await loadHistory(refresh: true);
     } catch (e) {
       LogUtil.e('Init chat detail failed: $e', tag: tag);
@@ -141,7 +147,9 @@ class ChatDetailController extends GetxController {
       _oldestMessage = _oldestRawMessage(list) ?? _oldestMessage;
       _isFirstLoad = false;
       hasMore.value = result.isEnd != true && list.isNotEmpty;
-      await markRead();
+      if (_isNearBottom) {
+        await markRead();
+      }
     } catch (e) {
       LogUtil.e('Load chat history failed: $e', tag: tag);
       errorMessage.value = '消息加载失败';
@@ -530,8 +538,51 @@ class ChatDetailController extends GetxController {
   }
 
   void _updateTitle(ConversationInfo conversation) {
+    final nickname = _profileName(userID);
     final showName = conversation.showName?.trim();
-    title.value = showName == null || showName.isEmpty ? userID : showName;
+    title.value =
+        nickname ?? (showName == null || showName.isEmpty ? userID : showName);
+  }
+
+  Future<void> _loadChatUserProfiles() async {
+    final userIDs = <String?>{
+      userID,
+      _chatService.currentUserID,
+    };
+    await _userProfileService.getProfilesForOpenIMUserIDs(userIDs);
+
+    final conversation = _conversationInfo;
+    if (conversation != null) {
+      _updateTitle(conversation);
+    } else {
+      title.value = _profileName(userID) ?? title.value;
+    }
+  }
+
+  Future<void> _refreshMessageUserProfiles(Iterable<String?> userIDs) async {
+    await _userProfileService.getProfilesForOpenIMUserIDs(userIDs);
+    for (var i = 0; i < messages.length; i++) {
+      messages[i] = _applyCachedProfile(messages[i]);
+    }
+  }
+
+  ChatMessageModel _applyCachedProfile(ChatMessageModel message) {
+    return message.copyWith(
+      senderFaceUrl: _profileAvatar(message.sendID) ?? message.senderFaceUrl,
+      senderNickname: _profileName(message.sendID) ?? message.senderNickname,
+    );
+  }
+
+  String? _profileName(String? userID) {
+    return _notEmpty(
+      _userProfileService.profileForOpenIMUserID(userID)?.nickname,
+    );
+  }
+
+  String? _profileAvatar(String? userID) {
+    return _notEmpty(
+      _userProfileService.profileForOpenIMUserID(userID)?.avatarUrl,
+    );
   }
 
   void _handleNewMessage(Message message) {
@@ -541,12 +592,15 @@ class ChatDetailController extends GetxController {
     if (mapped == null) return;
 
     _upsertMessage(mapped);
+    _refreshMessageUserProfiles([message.sendID]);
     if (_isNearBottom) {
       scrollToBottom();
     } else {
       showNewMessageIndicator.value = true;
     }
-    markRead();
+    if (_isNearBottom) {
+      markRead();
+    }
   }
 
   void _handleReadReceipt(List<ReadReceiptInfo> list) {
@@ -587,8 +641,13 @@ class ChatDetailController extends GetxController {
 
   ChatMessageModel? _mapMessage(Message message, {bool isSending = false}) {
     final type = _mapMessageType(message);
-    final content = message.textElem?.content ?? message.atTextElem?.text;
+    final content = message.textElem?.content ??
+        message.atTextElem?.text ??
+        message.notificationElem?.detail ??
+        message.customElem?.data ??
+        message.customElem?.description;
     final picture = message.pictureElem;
+    final video = message.videoElem;
     final sound = message.soundElem;
     final file = message.fileElem;
     final location = message.locationElem;
@@ -612,6 +671,19 @@ class ChatDetailController extends GetxController {
           picture?.sourcePicture?.url ??
           picture?.bigPicture?.url,
       imageLocalPath: picture?.sourcePath,
+      imageWidth: picture?.sourcePicture?.width ??
+          picture?.snapshotPicture?.width ??
+          picture?.bigPicture?.width,
+      imageHeight: picture?.sourcePicture?.height ??
+          picture?.snapshotPicture?.height ??
+          picture?.bigPicture?.height,
+      videoUrl: video?.videoUrl,
+      videoLocalPath: video?.videoPath,
+      videoSnapshotUrl: video?.snapshotUrl,
+      videoSnapshotLocalPath: video?.snapshotPath,
+      videoDuration: video?.duration,
+      senderFaceUrl: _profileAvatar(sendID) ?? message.senderFaceUrl,
+      senderNickname: _profileName(sendID) ?? message.senderNickname,
       voiceUrl: sound?.sourceUrl,
       voiceLocalPath: sound?.soundPath,
       voiceDuration: sound?.duration,
@@ -693,12 +765,21 @@ class ChatDetailController extends GetxController {
   }
 
   ChatMessageType _mapMessageType(Message message) {
+    final contentType = message.contentType;
+    if (contentType != null &&
+        contentType >= MessageType.notificationBegin &&
+        contentType <= MessageType.notificationEnd) {
+      return ChatMessageType.custom;
+    }
+
     switch (message.contentType) {
       case MessageType.text:
       case MessageType.atText:
         return ChatMessageType.text;
       case MessageType.picture:
         return ChatMessageType.image;
+      case MessageType.video:
+        return ChatMessageType.video;
       case MessageType.voice:
         return ChatMessageType.voice;
       case MessageType.file:
@@ -710,6 +791,12 @@ class ChatDetailController extends GetxController {
       default:
         return ChatMessageType.unsupported;
     }
+  }
+
+  String? _notEmpty(String? value) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+    return trimmed;
   }
 
   void _handleScroll() {

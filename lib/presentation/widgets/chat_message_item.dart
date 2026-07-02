@@ -10,6 +10,7 @@ import 'chat_message_pop_menu.dart';
 import 'chat_send_status_view.dart';
 import 'chat_text_bubble.dart';
 import 'chat_time_label.dart';
+import 'chat_video_bubble.dart';
 import 'chat_voice_bubble.dart';
 
 class ChatMessageItem extends StatelessWidget {
@@ -51,7 +52,7 @@ class ChatMessageItem extends StatelessWidget {
             mainAxisAlignment:
                 message.isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
-              if (!message.isSelf) _Avatar(label: _avatarLabel),
+              if (!message.isSelf) _Avatar(label: _avatarLabel, url: _avatarUrl),
               if (!message.isSelf) const SizedBox(width: 8),
               Flexible(
                 child: Column(
@@ -72,7 +73,7 @@ class ChatMessageItem extends StatelessWidget {
                 ),
               ),
               if (message.isSelf) const SizedBox(width: 8),
-              if (message.isSelf) _Avatar(label: _avatarLabel),
+              if (message.isSelf) _Avatar(label: _avatarLabel, url: _avatarUrl),
             ],
           ),
         ),
@@ -81,11 +82,17 @@ class ChatMessageItem extends StatelessWidget {
   }
 
   String get _avatarLabel {
-    final name = message.rawMessage.senderNickname?.trim();
+    final name = message.senderNickname?.trim() ??
+        message.rawMessage.senderNickname?.trim();
     if (name != null && name.isNotEmpty) return name.characters.first;
     final id = message.sendID.trim();
     if (id.isNotEmpty) return id.characters.first.toUpperCase();
     return '?';
+  }
+
+  String? get _avatarUrl {
+    final url = message.senderFaceUrl?.trim();
+    return url == null || url.isEmpty ? null : url;
   }
 
   Widget _buildBubble() {
@@ -94,6 +101,9 @@ class ChatMessageItem extends StatelessWidget {
     }
     if (message.type == ChatMessageType.image) {
       return ChatImageBubble(message: message);
+    }
+    if (message.type == ChatMessageType.video) {
+      return ChatVideoBubble(message: message);
     }
     if (message.type == ChatMessageType.voice) {
       return ChatVoiceBubble(
@@ -151,15 +161,20 @@ class ChatMessageItem extends StatelessWidget {
 
 class _Avatar extends StatelessWidget {
   final String label;
+  final String? url;
 
-  const _Avatar({required this.label});
+  const _Avatar({
+    required this.label,
+    this.url,
+  });
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: 18,
       backgroundColor: AppTheme.warmBorder,
-      child: Text(
+      backgroundImage: url == null ? null : NetworkImage(url!),
+      child: url != null ? null : Text(
         label,
         style: const TextStyle(
           color: AppTheme.textPrimary,

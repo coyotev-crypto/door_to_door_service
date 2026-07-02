@@ -41,6 +41,7 @@ class OpenIMChatRepository {
       data: {
         'userIds': userIds,
       },
+      cancelPrevious: false,
     );
     final baseResponse = BaseResponse<List<ChatUserProfileModel>>.fromJson(
       response.data as Map<String, dynamic>,

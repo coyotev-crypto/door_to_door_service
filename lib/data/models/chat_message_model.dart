@@ -3,6 +3,7 @@ import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 enum ChatMessageType {
   text,
   image,
+  video,
   voice,
   file,
   location,
@@ -25,6 +26,15 @@ class ChatMessageModel {
   final String? text;
   final String? imageUrl;
   final String? imageLocalPath;
+  final int? imageWidth;
+  final int? imageHeight;
+  final String? videoUrl;
+  final String? videoLocalPath;
+  final String? videoSnapshotUrl;
+  final String? videoSnapshotLocalPath;
+  final int? videoDuration;
+  final String? senderFaceUrl;
+  final String? senderNickname;
   final String? voiceUrl;
   final String? voiceLocalPath;
   final int? voiceDuration;
@@ -53,6 +63,15 @@ class ChatMessageModel {
     this.text,
     this.imageUrl,
     this.imageLocalPath,
+    this.imageWidth,
+    this.imageHeight,
+    this.videoUrl,
+    this.videoLocalPath,
+    this.videoSnapshotUrl,
+    this.videoSnapshotLocalPath,
+    this.videoDuration,
+    this.senderFaceUrl,
+    this.senderNickname,
     this.voiceUrl,
     this.voiceLocalPath,
     this.voiceDuration,
@@ -80,6 +99,15 @@ class ChatMessageModel {
     String? text,
     String? imageUrl,
     String? imageLocalPath,
+    int? imageWidth,
+    int? imageHeight,
+    String? videoUrl,
+    String? videoLocalPath,
+    String? videoSnapshotUrl,
+    String? videoSnapshotLocalPath,
+    int? videoDuration,
+    String? senderFaceUrl,
+    String? senderNickname,
     String? voiceUrl,
     String? voiceLocalPath,
     int? voiceDuration,
@@ -107,6 +135,16 @@ class ChatMessageModel {
       text: text ?? this.text,
       imageUrl: imageUrl ?? this.imageUrl,
       imageLocalPath: imageLocalPath ?? this.imageLocalPath,
+      imageWidth: imageWidth ?? this.imageWidth,
+      imageHeight: imageHeight ?? this.imageHeight,
+      videoUrl: videoUrl ?? this.videoUrl,
+      videoLocalPath: videoLocalPath ?? this.videoLocalPath,
+      videoSnapshotUrl: videoSnapshotUrl ?? this.videoSnapshotUrl,
+      videoSnapshotLocalPath:
+          videoSnapshotLocalPath ?? this.videoSnapshotLocalPath,
+      videoDuration: videoDuration ?? this.videoDuration,
+      senderFaceUrl: senderFaceUrl ?? this.senderFaceUrl,
+      senderNickname: senderNickname ?? this.senderNickname,
       voiceUrl: voiceUrl ?? this.voiceUrl,
       voiceLocalPath: voiceLocalPath ?? this.voiceLocalPath,
       voiceDuration: voiceDuration ?? this.voiceDuration,

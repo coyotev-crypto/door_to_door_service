@@ -131,9 +131,9 @@ class _ChatComposerState extends State<ChatComposer> {
               children: [
                 const SizedBox(width: 12),
                 _IconAction(
-                  icon: _voiceMode
-                      ? Icons.keyboard_rounded
-                      : Icons.mic_none_rounded,
+                  iconAsset: _voiceMode
+                      ? Resource.chatOpenKeyboard
+                      : Resource.chatOpenVoice,
                   tooltip: _voiceMode ? '\u952e\u76d8' : '\u8bed\u97f3',
                   onTap: _toggleVoiceMode,
                 ),
@@ -144,12 +144,12 @@ class _ChatComposerState extends State<ChatComposer> {
                 const SizedBox(width: 12),
                 _sendButtonVisible
                     ? _IconAction(
-                        icon: Icons.send_rounded,
+                        iconAsset: Resource.chatSendMessage,
                         tooltip: '\u53d1\u9001',
                         onTap: _voiceMode ? null : _send,
                       )
                     : _IconAction(
-                        icon: Icons.add_circle_outline_rounded,
+                        iconAsset: Resource.chatOpenToolbox,
                         tooltip: '\u66f4\u591a',
                         onTap: _toggleToolbox,
                       ),
@@ -272,12 +272,12 @@ class _ChatComposerState extends State<ChatComposer> {
 }
 
 class _IconAction extends StatelessWidget {
-  final IconData icon;
+  final String iconAsset;
   final String tooltip;
   final VoidCallback? onTap;
 
   const _IconAction({
-    required this.icon,
+    required this.iconAsset,
     required this.tooltip,
     this.onTap,
   });
@@ -289,10 +289,10 @@ class _IconAction extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: onTap,
-        child: Icon(
-          icon,
-          color: const Color(0xFF0C1C33),
-          size: 32,
+        child: Image.asset(
+          iconAsset,
+          width: 32,
+          height: 32,
         ),
       ),
     );

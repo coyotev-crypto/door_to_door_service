@@ -33,8 +33,8 @@ class ChatImageBubble extends StatelessWidget {
             border: Border.all(color: AppTheme.warmBorder),
           ),
           child: SizedBox(
-            width: 156,
-            height: 156,
+            width: _displaySize.width,
+            height: _displaySize.height,
             child: image,
           ),
         ),
@@ -84,5 +84,26 @@ class ChatImageBubble extends StatelessWidget {
         color: AppTheme.textMuted,
       ),
     );
+  }
+
+  Size get _displaySize {
+    final width = message.imageWidth;
+    final height = message.imageHeight;
+    if (width == null || height == null || width <= 0 || height <= 0) {
+      return const Size(156, 156);
+    }
+
+    const maxSide = 180.0;
+    const minSide = 96.0;
+    final ratio = width / height;
+    if (ratio >= 1) {
+      const displayWidth = maxSide;
+      final displayHeight = (displayWidth / ratio).clamp(minSide, maxSide);
+      return Size(displayWidth, displayHeight.toDouble());
+    }
+
+    const displayHeight = maxSide;
+    final displayWidth = (displayHeight * ratio).clamp(minSide, maxSide);
+    return Size(displayWidth.toDouble(), displayHeight);
   }
 }
