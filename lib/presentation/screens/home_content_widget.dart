@@ -82,64 +82,66 @@ class HomeContentWidget extends GetWidget<HomeContentController> {
         // 可滚动内容区 — Slivers 避免 shrinkWrap
         Expanded(
           child: Obx(
-            () => EasyRefresh(
-              controller: controller.refreshController,
-              onRefresh: _onRefresh,
-              onLoad: _onLoad,
-              child: CustomScrollView(
-                scrollCacheExtent: const ScrollCacheExtent.pixels(800),
-                slivers: [
-                  const SliverToBoxAdapter(
-                      child: SectionHeaderWidget(
-                          title: '推荐商户', badge: '精选')),
-                  // 服务列表
-                  if (controller.services.isEmpty)
-                    const SliverFillRemaining(
-                      child: EmptyPlaceholderWidget(
-                          message: '暂无推荐商户', constrainHeight: true),
-                    )
-                  else
-                    SliverList.builder(
-                      itemCount: controller.services.length,
-                      itemBuilder: (context, index) {
-                        final service = controller.services[index];
-                        return RepaintBoundary(
-                          child: Column(
-                            children: [
-                              ServiceCardWidget(
-                                service: service,
-                                onTap: () => Get.toNamed(
-                                    RouteNames.orderCreate,
-                                    arguments: service),
-                                onOrderTap: () => Get.toNamed(
-                                    RouteNames.orderCreate,
-                                    arguments: service),
-                                onFavoriteTap: () async {
-                                  final s =
-                                      !(service.isFavorite ?? false);
-                                  final success =
-                                      await serviceController.toggleFavorite(
-                                    service.id,
-                                    s,
-                                  );
-                                  if (!success) return;
-                                },
-                              ),
-                              if (index <
-                                  controller.services.length - 1)
-                                Divider(
-                                    height: 1,
-                                    indent: 16.w,
-                                    endIndent: 16.w,
-                                    color: AppTheme.warmBorder),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                ],
-              ),
-            ),
+            () {
+              final services = serviceController.servicesRx.toList();
+              return EasyRefresh(
+                controller: controller.refreshController,
+                onRefresh: _onRefresh,
+                onLoad: _onLoad,
+                child: CustomScrollView(
+                  scrollCacheExtent: const ScrollCacheExtent.pixels(800),
+                  slivers: [
+                    const SliverToBoxAdapter(
+                        child: SectionHeaderWidget(
+                            title: '推荐商户', badge: '精选')),
+                    // 服务列表
+                    if (services.isEmpty)
+                      const SliverFillRemaining(
+                        child: EmptyPlaceholderWidget(
+                            message: '暂无推荐商户', constrainHeight: true),
+                      )
+                    else
+                      SliverList.builder(
+                        itemCount: services.length,
+                        itemBuilder: (context, index) {
+                          final service = services[index];
+                          return RepaintBoundary(
+                            child: Column(
+                              children: [
+                                ServiceCardWidget(
+                                  service: service,
+                                  onTap: () => Get.toNamed(
+                                      RouteNames.orderCreate,
+                                      arguments: service),
+                                  onOrderTap: () => Get.toNamed(
+                                      RouteNames.orderCreate,
+                                      arguments: service),
+                                  onFavoriteTap: () async {
+                                    final s =
+                                        !(service.isFavorite ?? false);
+                                    final success =
+                                        await serviceController.toggleFavorite(
+                                      service.id,
+                                      s,
+                                    );
+                                    if (!success) return;
+                                  },
+                                ),
+                                if (index < services.length - 1)
+                                  Divider(
+                                      height: 1,
+                                      indent: 16.w,
+                                      endIndent: 16.w,
+                                      color: AppTheme.warmBorder),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],

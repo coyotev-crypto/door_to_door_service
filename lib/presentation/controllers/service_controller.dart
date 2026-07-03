@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:dtd/core/utils/loading_util.dart';
 import 'package:dtd/core/utils/log_util.dart';
 import 'package:dtd/core/utils/toast_util.dart';
@@ -47,7 +49,10 @@ class ServiceController extends GetxController {
   // 用户位置
   final Rx<double?> _userLatitude = Rx<double?>(null);
   final Rx<double?> _userLongitude = Rx<double?>(null);
-  bool _hasRefreshedWithGps = false; // GPS更新后仅刷新一次
+  static const double _locationRefreshDistanceMeters = 1000;
+  double? _lastRefreshLatitude;
+  double? _lastRefreshLongitude;
+  bool _isManualLocationSelected = false;
 
   // 筛选后的服务列表
   final RxList<ServiceItem> _filteredServices = <ServiceItem>[].obs;
@@ -65,12 +70,15 @@ class ServiceController extends GetxController {
   @override
   void onClose() {
     _locationService.onLocationUpdated = null;
-    _hasRefreshedWithGps = false;
+    _locationService.stopContinuousLocation();
     super.onClose();
   }
 
   /// 服务列表
   List<ServiceItem> get services => _services;
+
+  /// 服务列表响应式对象
+  RxList<ServiceItem> get servicesRx => _services;
 
   /// 总数量
   int get totalCount => _totalCount.value;
@@ -192,6 +200,13 @@ class ServiceController extends GetxController {
 
       _totalCount.value = response.count ?? 0;
       _errorMessage.value = '';
+      if (refresh &&
+          useLatitude != null &&
+          useLongitude != null &&
+          !_isManualLocationSelected) {
+        _lastRefreshLatitude = useLatitude;
+        _lastRefreshLongitude = useLongitude;
+      }
       return true;
     } catch (e) {
       if (requestVersion != _requestVersion) return false;
@@ -278,7 +293,9 @@ class ServiceController extends GetxController {
     required double latitude,
     required double longitude,
     bool refresh = true,
+    bool manual = false,
   }) async {
+    _isManualLocationSelected = manual;
     _userLatitude.value = latitude;
     _userLongitude.value = longitude;
     if (refresh) {
@@ -292,6 +309,9 @@ class ServiceController extends GetxController {
   Future<bool> clearUserLocation({bool refresh = true}) async {
     _userLatitude.value = null;
     _userLongitude.value = null;
+    _isManualLocationSelected = false;
+    _lastRefreshLatitude = null;
+    _lastRefreshLongitude = null;
     LogUtil.d('清除用户位置', tag: _tag);
     if (refresh) {
       return refreshServices();
@@ -301,15 +321,21 @@ class ServiceController extends GetxController {
 
   /// 初始化位置更新回调
   void _initLocationCallback() {
-    // 设置位置更新回调：GPS定位成功后触发一次刷新
-    _locationService.onLocationUpdated = (latitude, longitude) {
-      final shouldRefresh = !_hasRefreshedWithGps;
-      _hasRefreshedWithGps = true;
-      setUserLocation(
-        latitude: latitude,
-        longitude: longitude,
-        refresh: shouldRefresh,
-      );
+    // 设置位置更新回调：超过上次刷新位置 1km 后触发服务列表刷新。
+    _locationService.onLocationUpdated = (latitude, longitude) async {
+      if (_isManualLocationSelected) return;
+
+      _userLatitude.value = latitude;
+      _userLongitude.value = longitude;
+
+      if (!_shouldRefreshForLocation(latitude, longitude)) return;
+      if (_isLoading.value) return;
+
+      final success = await refreshServices();
+      if (success) {
+        _lastRefreshLatitude = latitude;
+        _lastRefreshLongitude = longitude;
+      }
     };
 
     // 如果 LocationService 已经有位置信息（缓存），立即设置但不刷新
@@ -326,6 +352,53 @@ class ServiceController extends GetxController {
         refresh: false,
       );
     }
+    _startContinuousLocation();
+  }
+
+  Future<void> _startContinuousLocation() async {
+    try {
+      await _locationService.startContinuousLocation();
+    } catch (e) {
+      LogUtil.w('启动持续定位失败: $e', tag: _tag);
+    }
+  }
+
+  bool _shouldRefreshForLocation(double latitude, double longitude) {
+    final lastLatitude = _lastRefreshLatitude;
+    final lastLongitude = _lastRefreshLongitude;
+    if (lastLatitude == null || lastLongitude == null) return true;
+
+    return _distanceInMeters(
+          lastLatitude,
+          lastLongitude,
+          latitude,
+          longitude,
+        ) >=
+        _locationRefreshDistanceMeters;
+  }
+
+  double _distanceInMeters(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) {
+    const earthRadiusMeters = 6371000.0;
+    final startLatRad = _degreesToRadians(startLatitude);
+    final endLatRad = _degreesToRadians(endLatitude);
+    final deltaLat = _degreesToRadians(endLatitude - startLatitude);
+    final deltaLng = _degreesToRadians(endLongitude - startLongitude);
+    final a = math.sin(deltaLat / 2) * math.sin(deltaLat / 2) +
+        math.cos(startLatRad) *
+            math.cos(endLatRad) *
+            math.sin(deltaLng / 2) *
+            math.sin(deltaLng / 2);
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return earthRadiusMeters * c;
+  }
+
+  double _degreesToRadians(double degrees) {
+    return degrees * math.pi / 180;
   }
 
   /// 切换收藏状态

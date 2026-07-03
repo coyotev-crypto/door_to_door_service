@@ -1,4 +1,5 @@
 import 'package:dtd/core/utils/loading_util.dart';
+import 'package:dtd/core/services/auth_service.dart';
 import 'package:dtd/core/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -91,6 +92,11 @@ class PostDetailController extends GetxController {
 
   /// 发表评论
   Future<void> submitComment() async {
+    final currentPost = post.value;
+    if (currentPost == null) {
+      ToastUtil.showError('帖子不存在');
+      return;
+    }
     final content = commentController.text.trim();
     if (content.isEmpty) {
       ToastUtil.showError('请输入评论内容');
@@ -98,14 +104,20 @@ class PostDetailController extends GetxController {
     }
     LoadingUtil.show();
     try {
-      await _repository.createComment(
-        postId: post.value!.id,
+      final response = await _repository.createComment(
+        postId: currentPost.id,
         content: content,
         parentId: replyToId.value,
       );
+      if (!response.isSuccess) {
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '评论失败，请稍后重试');
+        return;
+      }
       ToastUtil.showSuccess('评论成功');
       clearReplyTarget();
-      loadComments();
+      await loadComments();
     } catch (e) {
       ToastUtil.showError('$e');
     } finally {
@@ -115,27 +127,40 @@ class PostDetailController extends GetxController {
 
   /// 评论点赞
   Future<void> toggleCommentLike(int commentId) async {
-    final index = _findCommentIndex(commentId);
-    if (index == -1) return;
-    final c = comments[index];
-    comments[index] = CommentModel(
-      id: c.id,
-      postId: c.postId,
-      parentId: c.parentId,
-      userId: c.userId,
-      userName: c.userName,
-      userAvatar: c.userAvatar,
-      content: c.content,
-      likeCount: c.isLiked ? c.likeCount - 1 : c.likeCount + 1,
-      isLiked: !c.isLiked,
-      replies: c.replies,
-      createTime: c.createTime,
+    final originalComments = comments.toList();
+    final updatedComments = _updateCommentTree(
+      originalComments,
+      commentId,
+      (c) => CommentModel(
+        id: c.id,
+        postId: c.postId,
+        parentId: c.parentId,
+        userId: c.userId,
+        userName: c.userName,
+        userAvatar: c.userAvatar,
+        content: c.content,
+        likeCount: c.isLiked ? c.likeCount - 1 : c.likeCount + 1,
+        isLiked: !c.isLiked,
+        replies: c.replies,
+        createTime: c.createTime,
+      ),
     );
+    if (updatedComments == null) return;
+    comments.value = updatedComments;
     comments.refresh();
     LoadingUtil.show();
     try {
-      await _repository.toggleCommentLike(commentId);
-    } catch (_) {} finally {
+      final response = await _repository.toggleCommentLike(commentId);
+      if (!response.isSuccess) {
+        comments.value = originalComments;
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '操作失败，请稍后重试');
+      }
+    } catch (e) {
+      comments.value = originalComments;
+      ToastUtil.showError('$e');
+    } finally {
       LoadingUtil.dismiss();
     }
   }
@@ -155,18 +180,20 @@ class PostDetailController extends GetxController {
     if (confirmed != true) return;
     LoadingUtil.show();
     try {
-      await _repository.deleteComment(commentId);
-      comments.removeWhere((c) => c.id == commentId);
+      final response = await _repository.deleteComment(commentId);
+      if (!response.isSuccess) {
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '删除失败，请稍后重试');
+        return;
+      }
+      comments.value = _removeCommentFromTree(comments, commentId);
       ToastUtil.showSuccess('已删除');
     } catch (e) {
       ToastUtil.showError('$e');
     } finally {
       LoadingUtil.dismiss();
     }
-  }
-
-  int _findCommentIndex(int id) {
-    return comments.indexWhere((c) => c.id == id);
   }
 
   Future<void> toggleLike() async {
@@ -179,8 +206,17 @@ class PostDetailController extends GetxController {
     );
     LoadingUtil.show();
     try {
-      await _repository.toggleLike(p.id);
-    } catch (_) {} finally {
+      final response = await _repository.toggleLike(p.id);
+      if (!response.isSuccess) {
+        post.value = p;
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '操作失败，请稍后重试');
+      }
+    } catch (e) {
+      post.value = p;
+      ToastUtil.showError('$e');
+    } finally {
       LoadingUtil.dismiss();
     }
   }
@@ -191,10 +227,115 @@ class PostDetailController extends GetxController {
     post.value = p.copyWith(isCollected: !p.isCollected);
     LoadingUtil.show();
     try {
-      await _repository.toggleCollect(p.id);
-    } catch (_) {} finally {
+      final response = await _repository.toggleCollect(p.id);
+      if (!response.isSuccess) {
+        post.value = p;
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '操作失败，请稍后重试');
+      }
+    } catch (e) {
+      post.value = p;
+      ToastUtil.showError('$e');
+    } finally {
       LoadingUtil.dismiss();
     }
+  }
+
+  Future<void> deletePost() async {
+    final currentPost = post.value;
+    if (currentPost == null) return;
+    final confirmed = await Get.dialog<bool>(AlertDialog(
+      title: const Text('删除帖子'),
+      content: const Text('确定要删除这篇帖子吗？'),
+      actions: [
+        TextButton(
+            onPressed: () => Get.back(result: false), child: const Text('取消')),
+        TextButton(
+            onPressed: () => Get.back(result: true), child: const Text('删除')),
+      ],
+    ));
+    if (confirmed != true) return;
+    LoadingUtil.show();
+    try {
+      final response = await _repository.deletePost(currentPost.id);
+      if (!response.isSuccess) {
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '删除失败，请稍后重试');
+        return;
+      }
+      ToastUtil.showSuccess('已删除');
+      Get.back(result: {'deleted': true, 'id': currentPost.id});
+    } catch (e) {
+      ToastUtil.showError('$e');
+    } finally {
+      LoadingUtil.dismiss();
+    }
+  }
+
+  bool canManagePost(PostModel post) {
+    return AuthService.instance.user?.id == post.authorId.toString();
+  }
+
+  bool canManageComment(CommentModel comment) {
+    return AuthService.instance.user?.id == comment.userId.toString();
+  }
+
+  List<CommentModel>? _updateCommentTree(
+    List<CommentModel> source,
+    int commentId,
+    CommentModel Function(CommentModel comment) update,
+  ) {
+    var changed = false;
+    final next = source.map((comment) {
+      if (comment.id == commentId) {
+        changed = true;
+        return update(comment);
+      }
+      final updatedReplies =
+          _updateCommentTree(comment.replies, commentId, update);
+      if (updatedReplies == null) return comment;
+      changed = true;
+      return CommentModel(
+        id: comment.id,
+        postId: comment.postId,
+        parentId: comment.parentId,
+        userId: comment.userId,
+        userName: comment.userName,
+        userAvatar: comment.userAvatar,
+        content: comment.content,
+        likeCount: comment.likeCount,
+        isLiked: comment.isLiked,
+        replies: updatedReplies,
+        createTime: comment.createTime,
+      );
+    }).toList();
+    return changed ? next : null;
+  }
+
+  List<CommentModel> _removeCommentFromTree(
+    List<CommentModel> source,
+    int commentId,
+  ) {
+    return source
+        .where((comment) => comment.id != commentId)
+        .map(
+          (comment) => CommentModel(
+            id: comment.id,
+            postId: comment.postId,
+            parentId: comment.parentId,
+            userId: comment.userId,
+            userName: comment.userName,
+            userAvatar: comment.userAvatar,
+            content: comment.content,
+            likeCount: comment.likeCount,
+            isLiked: comment.isLiked,
+            replies: _removeCommentFromTree(comment.replies, commentId),
+            createTime: comment.createTime,
+          ),
+        )
+        .toList();
   }
 
   void share() {

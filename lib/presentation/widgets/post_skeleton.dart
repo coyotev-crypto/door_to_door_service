@@ -15,11 +15,14 @@ class PostSkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            height: 120.h,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+          AspectRatio(
+            aspectRatio: 3 / 4,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(12.r)),
+              ),
             ),
           ),
           Padding(

@@ -68,7 +68,9 @@ class PostCreatePage extends GetView<PostCreateController> {
 
   // ── 图片网格：每行 3 张 1:1 正方形 ──
   Widget _buildImageGrid(BuildContext context) {
-    return Obx(() => LayoutBuilder(
+    return Obx(() {
+      final images = controller.images.toList();
+      return LayoutBuilder(
           builder: (context, constraints) {
             final availableWidth = constraints.maxWidth;
             final spacing = 8.w;
@@ -78,7 +80,7 @@ class PostCreatePage extends GetView<PostCreateController> {
               spacing: spacing,
               runSpacing: spacing,
               children: [
-                ...controller.images.asMap().entries.map((e) {
+                ...images.asMap().entries.map((e) {
                   return SizedBox(
                     width: imageSize,
                     height: imageSize,
@@ -112,7 +114,7 @@ class PostCreatePage extends GetView<PostCreateController> {
                     ),
                   );
                 }),
-                if (controller.images.length < PostCreateController.maxImages)
+                if (images.length < PostCreateController.maxImages)
                   GestureDetector(
                     onTap: () => controller.pickImages(),
                     child: Container(
@@ -136,6 +138,7 @@ class PostCreatePage extends GetView<PostCreateController> {
               ],
             );
           },
-        ));
+        );
+    });
   }
 }

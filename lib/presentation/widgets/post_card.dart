@@ -21,23 +21,23 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: theme.brightness == Brightness.light
-                  ? Colors.black.withValues(alpha: 0.04)
-                  : Colors.white.withValues(alpha: 0.04),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: theme.brightness == Brightness.light
+                ? Colors.black.withValues(alpha: 0.04)
+                : Colors.white.withValues(alpha: 0.04),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: GestureDetector(
+        onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -73,6 +73,7 @@ class PostCard extends StatelessWidget {
           right: 8.w,
           bottom: 8.h,
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onLike,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
@@ -190,25 +191,18 @@ class PostCard extends StatelessWidget {
     return count.toString();
   }
 
-  static final Map<String, String> _timeCache = {};
-
   String _formatTime(String time) {
-    final cached = _timeCache[time];
-    if (cached != null) return cached;
     try {
       final dt = DateTime.parse(time);
       final diff = DateTime.now().difference(dt);
-      final result = diff.inMinutes < 60
+      return diff.inMinutes < 60
           ? '${diff.inMinutes}分钟前'
           : diff.inHours < 24
               ? '${diff.inHours}小时前'
               : diff.inDays < 7
                   ? '${diff.inDays}天前'
                   : '${dt.month}-${dt.day}';
-      _timeCache[time] = result;
-      return result;
     } catch (_) {
-      _timeCache[time] = time;
       return time;
     }
   }

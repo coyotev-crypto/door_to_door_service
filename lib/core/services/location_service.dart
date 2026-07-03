@@ -18,6 +18,7 @@ class LocationService extends GetxService {
   // 响应式状态
   final Rx<BaiduLocation?> _currentLocation = Rx<BaiduLocation?>(null);
   final RxBool _isLocating = false.obs;
+  final RxBool _isContinuousLocating = false.obs;
   final RxBool _isAuthorized = false.obs;
 
   // 存储键
@@ -33,6 +34,7 @@ class LocationService extends GetxService {
   // Getters
   BaiduLocation? get currentLocation => _currentLocation.value;
   bool get isLocating => _isLocating.value;
+  bool get isContinuousLocating => _isContinuousLocating.value;
   bool get isAuthorized => _isAuthorized.value;
   String? get currentCity => _currentLocation.value?.city;
   String? get currentProvince => _currentLocation.value?.province;
@@ -143,14 +145,22 @@ class LocationService extends GetxService {
 
   /// 开始持续定位
   Future<void> startContinuousLocation() async {
+    if (_isContinuousLocating.value) return;
+
     if (!_isAuthorized.value) {
-      if (isDebug) {
-        LogUtil.w('未授权，无法启动持续定位', tag: _tag);
+      final granted = await requestPermission();
+      _isAuthorized.value = granted;
+      if (!granted) {
+        if (isDebug) {
+          LogUtil.w('未授权，无法启动持续定位', tag: _tag);
+        }
+        return;
       }
-      return;
     }
+    _setupContinuousCallback();
     await _setLocationOptions(isContinuous: true);
     await _locationPlugin.startLocation();
+    _isContinuousLocating.value = true;
     _isLocating.value = true;
     if (isDebug) {
       LogUtil.d('持续定位已启动', tag: _tag);
@@ -160,6 +170,7 @@ class LocationService extends GetxService {
   /// 停止持续定位
   Future<void> stopContinuousLocation() async {
     await _locationPlugin.stopLocation();
+    _isContinuousLocating.value = false;
     _isLocating.value = false;
     if (isDebug) {
       LogUtil.d('持续定位已停止', tag: _tag);
@@ -168,6 +179,10 @@ class LocationService extends GetxService {
 
   /// 单次定位
   Future<BaiduLocation?> getLocationOnce() async {
+    if (_isContinuousLocating.value) {
+      return _currentLocation.value;
+    }
+
     if (!_isAuthorized.value) {
       if (isDebug) {
         LogUtil.w('未授权，无法获取位置', tag: _tag);
@@ -350,6 +365,8 @@ class LocationService extends GetxService {
   @override
   void onClose() {
     _locationPlugin.stopLocation();
+    _isContinuousLocating.value = false;
+    _isLocating.value = false;
     // 可移除回调（若 SDK 支持）
     super.onClose();
   }

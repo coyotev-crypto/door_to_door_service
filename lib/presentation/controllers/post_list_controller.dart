@@ -62,24 +62,50 @@ class PostListController extends GetxController {
   }
 
   void toggleLike(int postId) async {
+    final index = posts.indexWhere((p) => p.id == postId);
+    if (index == -1) return;
+    final post = posts[index];
+    final updatedPost = post.copyWith(
+      isLiked: !post.isLiked,
+      likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+    );
+    posts[index] = updatedPost;
+    posts.refresh();
+
     try {
-      await _repository.toggleLike(postId);
-      final index = posts.indexWhere((p) => p.id == postId);
-      if (index != -1) {
-        final post = posts[index];
-        posts[index] = post.copyWith(
-          isLiked: !post.isLiked,
-          likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
-        );
-        posts.refresh();
+      final response = await _repository.toggleLike(postId);
+      if (!response.isSuccess) {
+        _restorePost(post);
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '操作失败，请稍后重试');
+        return;
       }
     } catch (e) {
+      _restorePost(post);
       ToastUtil.showError('$e');
     }
   }
 
-  void navigateToDetail(PostModel post) {
-    Get.toNamed(RouteNames.postDetail, arguments: post);
+  void _restorePost(PostModel post) {
+    final index = posts.indexWhere((p) => p.id == post.id);
+    if (index == -1) return;
+    posts[index] = post;
+    posts.refresh();
+  }
+
+  Future<void> navigateToDetail(PostModel post) async {
+    final result = await Get.toNamed(RouteNames.postDetail, arguments: post);
+    if (result is PostModel) {
+      final index = posts.indexWhere((p) => p.id == result.id);
+      if (index != -1) {
+        posts[index] = result;
+        posts.refresh();
+      }
+    } else if (result is Map && result['deleted'] == true) {
+      final id = result['id'];
+      posts.removeWhere((p) => p.id == id || p.id == post.id);
+    }
   }
 
   Future<void> navigateToCreate() async {

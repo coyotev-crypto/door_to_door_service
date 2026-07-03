@@ -11,31 +11,37 @@ class PostDetailPage extends GetView<PostDetailController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.creamBg,
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (controller.loadError.value) {
-          return _buildErrorView(context);
-        }
-        final post = controller.post.value;
-        if (post == null) {
-          return _buildNotFoundView(context);
-        }
-        return Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(child: _buildBody(context, post)),
-                _buildCommentInputBar(context),
-              ],
-            ),
-            _buildImmersiveAppBar(context),
-          ],
-        );
-      }),
+    return WillPopScope(
+      onWillPop: () async {
+        _backWithResult();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.creamBg,
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (controller.loadError.value) {
+            return _buildErrorView(context);
+          }
+          final post = controller.post.value;
+          if (post == null) {
+            return _buildNotFoundView(context);
+          }
+          return Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(child: _buildBody(context, post)),
+                  _buildCommentInputBar(context),
+                ],
+              ),
+              _buildImmersiveAppBar(context),
+            ],
+          );
+        }),
+      ),
     );
   }
 
@@ -53,7 +59,7 @@ class PostDetailPage extends GetView<PostDetailController> {
         child: Row(
           children: [
             GestureDetector(
-              onTap: () => Get.back(),
+              onTap: _backWithResult,
               child: Container(
                 width: 36.w,
                 height: 36.w,
@@ -66,6 +72,22 @@ class PostDetailPage extends GetView<PostDetailController> {
               ),
             ),
             const Spacer(),
+            if (controller.post.value != null &&
+                controller.canManagePost(controller.post.value!))
+              GestureDetector(
+                onTap: () => controller.deletePost(),
+                child: Container(
+                  width: 36.w,
+                  height: 36.w,
+                  margin: EdgeInsets.only(right: 8.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.delete_outline_rounded,
+                      size: 18.sp, color: Colors.white),
+                ),
+              ),
             GestureDetector(
               onTap: () => controller.share(),
               child: Container(
@@ -200,12 +222,26 @@ class PostDetailPage extends GetView<PostDetailController> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          _buildStatItem(Icons.favorite, post.likeCount, Colors.grey[500]!),
+          GestureDetector(
+            onTap: () => controller.toggleLike(),
+            child: _buildStatItem(
+              post.isLiked ? Icons.favorite : Icons.favorite_border,
+              post.likeCount,
+              post.isLiked ? Colors.red : Colors.grey[500]!,
+            ),
+          ),
           SizedBox(width: 20.w),
           _buildStatItem(Icons.chat_bubble_outline_rounded,
-              controller.comments.length, Colors.grey[500]!),
+              _totalCommentCount(), Colors.grey[500]!),
           SizedBox(width: 20.w),
-          _buildStatItem(Icons.star_border_rounded, 0, Colors.grey[500]!),
+          GestureDetector(
+            onTap: () => controller.toggleCollect(),
+            child: _buildStatItem(
+              post.isCollected ? Icons.star_rounded : Icons.star_border_rounded,
+              0,
+              post.isCollected ? AppTheme.gold : Colors.grey[500]!,
+            ),
+          ),
         ],
       ),
     );
@@ -239,7 +275,7 @@ class PostDetailPage extends GetView<PostDetailController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('评论 (${controller.comments.length})',
+          Text('评论 (${_totalCommentCount()})',
               style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
@@ -362,13 +398,15 @@ class PostDetailPage extends GetView<PostDetailController> {
                         style: TextStyle(
                             fontSize: 12.sp, color: Colors.grey[500])),
                   ),
-                  SizedBox(width: 20.w),
-                  GestureDetector(
-                    onTap: () => controller.deleteComment(comment.id),
-                    child: Text('删除',
-                        style: TextStyle(
-                            fontSize: 12.sp, color: Colors.grey[400])),
-                  ),
+                  if (controller.canManageComment(comment)) ...[
+                    SizedBox(width: 20.w),
+                    GestureDetector(
+                      onTap: () => controller.deleteComment(comment.id),
+                      child: Text('删除',
+                          style: TextStyle(
+                              fontSize: 12.sp, color: Colors.grey[400])),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -537,6 +575,21 @@ class PostDetailPage extends GetView<PostDetailController> {
       },
     );
     overlay.insert(entry);
+  }
+
+  void _backWithResult() {
+    Get.back(result: controller.post.value);
+  }
+
+  int _totalCommentCount() {
+    return controller.comments
+        .fold<int>(0, (total, comment) => total + _countComment(comment));
+  }
+
+  int _countComment(CommentModel comment) {
+    return 1 +
+        comment.replies
+            .fold<int>(0, (total, reply) => total + _countComment(reply));
   }
 
   String _formatCount(int count) {

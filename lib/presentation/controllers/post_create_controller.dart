@@ -111,6 +111,10 @@ class PostCreateController extends GetxController {
       if (response.isSuccess) {
         Get.back(result: true);
         ToastUtil.showSuccess('发布成功');
+      } else {
+        ToastUtil.showError(response.message.isNotEmpty
+            ? response.message
+            : '发布失败，请稍后重试');
       }
     } catch (e) {
       LogUtil.e('发布失败: $e', tag: _tag);

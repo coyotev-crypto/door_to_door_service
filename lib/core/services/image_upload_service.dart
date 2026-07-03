@@ -58,8 +58,14 @@ class ImageUploadService {
             throw Exception('上传图片失败: 未获取到图片URL');
           }
 
-          LogUtil.d('图片上传成功: $imageUrl', tag: _tag);
-          return AppConfig.baseUrl + imageUrl;
+          final fullUrl = imageUrl.startsWith('http://') ||
+                  imageUrl.startsWith('https://')
+              ? imageUrl
+              : imageUrl.startsWith('/')
+                  ? AppConfig.baseUrl + imageUrl
+                  : '${AppConfig.baseUrl}/$imageUrl';
+          LogUtil.d('图片上传成功: $fullUrl', tag: _tag);
+          return fullUrl;
         } else {
           throw Exception('上传图片失败: 响应数据格式不正确');
         }

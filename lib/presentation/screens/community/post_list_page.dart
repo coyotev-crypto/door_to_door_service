@@ -2,6 +2,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/screen_adapter.dart';
+import '../../../data/models/post_model.dart';
 import '../../controllers/post_list_controller.dart';
 import '../../widgets/post_card.dart';
 import '../../widgets/post_skeleton.dart';
@@ -25,7 +26,7 @@ class _PostListPageState extends State<PostListPage> {
   void initState() {
     super.initState();
     controller = Get.find<PostListController>();
-    _onRefresh();
+    controller.onRefresh();
   }
 
   @override
@@ -57,20 +58,22 @@ class _PostListPageState extends State<PostListPage> {
     return Stack(
       children: [
         Obx(() {
-          if (controller.isLoading.value && controller.posts.isEmpty) {
+          final posts = controller.posts.toList();
+          final isLoading = controller.isLoading.value;
+          if (isLoading && posts.isEmpty) {
             return _buildSkeletonGrid(context);
           }
-          if (controller.posts.isEmpty) {
+          if (posts.isEmpty) {
             return EasyRefresh(
-              onRefresh: _onRefresh,
+              onRefresh: controller.onRefresh,
               child: _buildEmptyView(context),
             );
           }
-          return _buildGridView(context);
+          return _buildGridView(context, posts);
         }),
         Positioned(
           right: 16.w,
-          bottom: 16.h,
+          bottom: 76.h,
           child: FloatingActionButton(
             onPressed: () => controller.navigateToCreate(),
             backgroundColor: Theme.of(context).primaryColor,
@@ -134,7 +137,7 @@ class _PostListPageState extends State<PostListPage> {
     );
   }
 
-  Widget _buildGridView(BuildContext context) {
+  Widget _buildGridView(BuildContext context, List<PostModel> posts) {
     return EasyRefresh(
       controller: _refreshController,
       onRefresh: _onRefresh,
@@ -147,9 +150,9 @@ class _PostListPageState extends State<PostListPage> {
           crossAxisSpacing: 12,
           childAspectRatio: 0.56,
         ),
-        itemCount: controller.posts.length,
+        itemCount: posts.length,
         itemBuilder: (context, index) {
-          final post = controller.posts[index];
+          final post = posts[index];
           return RepaintBoundary(
             child: PostCard(
               post: post,

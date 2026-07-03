@@ -181,6 +181,7 @@ class HomeContentController extends GetxController {
       latitude: address.latitude,
       longitude: address.longitude,
       refresh: false,
+      manual: true,
     );
     // 用新的经纬度重新加载服务列表
     await loadServices();
