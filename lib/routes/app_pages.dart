@@ -57,6 +57,7 @@ import '../presentation/screens/chat/chat_detail_screen.dart';
 import '../presentation/screens/wallet/wallet_screen.dart';
 import '../presentation/screens/wallet/wallet_transactions_screen.dart';
 import '../presentation/screens/wallet/wallet_withdraw_screen.dart';
+import '../presentation/screens/wallet/wallet_withdrawals_screen.dart';
 import '../presentation/screens/wallet/wallet_withdrawal_detail_screen.dart';
 import '../presentation/screens/wallet/payment_account_screen.dart';
 import '../presentation/screens/wallet/bind_alipay_screen.dart';
@@ -251,6 +252,15 @@ class AppPages {
     GetPage(
       name: RouteNames.walletTransactions,
       page: () => const WalletTransactionsScreen(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<WalletController>()) {
+          Get.lazyPut(() => WalletController());
+        }
+      }),
+    ),
+    GetPage(
+      name: RouteNames.walletWithdrawals,
+      page: () => const WalletWithdrawalsScreen(),
       binding: BindingsBuilder(() {
         if (!Get.isRegistered<WalletController>()) {
           Get.lazyPut(() => WalletController());

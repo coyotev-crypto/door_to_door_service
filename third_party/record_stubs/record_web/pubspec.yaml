@@ -1,0 +1,19 @@
+name: record_web
+description: Local no-op stub for Android/iOS-only builds.
+version: 0.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    implements: record
+    platforms:
+      web:
+        fileName: record_web.dart
+        pluginClass: RecordWebPlugin

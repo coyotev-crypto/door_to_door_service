@@ -57,7 +57,7 @@ class WalletRepository {
     String remark = '',
   }) async {
     final response = await _dioClient.post(
-      ApiEndpoints.walletWithdraw,
+      ApiEndpoints.walletWithdrawals,
       data: {
         'accountId': accountId,
         'accountName': accountName,

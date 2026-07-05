@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:dtd/core/config/app_config.dart';
 import 'package:dtd/core/services/openim_chat_service.dart';
@@ -143,14 +145,13 @@ class LoginController extends GetxController {
         LogUtil.e('获取用户信息失败: $e', tag: 'LoginController');
       }
 
-      await _loginOpenIMChat();
-
       if (context.mounted) {
         // 登录成功,跳转到首页
         final hasPassword = await _accountSecurityRepository.hasPassword();
         Get.offAllNamed(
           hasPassword ? RouteNames.home : RouteNames.setPassword,
         );
+        unawaited(_loginOpenIMChat());
       }
     } on DioException catch (e) {
       ToastUtil.showError(e.message ?? '登录失败');
@@ -169,7 +170,9 @@ class LoginController extends GetxController {
       final chatService = Get.isRegistered<OpenIMChatService>()
           ? OpenIMChatService.to
           : Get.put(OpenIMChatService(), permanent: true);
-      await chatService.loginWithBackendToken();
+      await chatService.loginWithBackendToken().timeout(
+            const Duration(seconds: 8),
+          );
     } catch (e) {
       LogUtil.e('OpenIM Chat登录失败: $e', tag: 'LoginController');
     }

@@ -234,14 +234,14 @@ class PostDetailPage extends GetView<PostDetailController> {
           _buildStatItem(Icons.chat_bubble_outline_rounded,
               _totalCommentCount(), Colors.grey[500]!),
           SizedBox(width: 20.w),
-          GestureDetector(
-            onTap: () => controller.toggleCollect(),
-            child: _buildStatItem(
-              post.isCollected ? Icons.star_rounded : Icons.star_border_rounded,
-              0,
-              post.isCollected ? AppTheme.gold : Colors.grey[500]!,
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () => controller.toggleCollect(),
+          //   child: _buildStatItem(
+          //     post.isCollected ? Icons.star_rounded : Icons.star_border_rounded,
+          //     0,
+          //     post.isCollected ? AppTheme.gold : Colors.grey[500]!,
+          //   ),
+          // ),
         ],
       ),
     );

@@ -10,7 +10,8 @@ import 'package:flutter_baidu_mapapi_base/flutter_baidu_mapapi_base.dart';
 /// 定位服务 - 全局单例（由 GetX 管理）
 class LocationService extends GetxService {
   final String _tag = 'LocationService';
-  final bool isDebug = false; // 是否启用调试日志
+  final bool isDebug = true;
+  static const String _baiduAk = 'r5WLi2wuL2j8LfHDwFDOmtpRoBWw66mV';
 
   // 百度定位插件实例
   final LocationFlutterPlugin _locationPlugin = LocationFlutterPlugin();
@@ -50,40 +51,33 @@ class LocationService extends GetxService {
       if (isDebug) {
         LogUtil.d('正在初始化定位服务...', tag: _tag);
       }
-      _setupPrivacy();
-      if (Platform.isIOS) _setIOSAK();
+      await _setupPrivacy();
+      if (Platform.isIOS) await _setIOSAK();
       if (Platform.isAndroid) {
         BMFMapSDK.setCoordType(BMF_COORD_TYPE.BD09LL);
       }
       await _loadLastLocation(); // 先加载缓存，首屏立即显示本地城市
-      _requestPermissionAndStart();
+      await _requestPermissionAndStart();
       if (isDebug) {
         LogUtil.d('定位服务初始化完成', tag: _tag);
       }
     } catch (e) {
-      if (isDebug) {
-        LogUtil.e('定位服务初始化失败: $e', tag: _tag);
-      }
+      LogUtil.e('定位服务初始化失败: $e', tag: _tag);
     }
   }
 
   /// 设置百度 SDK 隐私政策
   Future<void> _setupPrivacy() async {
     BMFMapSDK.setAgreePrivacy(true); // 同意隐私政策
-    _locationPlugin.setAgreePrivacy(true);
-    if (isDebug) {
-      LogUtil.d('已同意百度隐私政策', tag: _tag);
-    }
+    final agreed = await _locationPlugin.setAgreePrivacy(true);
+    LogUtil.d('已同意百度隐私政策: $agreed', tag: _tag);
   }
 
   /// iOS 设置 AK
   Future<void> _setIOSAK() async {
-    BMFMapSDK.setApiKeyAndCoordType(
-        'r5WLi2wuL2j8LfHDwFDOmtpRoBWw66mV', BMF_COORD_TYPE.BD09LL);
-    _locationPlugin.authAK('r5WLi2wuL2j8LfHDwFDOmtpRoBWw66mV'); // 替换为实际 AK
-    if (isDebug) {
-      LogUtil.d('已设置 iOS AK', tag: _tag);
-    }
+    BMFMapSDK.setApiKeyAndCoordType(_baiduAk, BMF_COORD_TYPE.BD09LL);
+    final authed = await _locationPlugin.authAK(_baiduAk);
+    LogUtil.d('已设置 iOS AK: $authed', tag: _tag);
   }
 
   /// 请求权限并启动定位（若权限通过）
@@ -91,9 +85,7 @@ class LocationService extends GetxService {
     final granted = await requestPermission();
     _isAuthorized.value = granted;
     if (!granted) {
-      if (isDebug) {
-        LogUtil.w('定位权限未授予，无法启动定位', tag: _tag);
-      }
+      LogUtil.w('定位权限未授予，无法启动定位', tag: _tag);
       return;
     }
     // 设置持续定位回调（但不自动开始，由外部调用 startContinuousLocation）
@@ -105,20 +97,17 @@ class LocationService extends GetxService {
   /// 请求定位权限（处理首次拒绝和永久拒绝）
   Future<bool> requestPermission() async {
     final status = await Permission.location.status;
-    if (isDebug) {
-      LogUtil.d('当前定位权限状态: $status', tag: _tag);
-    }
+    LogUtil.d('当前定位权限状态: $status', tag: _tag);
     if (status.isGranted) return true;
 
     if (status.isDenied) {
       final result = await Permission.location.request();
+      LogUtil.d('定位权限请求结果: $result', tag: _tag);
       return result.isGranted;
     }
 
     if (status.isPermanentlyDenied) {
-      if (isDebug) {
-        LogUtil.w('定位权限永久被拒绝，请前往设置开启', tag: _tag);
-      }
+      LogUtil.w('定位权限永久被拒绝，请前往设置开启', tag: _tag);
       // 可在此处引导用户去设置页面
       return false;
     }
@@ -130,7 +119,11 @@ class LocationService extends GetxService {
   void _setupContinuousCallback() {
     _locationPlugin.seriesLocationCallback(
       callback: (BaiduLocation result) {
-        LogUtil.d('持续定位结果: $result', tag: _tag);
+        LogUtil.d(
+          '持续定位结果: locType=${result.locType}, errorCode=${result.errorCode}, '
+          'errorInfo=${result.errorInfo}, lat=${result.latitude}, lng=${result.longitude}',
+          tag: _tag,
+        );
         if (!_hasValidCoordinate(result)) return;
         _currentLocation.value = result;
         _saveLocation(result);
@@ -151,9 +144,7 @@ class LocationService extends GetxService {
       final granted = await requestPermission();
       _isAuthorized.value = granted;
       if (!granted) {
-        if (isDebug) {
-          LogUtil.w('未授权，无法启动持续定位', tag: _tag);
-        }
+        LogUtil.w('未授权，无法启动持续定位', tag: _tag);
         return;
       }
     }
@@ -162,9 +153,7 @@ class LocationService extends GetxService {
     await _locationPlugin.startLocation();
     _isContinuousLocating.value = true;
     _isLocating.value = true;
-    if (isDebug) {
-      LogUtil.d('持续定位已启动', tag: _tag);
-    }
+    LogUtil.d('持续定位已启动', tag: _tag);
   }
 
   /// 停止持续定位
@@ -172,9 +161,7 @@ class LocationService extends GetxService {
     await _locationPlugin.stopLocation();
     _isContinuousLocating.value = false;
     _isLocating.value = false;
-    if (isDebug) {
-      LogUtil.d('持续定位已停止', tag: _tag);
-    }
+    LogUtil.d('持续定位已停止', tag: _tag);
   }
 
   /// 单次定位
@@ -184,9 +171,7 @@ class LocationService extends GetxService {
     }
 
     if (!_isAuthorized.value) {
-      if (isDebug) {
-        LogUtil.w('未授权，无法获取位置', tag: _tag);
-      }
+      LogUtil.w('未授权，无法获取位置', tag: _tag);
       return null;
     }
     _isLocating.value = true;
@@ -195,9 +180,11 @@ class LocationService extends GetxService {
       final completer = Completer<BaiduLocation?>();
       _locationPlugin.singleLocationCallback(
         callback: (BaiduLocation result) {
-          if (isDebug) {
-            LogUtil.d('单次定位结果: $result', tag: _tag);
-          }
+          LogUtil.d(
+            '单次定位结果: locType=${result.locType}, errorCode=${result.errorCode}, '
+            'errorInfo=${result.errorInfo}, lat=${result.latitude}, lng=${result.longitude}',
+            tag: _tag,
+          );
           if (_hasValidCoordinate(result)) {
             _currentLocation.value = result;
             _saveLocation(result);
@@ -218,16 +205,12 @@ class LocationService extends GetxService {
       return await completer.future.timeout(
         const Duration(seconds: 10),
         onTimeout: () {
-          if (isDebug) {
-            LogUtil.w('单次定位超时', tag: _tag);
-          }
+          LogUtil.w('单次定位超时', tag: _tag);
           return null;
         },
       );
     } catch (e) {
-      if (isDebug) {
-        LogUtil.e('获取位置失败: $e', tag: _tag);
-      }
+      LogUtil.e('获取位置失败: $e', tag: _tag);
       return null;
     } finally {
       if (Platform.isAndroid) {
@@ -256,9 +239,7 @@ class LocationService extends GetxService {
     );
     await _locationPlugin.prepareLoc(
         androidOption.getMap(), iosOption.getMap());
-    if (isDebug) {
-      LogUtil.d('已设置定位参数: isContinuous=$isContinuous', tag: _tag);
-    }
+    LogUtil.d('已设置定位参数: isContinuous=$isContinuous', tag: _tag);
   }
 
   /// 保存位置到本地

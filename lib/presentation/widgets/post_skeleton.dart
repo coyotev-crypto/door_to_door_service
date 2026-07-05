@@ -26,33 +26,33 @@ class PostSkeleton extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 8.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 14.h,
+                  height: 10.h,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                 ),
-                SizedBox(height: 6.h),
+                SizedBox(height: 5.h),
                 Container(
-                  height: 14.h,
+                  height: 10.h,
                   width: 150.w,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 7.h),
                 Row(
                   children: [
-                    CircleAvatar(radius: 10.r, backgroundColor: Colors.grey[200]),
+                    CircleAvatar(radius: 8.r, backgroundColor: Colors.grey[200]),
                     SizedBox(width: 6.w),
                     Container(
-                      height: 10.h,
+                      height: 8.h,
                       width: 60.w,
                       decoration: BoxDecoration(
                         color: Colors.grey[200],

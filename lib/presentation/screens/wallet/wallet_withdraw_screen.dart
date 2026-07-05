@@ -76,6 +76,19 @@ class _WalletWithdrawBodyState extends State<_WalletWithdrawBody> {
         title: const Text('申请提现'),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: () => Get.toNamed(RouteNames.walletWithdrawals),
+            child: Text(
+              '提现记录',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.gold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Obx(
         () => ListView(

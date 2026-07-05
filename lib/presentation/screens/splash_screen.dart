@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dtd/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,17 +24,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await AuthService.instance.initialize();
-    // 检查登录状态
-    final isLoggedIn = AuthService.instance.isLoggedIn;
+    var isLoggedIn = false;
+    try {
+      await AuthService.instance.initialize().timeout(
+            const Duration(seconds: 5),
+          );
+      isLoggedIn = AuthService.instance.isLoggedIn;
+    } catch (e) {
+      LogUtil.e('启动认证初始化失败: $e', tag: 'SplashScreen');
+    }
+
+    if (!mounted) return;
 
     if (isLoggedIn) {
-      // 已登录，跳转到首页
-      await _loginOpenIMChat();
-      Get.toNamed(RouteNames.home);
+      Get.offAllNamed(RouteNames.home);
+      unawaited(_loginOpenIMChat());
     } else {
-      // 未登录，跳转到登录页
-      Get.toNamed(RouteNames.login);
+      Get.offAllNamed(RouteNames.login);
     }
   }
 

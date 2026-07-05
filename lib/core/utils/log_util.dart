@@ -2,6 +2,8 @@ import 'dart:developer' as developer;
 // 导入JSON编码器
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 /// 日志工具类
 class LogUtil {
   // 是否启用日志，生产环境可以设置为false
@@ -19,6 +21,7 @@ class LogUtil {
       name: logTag,
       time: DateTime.now(),
     );
+    debugPrint('[$logTag] $message');
   }
 
   /// 打印错误日志
@@ -34,6 +37,7 @@ class LogUtil {
       stackTrace: stackTrace,
       level: 1000, // error level
     );
+    debugPrint('[$logTag][ERROR] $message');
   }
 
   /// 打印警告日志
@@ -46,6 +50,7 @@ class LogUtil {
       time: DateTime.now(),
       level: 900, // warning level
     );
+    debugPrint('[$logTag][WARN] $message');
   }
 
   /// 打印信息日志
@@ -58,6 +63,7 @@ class LogUtil {
       time: DateTime.now(),
       level: 800, // info level
     );
+    debugPrint('[$logTag][INFO] $message');
   }
 
   /// 打印JSON格式数据
@@ -69,6 +75,7 @@ class LogUtil {
       name: logTag,
       time: DateTime.now(),
     );
+    debugPrint('[$logTag] $message');
   }
 
   /// 打印网络请求

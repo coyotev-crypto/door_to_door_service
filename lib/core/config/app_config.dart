@@ -13,7 +13,8 @@ class AppConfig {
   /// API基础URL
   /// 开发环境: http://localhost:8080
   /// 生产环境: 请修改为实际的生产环境地址
-  static String get baseUrl => 'http://$_host:8000';
+  static String get baseUrl => 'https://plated-raven-atypical.ngrok-free.dev';
+  // static String get baseUrl => 'http://$_host:8000';
   // 前端地址，用于构建一些需要前端URL的接口，如支付回调等
   static String get webUrl => 'http://$_host:8080';
   static String get baseApiUrl => '$baseUrl/api/v1';

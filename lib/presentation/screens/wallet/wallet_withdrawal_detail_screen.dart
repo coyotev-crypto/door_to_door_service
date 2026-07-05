@@ -64,7 +64,7 @@ class _WalletWithdrawalDetailScreenState
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    item.status == 'completed' ? '提现金额已到账' : '提现申请处理中',
+                    _statusDescription(item.status),
                     style: TextStyle(
                         fontSize: 13.sp, color: AppTheme.textSecondary),
                   ),
@@ -123,5 +123,22 @@ class _WalletWithdrawalDetailScreenState
         ],
       ),
     );
+  }
+
+  String _statusDescription(String status) {
+    switch (status) {
+      case 'pending':
+        return '提现申请等待审核';
+      case 'processing':
+        return '提现申请处理中';
+      case 'success':
+        return '提现金额已到账';
+      case 'failed':
+        return '提现处理失败';
+      case 'rejected':
+        return '提现申请已驳回';
+      default:
+        return '提现申请处理中';
+    }
   }
 }

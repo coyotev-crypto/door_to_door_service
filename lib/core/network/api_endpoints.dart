@@ -8,8 +8,8 @@ class ApiEndpoints {
   static const String payment = '/payment?orderNo=';
   static const String wallet = '/wallet';
   static const String walletTransactions = '/wallet/transactions';
-  static const String walletWithdraw = '/wallet/withdraw';
   static const String walletWithdrawals = '/wallet/withdrawals';
+  static const String walletWithdraw = walletWithdrawals;
   static const String walletWithdrawalDetail = '/wallet/withdrawals/{id}';
   static const String commissionRate = '/admin/commission/rate';
   static const String paymentAccounts = '/wallet/accounts';

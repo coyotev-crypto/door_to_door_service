@@ -207,8 +207,8 @@ class AccountSecurityController extends GetxController {
         newPassword: setLoginPasswordController.text,
       );
       ToastUtil.showSuccess('密码设置成功');
-      await _loginOpenIMChat();
       Get.offAllNamed(RouteNames.home);
+      unawaited(_loginOpenIMChat());
       return true;
     } catch (e) {
       ToastUtil.showError(e.toString().replaceAll('Exception: ', ''));
@@ -225,7 +225,9 @@ class AccountSecurityController extends GetxController {
       final chatService = Get.isRegistered<OpenIMChatService>()
           ? OpenIMChatService.to
           : Get.put(OpenIMChatService(), permanent: true);
-      await chatService.loginWithBackendToken();
+      await chatService.loginWithBackendToken().timeout(
+            const Duration(seconds: 8),
+          );
     } catch (e) {
       LogUtil.e('OpenIM Chat登录失败: $e', tag: 'AccountSecurityController');
     }

@@ -22,6 +22,7 @@ class RouteNames {
    static const String wallet = '/wallet';
    static const String walletWithdraw = '/wallet/withdraw';
    static const String walletTransactions = '/wallet/transactions';
+   static const String walletWithdrawals = '/wallet/withdrawals';
    static const String walletWithdrawalDetail = '/wallet/withdrawals/:id';
    static const String paymentAccount = '/wallet/payment-account';
    static const String bindAlipay = '/wallet/bind-alipay';

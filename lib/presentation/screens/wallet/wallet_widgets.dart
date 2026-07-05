@@ -20,21 +20,31 @@ String fullDate(DateTime? value) {
 
 String statusText(String status) {
   switch (status) {
-    case 'completed':
-      return '已完成';
-    case 'rejected':
-      return '已拒绝';
-    default:
+    case 'pending':
+      return '待审核';
+    case 'processing':
       return '处理中';
+    case 'success':
+      return '已成功';
+    case 'failed':
+      return '已失败';
+    case 'rejected':
+      return '已驳回';
+    default:
+      return status;
   }
 }
 
 Color statusColor(String status) {
   switch (status) {
-    case 'completed':
+    case 'success':
       return const Color(0xFF4CAF50);
+    case 'failed':
     case 'rejected':
       return AppTheme.danger;
+    case 'pending':
+      return AppTheme.gold;
+    case 'processing':
     default:
       return AppTheme.amber;
   }

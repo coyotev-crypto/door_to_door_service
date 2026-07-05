@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../core/services/location_service.dart';
 import '../routes/app_pages.dart';
 import '../core/themes/app_theme.dart';
 import '../core/utils/screen_adapter.dart';
@@ -26,11 +25,6 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.system,
           initialRoute: AppPages.initial,
-          initialBinding: BindingsBuilder(() {
-            if (!Get.isRegistered<LocationService>()) {
-              Get.put(LocationService(), permanent: true);
-            }
-          }),
           getPages: AppPages.routes,
           navigatorKey: navigatorKey,
           builder: (context, child) {
