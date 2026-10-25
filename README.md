@@ -1,19 +1,137 @@
 # door_to_door_service
 
-A new Flutter project.
+一个基于 Flutter 开发的预约服务 App，主要面向门到门 / 上门服务场景，支持用户预约下单、服务人员接单、订单跟踪、在线沟通与交易流水管理等功能。
 
-## Getting Started
+> **重要声明：本项目禁止商用。**  
+> **Commercial use of this project is strictly prohibited.**
 
-This project is a starting point for a Flutter application.
+## 项目简介
 
-A few resources to get you started if this is your first Flutter project:
+`door_to_door_service` 是一个预约服务类移动应用。用户可以在首页浏览服务并快速下单，填写服务地址与预约信息；服务人员可查看接单列表并接单；双方可通过消息与聊天功能沟通；订单完成后可查看订单详情与交易流水。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+本项目主要用于学习、研究、技术交流和非商业用途。未经作者书面许可，任何人或组织不得将本项目用于任何商业目的。
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 功能特性
 
-模拟定位：
-adb -s emulator-5554 emu geo fix 104.0668 30.5728
+| 模块 | 功能说明 |
+| --- | --- |
+| 首页 | 服务入口、推荐服务、快捷下单、平台信息展示 |
+| 下单 | 选择服务、填写地址、预约时间、服务需求并提交订单 |
+| 动态 | 浏览平台公告、服务动态、用户动态等内容 |
+| 地址管理 | 新增、编辑、删除服务地址，设置默认地址 |
+| 消息 | 系统通知、订单消息、互动消息等消息列表 |
+| 聊天 | 用户与服务人员在线沟通、订单相关会话 |
+| 订单 | 订单列表、状态筛选、订单操作与进度查看 |
+| 订单详情 | 查看订单信息、服务状态、费用明细、操作入口 |
+| 接单列表 | 服务人员查看可接订单、接单/抢单 |
+| 交易流水 | 查看收入、支出、订单交易记录与明细 |
+
+## 技术栈
+
+- Flutter
+- Dart
+- Material Design
+- 网络请求与本地存储：根据项目实际依赖配置
+- 状态管理：根据项目实际架构配置
+
+## 快速开始
+
+### 环境要求
+
+- 已安装 Flutter SDK
+- 已配置 Android Studio / Xcode 或对应开发环境
+- 已连接模拟器或真机
+
+### 安装依赖
+
+```bash
+flutter pub get
+
+运行项目
+bash
+flutter run
+构建应用
+Android：
+
+bash
+flutter build apk
+iOS：
+
+bash
+flutter build ios
+项目结构
+项目结构可根据实际开发情况调整，建议按功能模块组织，例如：
+
+text
+lib/
+├── main.dart
+├── pages/
+│   ├── home/
+│   ├── order/
+│   ├── order_detail/
+│   ├── address/
+│   ├── message/
+│   ├── chat/
+│   ├── accept_order/
+│   └── transaction/
+├── models/
+├── services/
+├── widgets/
+└── utils/
+开发说明
+首页、下单、订单、订单详情构成核心预约流程。
+
+接单列表面向服务人员，用于查看和接收订单。
+
+消息与聊天用于订单沟通和系统通知。
+
+地址管理为下单流程提供地址选择与维护能力。
+
+交易流水用于记录订单相关资金变动。
+
+使用限制
+本项目仅允许用于个人学习、研究、技术交流和非商业演示，并需保留项目中的版权声明和许可声明。
+
+禁止任何形式的商业使用，包括但不限于：
+
+将本项目或修改后的代码用于商业产品或商业服务；
+
+销售、出租、许可、分发本项目以获取商业利益；
+
+将本项目集成到收费产品、收费平台或收费服务中；
+
+使用本项目进行广告变现、流量变现或其他商业变现；
+
+在企业内部商业运营、商业项目交付或外包项目中使用；
+
+移除、修改或隐藏本项目中的版权声明、许可声明或作者标识；
+
+以其他直接或间接方式将本项目用于盈利目的。
+
+如需商业使用，必须事先取得项目作者的书面授权。未经书面授权，任何商业使用行为均被禁止。
+
+免责声明
+本项目按“现状”提供，作者不对项目的完整性、稳定性、适用性或安全性作出任何明示或暗示的保证。因使用或无法使用本项目所产生的任何直接或间接损失，作者不承担任何责任。
+
+使用者应自行确保其使用行为符合所在地法律法规及本项目许可要求。
+
+相关资源
+Flutter 官方文档
+
+Flutter 入门教程
+
+Flutter Cookbook
+
+贡献
+欢迎提交 Issue 或 Pull Request 参与项目改进。提交贡献即表示你同意相关内容可在本项目非商业许可范围内使用。
+
+许可证
+本项目采用自定义非商业许可证。
+
+Copyright © door_to_door_service 作者。保留所有权利。
+
+允许：个人学习、研究、技术交流、非商业演示。
+
+禁止：任何形式的商业使用。
+
+商业授权：需联系项目作者。

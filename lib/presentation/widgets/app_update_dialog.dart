@@ -41,23 +41,44 @@ class AppUpdateDialog extends StatelessWidget {
         backgroundColor: Colors.white,
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.72,
+            maxWidth: 360.w,
+            maxHeight: MediaQuery.of(context).size.height * 0.52,
           ),
           child: Padding(
             padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Header(result: result, accent: accent),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _Header(result: result, accent: accent),
+                        SizedBox(height: 16.h),
+                        _VersionMeta(result: result),
+                        SizedBox(height: 16.h),
+                        _ReleaseNotes(notes: result.releaseNotes),
+                      ],
+                    ),
+                  ),
+                ),
                 SizedBox(height: 16.h),
-                _VersionMeta(result: result),
+                Obx(
+                  () => _DownloadStatus(
+                    state: service.downloadState.value,
+                    progress: service.downloadProgress.value,
+                    errorMessage: service.errorMessage.value,
+                  ),
+                ),
                 SizedBox(height: 16.h),
-                _ReleaseNotes(notes: result.releaseNotes),
-                SizedBox(height: 16.h),
-                Obx(() => _DownloadStatus(service: service)),
-                SizedBox(height: 16.h),
-                Obx(() => _Actions(result: result, service: service)),
+                Obx(
+                  () => _Actions(
+                    result: result,
+                    service: service,
+                    state: service.downloadState.value,
+                  ),
+                ),
               ],
             ),
           ),
@@ -219,58 +240,58 @@ class _ReleaseNotes extends StatelessWidget {
     final content = notes?.trim().isNotEmpty == true
         ? notes!.trim()
         : '本次更新包含体验优化和问题修复';
-    return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '更新内容',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '更新内容',
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: AppTheme.creamFill,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Text(
+            content,
             style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              fontSize: 13.sp,
+              height: 1.45,
+              color: AppTheme.textSecondary,
             ),
           ),
-          SizedBox(height: 8.h),
-          Container(
-            constraints: BoxConstraints(maxHeight: 190.h),
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: AppTheme.creamFill,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: SingleChildScrollView(
-              child: Text(
-                content,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  height: 1.45,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 class _DownloadStatus extends StatelessWidget {
-  final AppUpdateService service;
+  final AppUpdateDownloadState state;
+  final double progress;
+  final String errorMessage;
 
-  const _DownloadStatus({required this.service});
+  const _DownloadStatus({
+    required this.state,
+    required this.progress,
+    required this.errorMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final state = service.downloadState.value;
     if (state == AppUpdateDownloadState.idle) {
       return const SizedBox.shrink();
     }
     if (state == AppUpdateDownloadState.failed) {
       return Text(
-        service.errorMessage.value.isNotEmpty
-            ? service.errorMessage.value
+        errorMessage.isNotEmpty
+            ? errorMessage
             : '下载失败，请检查网络后重试',
         style: TextStyle(
           fontSize: 12.sp,
@@ -280,7 +301,6 @@ class _DownloadStatus extends StatelessWidget {
       );
     }
 
-    final progress = service.downloadProgress.value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,12 +328,16 @@ class _DownloadStatus extends StatelessWidget {
 class _Actions extends StatelessWidget {
   final AppVersionCheckResult result;
   final AppUpdateService service;
+  final AppUpdateDownloadState state;
 
-  const _Actions({required this.result, required this.service});
+  const _Actions({
+    required this.result,
+    required this.service,
+    required this.state,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final state = service.downloadState.value;
     final downloading = state == AppUpdateDownloadState.downloading;
     final completed = state == AppUpdateDownloadState.completed;
     final failed = state == AppUpdateDownloadState.failed;

@@ -28,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen>
   late final HomeController _controller;
   final Map<int, Widget> _pageCache = <int, Widget>{};
   final Set<int> _loadedPages = <int>{0}; // 记录已加载的页面索引，默认加载首页
+  bool _isCheckingAppUpdate = false;
+  bool _hasCheckedAppUpdateOnEnter = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -38,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.addObserver(this);
     _controller = Get.find<HomeController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAppUpdate();
+      _checkAppUpdate(force: true);
     });
   }
 
@@ -55,10 +57,22 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<void> _checkAppUpdate() async {
-    final result = await AppUpdateService.instance.checkForUpdate();
-    if (!mounted || result == null || !result.hasUpdate) return;
-    await AppUpdateDialog.show(result);
+  Future<void> _checkAppUpdate({bool force = false}) async {
+    if (_isCheckingAppUpdate) return;
+    if (force && _hasCheckedAppUpdateOnEnter) return;
+
+    _isCheckingAppUpdate = true;
+    if (force) _hasCheckedAppUpdateOnEnter = true;
+    try {
+      LogUtil.d('开始检查版本更新: force=$force', tag: 'HomeScreen');
+      final result = await AppUpdateService.instance.checkForUpdate(
+        manual: force,
+      );
+      if (!mounted || result == null || !result.hasUpdate) return;
+      await AppUpdateDialog.show(result);
+    } finally {
+      _isCheckingAppUpdate = false;
+    }
   }
 
   Widget _buildPageByIndex(int index) {
